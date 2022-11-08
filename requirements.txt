@@ -1,5 +1,5 @@
-pandas==1.4.4
-tableaudocumentapi==0.10
+pandas==1.5.1
+tableaudocumentapi==0.11
 easygui==0.98.3
-numpy==1.20.3
-pydotplus==2.0.2
+numpy==1.23.4
+pydot==1.4.2
