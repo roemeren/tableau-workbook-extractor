@@ -133,5 +133,5 @@ df = df[colKeep]
 print("Saving table result in " + outFilePath + "...")
 if not os.path.isdir(outFileDirectory):
     os.makedirs(outFileDirectory)
-df.to_csv(path_or_buf = outFilePath, index = False)
+df.to_csv(path_or_buf = outFilePath, index = False, sep = ',')
 input("Done! Press Enter to continue...")
