@@ -128,7 +128,7 @@ def replaceParamReference(x):
 
 # https://graphviz.org/docs/nodes/
 # https://github.com/pydot/pydot/blob/master/src/pydot/core.py
-def visualizeDependencies(df, sf, g, din):
+def visualizeDependencies(df, sf, g, fin):
     s = sf.split(".")[0]
     f = sf.split(".")[1]
     dictBackward = \
@@ -164,7 +164,7 @@ def visualizeDependencies(df, sf, g, din):
         # create output graphs folder  if it doesn't exist yet
         sout = re.sub('[^A-Za-z0-9]+', '', s[1:-1])
         fout = re.sub('[^A-Za-z0-9]+', '', f[1:-1])
-        dout = "{0}\\graphs\\{1}\\".format(din, sout)
+        dout = "{0} Files\\Graphs\\{1}\\".format(fin, sout)
 
         if not os.path.isdir(dout):
             os.makedirs(dout)

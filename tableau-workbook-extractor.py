@@ -2,15 +2,15 @@ from twefunctions import *
 
 # prompt user for twb file and extract file/directory names
 print("Prompt for input Tableau workbook...")
-inpFile = easygui.fileopenbox(filetypes = ['*.twb'])
-inpFileDirectory = os.path.dirname(inpFile)
-inpFileName = os.path.splitext(os.path.basename(inpFile))[0]
-outFile = inpFileDirectory + '\\' + inpFileName + '.csv'
+inpFilePath = easygui.fileopenbox(default = "*.twb*")
+inpFileName = os.path.splitext(os.path.basename(inpFilePath))[0]
+outFilePath = inpFilePath + ' Files\\Fields\\' + inpFileName + '.csv'
+outFileDirectory = os.path.dirname(outFilePath)
 
 # initial data frame with nested data source and field objects
 print("Extract data sources and fields from workbook...")
 with suppress_stdout():
-    inpTwb = Workbook(inpFile)
+    inpTwb = Workbook(inpFilePath)
 df1 = pd.DataFrame(inpTwb.datasources, columns = ["data_source"])
 df1["fields"] = df1.apply(lambda x: \
     list(x.data_source.fields.values()), axis = 1)
@@ -86,6 +86,12 @@ df["field_backward_dependencies"] = \
 df["field_forward_dependencies"] = \
     df["source_field_label"].apply(lambda x: getForwardDependencies(df, x))
 
+# flag fields with no dependencies and/or linked sheets
+df["field_flagged"] = df.apply(lambda x: \
+    np.where((len(x.field_backward_dependencies) == 0) & \
+        (len(x.field_forward_dependencies) == 0) & \
+            (len(x.field_worksheets) == 0), 1, 0), axis = 1)
+
 print("Creating graphs...")
 # Create master node graph
 colors = {"Parameter": "#cbc3e3", "Field": "green", "Calculated Field": "orange"}
@@ -114,7 +120,7 @@ df["field_forward_dependencies_temp"] = \
 # create dependency graphs per field
 df["field_dependencies_file"] = df.apply(lambda x: \
     visualizeDependencies(df, x.source_field_label, 
-    gMaster, inpFileDirectory), axis = 1)
+    gMaster, inpFilePath), axis = 1)
 
 # remove intermediate results
 colRemove = ["data_source", "fields", "variable", "value", \
@@ -124,6 +130,8 @@ colKeep = [x for x in df.columns if x not in colRemove]
 df = df[colKeep]
 
 # store results and finish
-print("Saving table result in " + outFile + "...")
-df.to_csv(path_or_buf = outFile, index = False)
+print("Saving table result in " + outFilePath + "...")
+if not os.path.isdir(outFileDirectory):
+    os.makedirs(outFileDirectory)
+df.to_csv(path_or_buf = outFilePath, index = False)
 input("Done! Press Enter to continue...")
