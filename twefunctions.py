@@ -168,7 +168,7 @@ def visualizeDependencies(df, sf, g, din):
 
         if not os.path.isdir(dout):
             os.makedirs(dout)
-        outFile = "{0}{1}-{2}.jpeg".format(dout, sout, fout)
+        outFile = "{0}{1}-{2}.png".format(dout, sout, fout)
         print("Writing file {0}".format(outFile))
-        G.write_jpeg(outFile)
+        G.write_png(outFile)
         return outFile
