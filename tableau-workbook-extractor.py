@@ -29,8 +29,8 @@ df = pd.melt(df, id_vars = colId, value_vars = colVal)
 df = df[df["value"].notnull()]
 
 # extract field attributes
-fieldAttr = ["id", "caption", "datatype", "role", "type", "alias", \
-    "calculation", "description", "hidden"]
+fieldAttr = ["id", "caption", "datatype", "role", "type", "alias", "aliases", \
+    "calculation", "description", "hidden", "worksheets"]
 for attr in fieldAttr:
     df["field_" + attr] = df.apply(lambda x: getattr(x.value, attr) , axis = 1)
 
