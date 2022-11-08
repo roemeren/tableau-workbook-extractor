@@ -46,11 +46,11 @@ dictMapping = fieldCalculationMappingTable(df, "data_source_name", \
 
 # create cleaned copy of field calculations
 # replace na by empty string otherwise errors due to NaN
-df["field_calculation_corr"] = df.apply(lambda x: \
+df["field_calculation_cleaned"] = df.apply(lambda x: \
     fieldCalculationClean(x.field_calculation, x.data_source_name), axis = 1)
 
 # apply field mappings to calculations
-df["field_calculation_corr"] = df["field_calculation_corr"].apply(lambda x: \
+df["field_calculation_cleaned"] = df["field_calculation_cleaned"].apply(lambda x: \
     fieldCalculationMapping(dictMapping, x))
 
 # merge field and data source name fields
@@ -72,7 +72,7 @@ lstFields = list(dict.fromkeys(list(df["source_field_label"])))
 
 # get list of field dependencies
 df["field_calculation_dependencies"] = \
-    df["field_calculation_corr"].apply(lambda x: \
+    df["field_calculation_cleaned"].apply(lambda x: \
         fieldCalculationDependencies(lstFields, x))
 
 # calculate type of field
@@ -118,7 +118,8 @@ df["field_dependencies_file"] = df.apply(lambda x: \
 
 # remove intermediate results
 colRemove = ["data_source", "fields", "variable", "value", \
-    "field_backward_dependencies_temp", "field_forward_dependencies_temp"]
+    "field_backward_dependencies_temp", "field_forward_dependencies_temp", 
+    "field_is_param_duplicate"]
 colKeep = [x for x in df.columns if x not in colRemove]
 df = df[colKeep]
 
