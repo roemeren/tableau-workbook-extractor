@@ -1,7 +1,4 @@
 from twefunctions import *
-import easygui
-from tableaudocumentapi import Workbook
-import pandas as pd
 
 # prompt user for twb file and extract file/directory names
 print("Prompt for input Tableau workbook...")
@@ -80,7 +77,7 @@ df["field_calculation_dependencies"] = \
 
 # calculate type of field
 df["field_category"] = df.apply(lambda x: \
-    fieldCategory(x.field_label, x.field_calculation_dependencies), axis = 1)
+    fieldCategory(x.source_field_label, x.field_calculation_dependencies), axis = 1)
 
 # expand dependencies to full lists of backward and forward dependencies
 df["field_backward_dependencies"] = \
@@ -88,12 +85,37 @@ df["field_backward_dependencies"] = \
 df["field_forward_dependencies"] = \
     df["source_field_label"].apply(lambda x: getForwardDependencies(df, x))
 
+print("Creating graphs...")
+# Create master node graph
+colors = {"Parameter": "#cbc3e3", "Field": "green", "Calculated Field": "orange"}
+shapes = {"Parameter": "parallelogram", "Field": "box", "Calculated Field": "oval"}
+nodes = df.apply(lambda x: addNode(x.source_field_label, x.field_category, shapes, colors), axis = 1)
+lstNodes = []
+for node in nodes: lstNodes += node
+gMaster = pydot.Dot()
+for node in lstNodes: gMaster.add_node(node)
+
+# final clean-up of backward and forward dependencies
+df["field_backward_dependencies"] = df.apply(lambda x: 
+                                             replaceSourceReference(x.field_backward_dependencies, x.source_label), axis = 1)
+df["field_forward_dependencies"] = df.apply(lambda x: 
+                                             replaceSourceReference(x.field_forward_dependencies, x.source_label), axis = 1)
+
+# calculate temporary version with parameter source references removed
+df["field_backward_dependencies_temp"] = df["field_backward_dependencies"].apply(lambda x: replaceParamReference(x))
+df["field_forward_dependencies_temp"] = df["field_forward_dependencies"].apply(lambda x: replaceParamReference(x))
+
+# create dependency graphs per field
+df["field_dependencies_file"] = df.apply(lambda x: \
+    visualizeDependencies(df, x.source_field_label, gMaster, inpFileDirectory), axis = 1)
+
 # remove intermediate results
-colRemove = ["data_source", "fields", "variable", "value"]
+colRemove = ["data_source", "fields", "variable", "value", \
+    "field_backward_dependencies_temp", "field_forward_dependencies_temp"]
 colKeep = [x for x in df.columns if x not in colRemove]
 df = df[colKeep]
 
 # store results and finish
-print("Saving results in " + outFile + "...")
+print("Saving table result in " + outFile + "...")
 df.to_csv(path_or_buf = outFile, index = False)
 input("Done! Press Enter to continue...")
