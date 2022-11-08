@@ -77,7 +77,8 @@ df["field_calculation_dependencies"] = \
 
 # calculate type of field
 df["field_category"] = df.apply(lambda x: \
-    fieldCategory(x.source_field_label, x.field_calculation_dependencies), axis = 1)
+    fieldCategory(x.source_field_label, 
+    x.field_calculation_dependencies), axis = 1)
 
 # expand dependencies to full lists of backward and forward dependencies
 df["field_backward_dependencies"] = \
@@ -89,25 +90,31 @@ print("Creating graphs...")
 # Create master node graph
 colors = {"Parameter": "#cbc3e3", "Field": "green", "Calculated Field": "orange"}
 shapes = {"Parameter": "parallelogram", "Field": "box", "Calculated Field": "oval"}
-nodes = df.apply(lambda x: addNode(x.source_field_label, x.field_category, shapes, colors), axis = 1)
+nodes = df.apply(lambda x: \
+    addNode(x.source_field_label, x.field_category, shapes, colors), axis = 1)
 lstNodes = []
 for node in nodes: lstNodes += node
 gMaster = pydot.Dot()
 for node in lstNodes: gMaster.add_node(node)
 
 # final clean-up of backward and forward dependencies
-df["field_backward_dependencies"] = df.apply(lambda x: 
-                                             replaceSourceReference(x.field_backward_dependencies, x.source_label), axis = 1)
-df["field_forward_dependencies"] = df.apply(lambda x: 
-                                             replaceSourceReference(x.field_forward_dependencies, x.source_label), axis = 1)
+df["field_backward_dependencies"] = df.apply(lambda x: \
+    replaceSourceReference(x.field_backward_dependencies, 
+    x.source_label), axis = 1)
+df["field_forward_dependencies"] = df.apply(lambda x: \
+    replaceSourceReference(x.field_forward_dependencies, 
+    x.source_label), axis = 1)
 
 # calculate temporary version with parameter source references removed
-df["field_backward_dependencies_temp"] = df["field_backward_dependencies"].apply(lambda x: replaceParamReference(x))
-df["field_forward_dependencies_temp"] = df["field_forward_dependencies"].apply(lambda x: replaceParamReference(x))
+df["field_backward_dependencies_temp"] = \
+    df["field_backward_dependencies"].apply(lambda x: replaceParamReference(x))
+df["field_forward_dependencies_temp"] = \
+    df["field_forward_dependencies"].apply(lambda x: replaceParamReference(x))
 
 # create dependency graphs per field
 df["field_dependencies_file"] = df.apply(lambda x: \
-    visualizeDependencies(df, x.source_field_label, gMaster, inpFileDirectory), axis = 1)
+    visualizeDependencies(df, x.source_field_label, 
+    gMaster, inpFileDirectory), axis = 1)
 
 # remove intermediate results
 colRemove = ["data_source", "fields", "variable", "value", \

@@ -110,8 +110,10 @@ def getForwardDependencies(df, f, level = 0, p = None):
 def addNode(sf, cat, shapes, colors):
     s = sf.split(".")[0]
     f = sf.split(".")[1]
-    node1 = pydot.Node(name = f, shape = shapes[cat], fillcolor = colors[cat], style = "filled")
-    node2 = pydot.Node(name = sf, shape = shapes[cat], fillcolor = colors[cat], style = "filled")
+    node1 = pydot.Node(name = f, shape = shapes[cat], \
+        fillcolor = colors[cat], style = "filled")
+    node2 = pydot.Node(name = sf, shape = shapes[cat], \
+        fillcolor = colors[cat], style = "filled")
     return [node1, node2]
 
 # d: dictionary of dependencies (formatted as string)
@@ -129,9 +131,14 @@ def replaceParamReference(x):
 def visualizeDependencies(df, sf, g, din):
     s = sf.split(".")[0]
     f = sf.split(".")[1]
-    dictBackward = list(df[df.source_field_label == sf]["field_backward_dependencies_temp"])
-    dictBackward = [json.loads(idx.replace("'", '"')) for idx in dictBackward][0]
-    dictForward = list(df[df.source_field_label == sf]["field_forward_dependencies_temp"])
+    dictBackward = \
+        list(df[df.source_field_label == sf]\
+            ["field_backward_dependencies_temp"])
+    dictBackward = [json.loads(idx.replace("'", '"')) \
+        for idx in dictBackward][0]
+    dictForward = \
+        list(df[df.source_field_label == sf]\
+            ["field_forward_dependencies_temp"])
     dictForward = [json.loads(idx.replace("'", '"')) for idx in dictForward][0]
     dictDependency = dictBackward + dictForward
     # only generate graph if there are dependencies
