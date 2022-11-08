@@ -64,25 +64,25 @@ def fieldCategory(s, d):
     else: return "Calculated Field"
 
 # recursively get all backward dependencies of a field
-def getBackwardDependencies(df, f, level = 0):
+def getBackwardDependencies(df, f, level = 0, p = None):
     x = df.loc[df.source_field_label == f]
     depList = list(x.field_calculation_dependencies)
     cat = list(x.field_category)[0]
     lst = []
     
     # add dependency
-    if level > 0: lst += [{"dependency": f, \
+    if level > 0: lst += [{"child": f, "parent": p, \
         "level": "-{0}".format(level), "category": cat}]
     
     # add dependencies of dependency
     if len(depList) > 0:
         # remove reference by copying the list
         for y in depList[0].copy():
-            lst += getBackwardDependencies(df, y, level + 1)
+            lst += getBackwardDependencies(df, y, level + 1, f)
     return lst
 
 # recursively get all forward dependencies of a field
-def getForwardDependencies(df, f, level = 0):
+def getForwardDependencies(df, f, level = 0, c = None):
     x = df.loc[df.source_field_label == f]
     depList = df.apply(lambda z: \
         f in z.field_calculation_dependencies, axis = 1)
@@ -91,12 +91,12 @@ def getForwardDependencies(df, f, level = 0):
     lst = []
     
     # add dependency
-    if level > 0: lst += [{"dependency": f, \
+    if level > 0: lst += [{"child": c, "parent": f, \
         "level": "+{0}".format(level), "category": cat}]
     
     # add dependencies of dependency
     if len(depList) > 0:
         # remove reference by copying the list
         for y in depList.copy(): 
-            lst += getForwardDependencies(df, y, level + 1)
+            lst += getForwardDependencies(df, y, level + 1, f)
     return lst
