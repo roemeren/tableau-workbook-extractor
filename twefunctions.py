@@ -6,6 +6,8 @@ import json
 import copy
 import pydot
 import logging
+import random
+import string
 
 # suppress console output when workbook is opened
 # source: http://thesmithfam.org/blog/2012/10/25/temporarily-suppress-console-output-in-python/
@@ -19,12 +21,30 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
-def step_log(message, *args, **kwargs):
-  logging.info(" STEP %d: " % step_log.counter + message, *args, **kwargs)
-  step_log.counter += 1
+def stepLog(message, *args, **kwargs):
+  logging.info(" STEP %d: " % stepLog.counter + message, *args, **kwargs)
+  stepLog.counter += 1
+
+def getRandomBaseID(c):
+    """
+    Generate a random sequence of 10 lower case letters that will serve as a 
+    base for a generated field ID field
+
+    Args:
+        c: list of unique field calculations
+    
+    Returns:
+        Random sequence of 10 lower case letters that can be used as a basis 
+        for an ID field
+    """
+    flagSucceed = False
+    while not flagSucceed:
+        res = ''.join(random.choice(string.ascii_lowercase) for x in range(10))
+        flagSucceed = not any(res in s for s in c)
+    return res
 
 # dictionary of [source ID].[field ID] -> [source caption].[label caption]
-def fieldCalculationMappingTable(df, colFromSource, \
+def sourceFieldIDToLabelMappingTable(df, colFromSource, \
     colToSource, colFromField, colToField):
     dfRes = df.copy()
     # original [source].[field]
@@ -40,33 +60,74 @@ def fieldCalculationMappingTable(df, colFromSource, \
     dictRes = dict(arrRes[1:]) 
     return dictRes
 
-def fieldCalculationClean(x, s):
+def sourceFieldMappingTable(df, colFrom, colTo):
+    dfRes = df.copy()
+    dfRes = dfRes[[colFrom, colTo]]
+    dfRes.columns = ["from", "to"]
+    arrRes = np.array(dfRes)
+    # dict conversion automatically deduplicates mappings
+    dictRes = dict(arrRes[1:]) 
+    return dictRes
+
+def fieldCalculationRemoveComments(x):
     """
-    Clean up a Tableau calculation expression by removing 
-    all comments and include the source name for each field.
+    Removes comments from a field calculation
 
     Args:
         x: Calculation string
-        s: Source name
 
     Returns:
-        Cleaned calculation string
+        Calculation string without comments
     """
-    # pattern: //...\n -> ''
     res = re.sub(r"\/{2}.*\n", '', x)
-    # pattern: ([field] + not .) -> [source].[field]
-    res = re.sub(r"(\[.*\])([^.])", "[" + s + r"].\1" + r"\2", res)
-    # pattern: (not . + [field]) -> [source].[field]
-    res = re.sub(r"([^.])(\[.*\])", r"\1" + "[" + s + r"].\2", res)
     return res
 
-# apply a set of replacements to a string
-# note: the mapping (field_id -> field_caption) appears to be unique
-# (renaming in Tableau is reverted automatically when reopening the workbook)
-def fieldCalculationMapping(d, x):
+def fieldCalculationMapping(c, d, s, l):
+    """
+    Replace all external and internal field references by unique
+    source/field IDs
+
+    Args:
+        c: Source field calculation string
+        d: Dictionary of source field -> source field ID mappings
+        s: Source field source name
+        l: List of unique field names
+
+    Returns:
+        Calculation string without comments
+    """
+    # map external [source].[field] combinations to id
+    res = c
+    for key in d: res = res.replace(key, d.get(key))
+    # add [source]. to internal [field]
+    for fld in l: res = res.replace(fld, "{0}.{1}".format(s, fld))
+    # finally add external [source].[field] combinations again
+    for key in d: res = res.replace(d.get(key), key)
+    return res
+
+def fieldCalculationMapping2(d, x):
     res = x
     for key in d: res = res.replace(key, d.get(key))
     return res
+
+
+def processCaptions(i, c):
+    """
+    Process captions to the format in which they are used in calculations
+
+    Args:
+        i: Source or field ID value
+        x: Source or field caption value
+
+    Returns:
+        Processed caption enclosed in square brackets + any additional
+        right square brackets doubled
+    """
+    if c == '':
+        return i
+    else:
+        # right brackets are doubled in calculations
+        return "[{0}]".format(c.replace("]", "]]"))
 
 # list direct dependencies in a calculation x based on a list l
 def fieldCalculationDependencies(l, x):

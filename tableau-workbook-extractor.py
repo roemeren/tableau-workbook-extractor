@@ -6,21 +6,21 @@ import warnings
 from tqdm import tqdm
 
 # ignore future warnings when reading field attributes (not applicable)
-warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action = 'ignore', category = FutureWarning)
 
 # logging config
 logging.basicConfig(level = logging.DEBUG)
-step_log.counter = 1
+stepLog.counter = 1
 
 # prompt user for twb file and extract file/directory names
-step_log("Prompt for input Tableau workbook...")
+stepLog("Prompt for input Tableau workbook...")
 inpFilePath = easygui.fileopenbox(default = "*.twb*")
 inpFileName = os.path.splitext(os.path.basename(inpFilePath))[0]
 outFilePath = inpFilePath + ' Files\\Fields\\' + inpFileName + '.csv'
 outFileDirectory = os.path.dirname(outFilePath)
 
 # initial data frame with nested data source and field objects
-step_log("Extract data sources and fields from workbook...")
+stepLog("Extract data sources and fields from workbook...")
 with suppress_stdout():
     inpTwb = Workbook(inpFilePath)
 df1 = pd.DataFrame(inpTwb.datasources, columns = ["data_source"])
@@ -52,27 +52,38 @@ df[["data_source_caption", "field_caption", "field_calculation"]] = \
     df[["data_source_caption", "field_caption",
      "field_calculation"]].fillna('')
 
-# create data sources & fields mapping dictionary
-dictMapping = fieldCalculationMappingTable(df, "data_source_name", \
-    "data_source_caption", "field_id", "field_caption")
+# add a randomly generated ID field for each unique field
+uniqueCalcs = list(df["field_calculation"].unique())
+baseID = getRandomBaseID(uniqueCalcs)
+df["field_sfid"] = "[" + baseID + df.index.astype(str) + "]"
 
-# create cleaned copy of field calculations
-# replace na by empty string otherwise errors due to NaN
+# modify source and field ID fields to match the calculations
+df["data_source_name"] = "[" + df["data_source_name"]+ "]"
+
+# create unique source field combinations
+df["source_field_id"] = df["data_source_name"] + "." + df["field_id"]
+
+# create source fields to ID mapping dictionary as well as the reverse
+dictMapping = sourceFieldMappingTable(df, "source_field_id", "field_sfid")
+
+# remove comments from calculations
 df["field_calculation_cleaned"] = df.apply(lambda x: \
-    fieldCalculationClean(x.field_calculation, x.data_source_name), 
+    fieldCalculationRemoveComments(x.field_calculation), 
     axis = 1)
 
 # apply field mappings to calculations
+lstFieldID = list(df["field_id"].unique())
 df["field_calculation_cleaned"] = \
-    df["field_calculation_cleaned"].apply(lambda x: \
-    fieldCalculationMapping(dictMapping, x))
+    df.apply(lambda x: \
+    fieldCalculationMapping(x.field_calculation_cleaned, dictMapping, 
+    x.data_source_name, lstFieldID), 
+    axis = 1)
 
 # merge field and data source name fields
-df["field_label"] = np.where(df["field_caption"] == '', \
-    df["field_id"], '[' + df["field_caption"] + ']')
-df["source_label"] = "[" + np.where(df["data_source_caption"] == '', 
-                                   df["data_source_name"], \
-                                    df["data_source_caption"]) + "]"
+df["field_label"] = df.apply(lambda x: \
+    processCaptions(x.field_id, x.field_caption), axis = 1)
+df["source_label"] = df.apply(lambda x: \
+    processCaptions(x.data_source_name, x.data_source_caption), axis = 1)
 
 # filter out duplicate parameter rows
 lstParam = list(df[df["source_label"] == "[Parameters]"]["field_label"])
@@ -82,12 +93,19 @@ df = df[df["field_is_param_duplicate"] == 0]
 
 # create list of unique combinations of data sources + field names
 df["source_field_label"] = df["source_label"] + "." + df["field_label"]
-lstFields = list(dict.fromkeys(list(df["source_field_label"])))
+
+# replace [source ID].[field ID] by [source label].[field label]
+dictMapping = sourceFieldMappingTable(df, "source_field_id", \
+    "source_field_label")
+df["field_calculation_cleaned"] = \
+    df["field_calculation_cleaned"].apply(lambda x: \
+    fieldCalculationMapping2(dictMapping, x))
 
 # get list of field dependencies
+lstSourceFields = list(df["source_field_label"].unique())
 df["field_calculation_dependencies"] = \
     df["field_calculation_cleaned"].apply(lambda x: \
-        fieldCalculationDependencies(lstFields, x))
+        fieldCalculationDependencies(lstSourceFields, x))
 
 # calculate type of field
 df["field_category"] = df.apply(lambda x: \
@@ -106,7 +124,7 @@ df["field_flagged"] = df.apply(lambda x: \
         (len(x.field_forward_dependencies) == 0) & \
             (len(x.field_worksheets) == 0), 1, 0), axis = 1)
 
-step_log("Creating field dependency graphs...")
+stepLog("Creating field dependency graphs...")
 # Create master node graph
 colors = {"Parameter": "#cbc3e3",
     "Field": "green", "Calculated Field": "orange"}
@@ -145,7 +163,7 @@ colKeep = [x for x in df.columns if x not in colRemove]
 df = df[colKeep]
 
 # store results and finish
-step_log("Saving table result in " + outFilePath + "...")
+stepLog("Saving table result in " + outFilePath + "...")
 if not os.path.isdir(outFileDirectory):
     os.makedirs(outFileDirectory)
 df.to_csv(path_or_buf = outFilePath, index = False, sep = ',')
