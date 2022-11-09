@@ -39,6 +39,7 @@ Let people know what your project can do specifically. Provide context and add a
 - [Document API Python documentation](https://tableau.github.io/document-api-python/): describes how workbook and field information can be extracted
 - [Pydot repository](https://github.com/pydot/pydot): methods and attributes in `pydot` package used for visualizing graphs
 - [Graphviz documentation](https://graphviz.org/docs/nodes/): node and graph attributes
+- [Google Python Style Guide](https://github.com/google/styleguide/blob/gh-pages/pyguide.md#38-comments-and-docstrings): information on docstrings
 
 ## Visuals
 Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
