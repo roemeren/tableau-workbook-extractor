@@ -107,17 +107,20 @@ def getForwardDependencies(df, f, level = 0, p = None):
         f in z.field_calculation_dependencies, axis = 1)
     depList  = list(df.loc[depList]["source_field_label"])
     cat = list(x["field_category"])[0]
+    ws = list(x["field_worksheets"])[0]
     lst = []
     
-    # add dependency
+    # add dependency (including its sheets)
     if level > 0: lst += [{"child": f, "parent": p, \
-        "level": "+{0}".format(level), "childCategory": cat}]
+        "level": "+{0}".format(level), "childCategory": cat, 
+        "childSheets": ws}]
     
     # add dependencies of dependency
     if len(depList) > 0:
         # remove reference by copying the list
         for y in depList.copy(): 
             lst += getForwardDependencies(df, y, level + 1, f)
+
     return lst
 
 def addNode(sf, cat, shapes, colors):
