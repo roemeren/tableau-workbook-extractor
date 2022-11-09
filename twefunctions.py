@@ -151,16 +151,31 @@ def visualizeDependencies(df, sf, g, fin):
         list(df[df.source_field_label == sf]\
             ["field_forward_dependencies_temp"])
     dictForward = [json.loads(idx.replace("'", '"')) for idx in dictForward][0]
-    dictDependency = dictBackward + dictForward
+    dictDependency = copy.deepcopy(dictBackward + dictForward)
     # only generate graph if there are dependencies
     if len(dictDependency) > 0:
+
         # create a copy of the master node list in order to not modify it
         MGCopy = copy.deepcopy(g)
+
         # set properties for main node
         G = pydot.Dot(graph_type = "digraph")
         subject = '"' + f + '"'
         G.add_node(MGCopy.get_node(subject)[0])
         G.get_node(subject)[0].set("fillcolor", "lightblue")
+
+        # retain unique (parent, child) relationships
+        keysKeep = {"key", "parent", "child"}
+        for d in dictDependency:
+            # add surrogate key that defines a unique edge
+            keyValue = "{0}->{1}".format(d.get("parent"), d.get("child"))
+            d.update(key = keyValue)
+            keysDict = set(dictDependency[0].keys())
+            keysRemove = keysDict - keysKeep
+            for k in keysRemove: del d[k]
+        dictDependency = list({v["key"]: v for v in dictDependency}.values())
+
+        # add (parent -> child) edges to graph
         for d in dictDependency:
             parent = '"' + d["parent"] + '"'
             child = '"' + d["child"] + '"'
@@ -171,14 +186,14 @@ def visualizeDependencies(df, sf, g, fin):
             edge = pydot.Edge(nodeParent, nodeChild)
             G.add_edge(edge)
 
-        # write output filet
         # create output graphs folder  if it doesn't exist yet
         sout = re.sub('[^A-Za-z0-9]+', '', s[1:-1])
         fout = re.sub('[^A-Za-z0-9]+', '', f[1:-1])
         dout = "{0} Files\\Graphs\\{1}\\".format(fin, sout)
-
         if not os.path.isdir(dout):
             os.makedirs(dout)
+        
+        # write output file
         outFile = "{0}{1}-{2}.png".format(dout, sout, fout)
         print("Writing file {0}".format(outFile))
         G.write_png(outFile)
