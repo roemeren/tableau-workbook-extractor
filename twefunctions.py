@@ -38,12 +38,23 @@ def fieldCalculationMappingTable(df, colFromSource, \
     dictRes = dict(arrRes[1:]) 
     return dictRes
 
-# clean up an expression x
 def fieldCalculationClean(x, s):
-    # remove all comments (important for dependencies)
-    # pattern: starts with 2 forward slashes and ends with new line \n
+    """
+    Clean up a Tableau calculation expression by removing 
+    all comments and include the source name for each field.
+
+    Args:
+        x: Calculation string
+        s: Source name
+
+    Returns:
+        Cleaned calculation string
+    """
+    # pattern: //...\n -> ''
     res = re.sub(r"\/{2}.*\n", '', x)
-    # replace internal field reference (not . + [field]) by [source].[field]
+    # pattern: ([field] + not .) -> [source].[field]
+    res = re.sub(r"(\[.*\])([^.])", "[" + s + r"].\1" + r"\2", res)
+    # pattern: (not . + [field]) -> [source].[field]
     res = re.sub(r"([^.])(\[.*\])", r"\1" + "[" + s + r"].\2", res)
     return res
 
