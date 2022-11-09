@@ -59,10 +59,12 @@ dictMapping = fieldCalculationMappingTable(df, "data_source_name", \
 # create cleaned copy of field calculations
 # replace na by empty string otherwise errors due to NaN
 df["field_calculation_cleaned"] = df.apply(lambda x: \
-    fieldCalculationClean(x.field_calculation, x.data_source_name), axis = 1)
+    fieldCalculationClean(x.field_calculation, x.data_source_name), 
+    axis = 1)
 
 # apply field mappings to calculations
-df["field_calculation_cleaned"] = df["field_calculation_cleaned"].apply(lambda x: \
+df["field_calculation_cleaned"] = \
+    df["field_calculation_cleaned"].apply(lambda x: \
     fieldCalculationMapping(dictMapping, x))
 
 # merge field and data source name fields
@@ -106,8 +108,10 @@ df["field_flagged"] = df.apply(lambda x: \
 
 step_log("Creating field dependency graphs...")
 # Create master node graph
-colors = {"Parameter": "#cbc3e3", "Field": "green", "Calculated Field": "orange"}
-shapes = {"Parameter": "parallelogram", "Field": "box", "Calculated Field": "oval"}
+colors = {"Parameter": "#cbc3e3",
+    "Field": "green", "Calculated Field": "orange"}
+shapes = {"Parameter": "parallelogram", 
+    "Field": "box", "Calculated Field": "oval"}
 nodes = df.apply(lambda x: \
     addNode(x.source_field_label, x.field_category, shapes, colors), axis = 1)
 lstNodes = []
