@@ -1,4 +1,8 @@
 from twefunctions import *
+import warnings
+
+# ignore future warnings when reading field attributes (not applicable)
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # prompt user for twb file and extract file/directory names
 print("Prompt for input Tableau workbook...")
@@ -32,7 +36,7 @@ df = df[df["value"].notnull()]
 fieldAttr = ["id", "caption", "datatype", "role", "type", "alias", "aliases", \
     "calculation", "description", "hidden", "worksheets"]
 for attr in fieldAttr:
-    df["field_" + attr] = df.apply(lambda x: getattr(x.value, attr) , axis = 1)
+    df["field_" + attr] = df.apply(lambda x: getattr(x.value, attr), axis = 1)
 
 # additional transformations
 df["field_hidden"] = np.where(df["field_hidden"] == "true", 1, 0)
