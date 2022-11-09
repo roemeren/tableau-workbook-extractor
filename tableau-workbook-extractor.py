@@ -1,18 +1,26 @@
 from twefunctions import *
+from tableaudocumentapi import Workbook
+import pandas as pd
+import easygui
 import warnings
+from tqdm import tqdm
 
 # ignore future warnings when reading field attributes (not applicable)
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
+# logging config
+logging.basicConfig(level = logging.DEBUG)
+step_log.counter = 1
+
 # prompt user for twb file and extract file/directory names
-print("Prompt for input Tableau workbook...")
+step_log("Prompt for input Tableau workbook...")
 inpFilePath = easygui.fileopenbox(default = "*.twb*")
 inpFileName = os.path.splitext(os.path.basename(inpFilePath))[0]
 outFilePath = inpFilePath + ' Files\\Fields\\' + inpFileName + '.csv'
 outFileDirectory = os.path.dirname(outFilePath)
 
 # initial data frame with nested data source and field objects
-print("Extract data sources and fields from workbook...")
+step_log("Extract data sources and fields from workbook...")
 with suppress_stdout():
     inpTwb = Workbook(inpFilePath)
 df1 = pd.DataFrame(inpTwb.datasources, columns = ["data_source"])
@@ -96,7 +104,7 @@ df["field_flagged"] = df.apply(lambda x: \
         (len(x.field_forward_dependencies) == 0) & \
             (len(x.field_worksheets) == 0), 1, 0), axis = 1)
 
-print("Creating graphs...")
+step_log("Creating field dependency graphs...")
 # Create master node graph
 colors = {"Parameter": "#cbc3e3", "Field": "green", "Calculated Field": "orange"}
 shapes = {"Parameter": "parallelogram", "Field": "box", "Calculated Field": "oval"}
@@ -122,9 +130,8 @@ df["field_forward_dependencies_temp"] = \
     df["field_forward_dependencies"].apply(lambda x: replaceParamReference(x))
 
 # create dependency graphs per field
-df["field_dependencies_file"] = df.apply(lambda x: \
-    visualizeDependencies(df, x.source_field_label, 
-    gMaster, inpFilePath), axis = 1)
+for index, row in tqdm(df.iterrows(), total = df.shape[0]):
+    visualizeDependencies(df, row.source_field_label, gMaster, inpFilePath)
 
 # remove intermediate results
 colRemove = ["data_source", "fields", "variable", "value", \
@@ -134,7 +141,7 @@ colKeep = [x for x in df.columns if x not in colRemove]
 df = df[colKeep]
 
 # store results and finish
-print("Saving table result in " + outFilePath + "...")
+step_log("Saving table result in " + outFilePath + "...")
 if not os.path.isdir(outFileDirectory):
     os.makedirs(outFileDirectory)
 df.to_csv(path_or_buf = outFilePath, index = False, sep = ',')

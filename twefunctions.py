@@ -1,13 +1,11 @@
 import sys, os
 from contextlib import contextmanager
-from tableaudocumentapi import Workbook
-import pandas as pd
 import numpy as np
 import re
 import json
 import copy
 import pydot
-import easygui
+import logging
 
 # suppress console output when workbook is opened
 # source: http://thesmithfam.org/blog/2012/10/25/temporarily-suppress-console-output-in-python/
@@ -20,6 +18,10 @@ def suppress_stdout():
             yield
         finally:
             sys.stdout = old_stdout
+
+def step_log(message, *args, **kwargs):
+  logging.info(" STEP %d: " % step_log.counter + message, *args, **kwargs)
+  step_log.counter += 1
 
 # dictionary of [source ID].[field ID] -> [source caption].[label caption]
 def fieldCalculationMappingTable(df, colFromSource, \
@@ -137,8 +139,6 @@ def replaceSourceReference(d, s):
 def replaceParamReference(x):
     return str(x).replace("[Parameters].", "")
 
-# https://graphviz.org/docs/nodes/
-# https://github.com/pydot/pydot/blob/master/src/pydot/core.py
 def visualizeDependencies(df, sf, g, fin):
     s = sf.split(".")[0]
     f = sf.split(".")[1]
@@ -186,15 +186,15 @@ def visualizeDependencies(df, sf, g, fin):
             edge = pydot.Edge(nodeParent, nodeChild)
             G.add_edge(edge)
 
-        # create output graphs folder  if it doesn't exist yet
-        sout = re.sub('[^A-Za-z0-9]+', '', s[1:-1])
-        fout = re.sub('[^A-Za-z0-9]+', '', f[1:-1])
+        # create output graphs folder if it doesn't exist yet
+        specialChar = "[^A-Za-z0-9]+"
+        sout = re.sub(specialChar, '', s)
+        fout = re.sub(specialChar, '', f)
         dout = "{0} Files\\Graphs\\{1}\\".format(fin, sout)
         if not os.path.isdir(dout):
             os.makedirs(dout)
         
         # write output file
         outFile = "{0}{1}-{2}.png".format(dout, sout, fout)
-        print("Writing file {0}".format(outFile))
         G.write_png(outFile)
         return outFile
