@@ -70,7 +70,6 @@ df["field_is_param_duplicate"] = df.apply(lambda x: \
     isParamDuplicate(lstParam, x.source_label, x.field_label), axis = 1)
 df = df[df["field_is_param_duplicate"] == 0]
 
-stepLog("Processing field calculations...")
 # add a randomly generated ID field for each unique field
 df["source_field_repl_id"] = getRandomReplacementID(df, "field_calculation")
 
@@ -99,11 +98,18 @@ df["field_category"] = df.apply(lambda x: \
     x.field_calculation_dependencies, x.field_calculation_cleaned), axis = 1)
 
 stepLog("Processing field dependencies...")
-# expand dependencies to full lists of backward and forward dependencies
+# get full list of backward dependencies
 df["field_backward_dependencies"] = \
     df["source_field_label"].apply(lambda x: getBackwardDependencies(df, x))
+
+# get full list of forward dependencies using exploded version of df (faster)
+dfExplode = df[["source_field_label", "field_category", \
+    "field_worksheets", "field_calculation_dependencies"]]
+dfExplode = dfExplode.explode("field_calculation_dependencies")
+dfExplode.columns = ["label", "category", "worksheets", "dependency"]
 df["field_forward_dependencies"] = \
-    df["source_field_label"].apply(lambda x: getForwardDependencies(df, x))
+    df["source_field_label"].apply(lambda x: \
+        getForwardDependencies(dfExplode, x))
 
 # flag fields with no dependencies and/or linked sheets
 df["field_flagged"] = df.apply(lambda x: \

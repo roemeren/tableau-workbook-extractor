@@ -148,16 +148,13 @@ def getBackwardDependencies(df, f, level = 0, c = None):
             lst += getBackwardDependencies(df, y, level + 1, f)
     return lst
 
-# recursively get all forward dependencies of a field (SLOW)
+# recursively get all forward dependencies of a field
 def getForwardDependencies(df, f, level = 0, p = None):
-    x = df.loc[df.source_field_label == f]
-    depList = df.apply(lambda z: \
-        f in z.field_calculation_dependencies, axis = 1)
-    depList  = list(df.loc[depList]["source_field_label"])
-    cat = list(x["field_category"])[0]
-    ws = list(x["field_worksheets"])[0]
+    x = df.loc[df.label == f][["category", "worksheets"]]
+    cat, ws = x.head(1).values.flatten()
+    depList = list(df.loc[df.dependency == f]["label"])
     lst = []
-    
+
     # add dependency (including its sheets)
     if level > 0: lst += [{"child": f, "parent": p, \
         "level": "+{0}".format(level), "childCategory": cat, 
@@ -182,6 +179,12 @@ def addNode(sf, cat, shapes, colors):
 
 # d: dictionary of dependencies (formatted as string)
 def replaceSourceReference(d, s):
+    # print("d: \n")
+    # print(str(d))
+    # print("s: \n")
+    # print(s)
+    # print("res: \n")
+    # print(str(d).replace(s + ".", ""))
     return str(d).replace(s + ".", "")
     
 # Replace all source references from the same source
