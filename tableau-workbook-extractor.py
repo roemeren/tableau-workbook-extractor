@@ -133,12 +133,10 @@ gMaster = pydot.Dot()
 for node in lstNodes: gMaster.add_node(node)
 
 # final clean-up of backward and forward dependencies
-df["field_backward_dependencies"] = df.apply(lambda x: \
-    replaceSourceReference(x.field_backward_dependencies, 
-    x.source_label), axis = 1)
-df["field_forward_dependencies"] = df.apply(lambda x: \
-    replaceSourceReference(x.field_forward_dependencies, 
-    x.source_label), axis = 1)
+lstClean = ["field_calculation_cleaned", "field_calculation_dependencies", 
+    "field_backward_dependencies", "field_backward_dependencies"]
+for col in lstClean:
+    df[col] = df.apply(lambda x: replaceSourceReference(x[col], x.source_label), axis = 1)
 
 # calculate temporary version with parameter source references removed
 df["field_backward_dependencies_temp"] = \
@@ -150,16 +148,17 @@ df["field_forward_dependencies_temp"] = \
 for index, row in tqdm(df.iterrows(), total = df.shape[0]):
     visualizeDependencies(df, row.source_field_label, gMaster, inpFilePath)
 
-# remove intermediate results
-colRemove = ["data_source", "fields", "variable", "value", \
-    "field_backward_dependencies_temp", "field_forward_dependencies_temp", 
-    "field_is_param_duplicate"]
-colKeep = [x for x in df.columns if x not in colRemove]
-df = df[colKeep]
+# remove intermediate results and apply output table column order
+colKeep = ["source_label", "field_label", "field_datatype", "field_role", 
+    "field_role", "field_type", "field_aliases", "field_description", 
+    "field_hidden", "field_category", "field_calculation_cleaned", 
+    "field_calculation_dependencies", "field_backward_dependencies", 
+    "field_forward_dependencies", "field_worksheets", "field_flagged"]
+dfWrite = df[colKeep]
 
 # store results and finish
 stepLog("Saving table result in " + outFilePath + "...")
 if not os.path.isdir(outFileDirectory):
     os.makedirs(outFileDirectory)
-df.to_csv(path_or_buf = outFilePath, index = False, sep = ',')
+dfWrite.to_csv(path_or_buf = outFilePath, index = False, sep = ',')
 input("Done! Press Enter to continue...")
