@@ -238,6 +238,22 @@ def getForwardDependencies(df, f, level = 0, p = None):
 
     return lst
 
+def getMaxLevel(l):
+    """
+    Return maximum forward or backward dependency level of a given input list
+
+    Args:
+        l: input list of dependency dictionaries
+        f: flag indicating max. forward (True) or backward (False) level
+
+    Returns: 
+        Maximum dependency level for the given dictionary list
+    """
+    res = 0
+    # note: values are formatted as text -> max('-1', '-4') = -4
+    if len(l) > 0: res = max([d.get("level") for d in l])
+    return res
+
 def addNode(sf, cat, shapes, colors):
     """
     Creates graph node objects for an input source field

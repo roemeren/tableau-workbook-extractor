@@ -111,6 +111,12 @@ df["field_forward_dependencies"] = \
     df["source_field_label"].apply(lambda x: \
         getForwardDependencies(dfExplode, x))
 
+# calculate max. forward and backward dependency levels
+df["field_backward_dependencies_max_level"] = \
+    df["field_backward_dependencies"].apply(lambda x: getMaxLevel(x))
+df["field_forward_dependencies_max_level"] = \
+    df["field_forward_dependencies"].apply(lambda x: getMaxLevel(x))
+
 # flag fields with no dependencies and/or linked sheets
 df["field_flagged"] = df.apply(lambda x: \
     np.where((len(x.field_backward_dependencies) == 0) & \
@@ -158,7 +164,8 @@ colKeep = ["source_label", "field_label", "field_datatype", "field_role",
     "field_role", "field_type", "field_aliases", "field_description", 
     "field_hidden", "field_category", "field_calculation_cleaned", 
     "field_calculation_dependencies", "field_backward_dependencies", 
-    "field_forward_dependencies", "field_worksheets", "field_flagged"]
+    "field_forward_dependencies", "field_backward_dependencies_max_level", 
+    "field_forward_dependencies_max_level", "field_worksheets", "field_flagged"]
 dfWrite = df[colKeep]
 
 # store results and finish
