@@ -244,7 +244,6 @@ def getMaxLevel(l):
 
     Args:
         l: input list of dependency dictionaries
-        f: flag indicating max. forward (True) or backward (False) level
 
     Returns: 
         Maximum dependency level for the given dictionary list
@@ -252,6 +251,29 @@ def getMaxLevel(l):
     res = 0
     # note: values are formatted as text -> max('-1', '-4') = -4
     if len(l) > 0: res = max([d.get("level") for d in l])
+    return res
+
+def getFieldsFromCategory(l, c, f):
+    """
+    Return list of fields of a given category from a list of 
+    dependency dictionaries
+
+    Args:
+        l: input list of dependency dictionaries
+        c: category type
+        f: flag indicating backward (True) or forward (False) dependencies
+
+    Returns: 
+        List of field names corresponding to the category
+    """
+    res = []
+    if len(l) > 0:
+        if f == True:
+            res = [d.get("parent") for d in l if d.get("parentCategory") == c]
+        else:
+            res = [d.get("child") for d in l if d.get("childCategory") == c]
+    # only keep unique values
+    res = list(set(res))
     return res
 
 def addNode(sf, cat, shapes, colors):

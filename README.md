@@ -54,6 +54,9 @@ Use examples liberally, and show the expected output if you can. It's helpful to
 
 - **Not all dependencies are captured**: it is possible that flagged fields/parameters are still used/useful in the workbook because they are for example used in a dashboard URL action. Deleting it in Tableau won't raise any warnings (surprisingly) but the field removal may cause issues.
 - **Not all field captions are captured**: some data source field captions (among other attributes) are missing when using the Tableau Document API while these captions can be located in the workbook's raw XML (within the `<metadata-record>`'s `<caption>` tag). It appears to be related to hidden fields (maybe previously unhidden?) in the data source.
+- **Not all fields are assigned to the correct data source**: for unknown reasons
+some (copies of) fields are assigned to a data source it doesn't belong to. This 
+may also be related to open issues in the Document API.
 
 ## Support
 Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.

@@ -123,6 +123,23 @@ df["field_flagged"] = df.apply(lambda x: \
         (len(x.field_forward_dependencies) == 0) & \
             (len(x.field_worksheets) == 0), 1, 0), axis = 1)
 
+# get list of source fields
+df["source_field_dependencies"] = \
+    df.apply(lambda x: getFieldsFromCategory(x.field_backward_dependencies, 
+    "Field", True), axis = 1)
+df["n_source_field_dependencies"] = \
+    df["source_field_dependencies"].apply(lambda x: len(x))
+df["n_worksheets"] = \
+    df["field_worksheets"].apply(lambda x: len(x))
+
+# final clean-up of backward and forward dependencies
+lstClean = ["field_calculation_cleaned", "field_calculation_dependencies", 
+    "field_backward_dependencies", "field_forward_dependencies", 
+    "source_field_dependencies"]
+for col in lstClean:
+    df[col] = df.apply(lambda x: replaceSourceReference(x[col], x.source_label),
+     axis = 1)
+
 stepLog("Creating field dependency graphs...")
 # Create master node graph
 colors = {"Parameter": "#cbc3e3",
@@ -137,13 +154,6 @@ lstNodes = []
 for node in nodes: lstNodes += node
 gMaster = pydot.Dot()
 for node in lstNodes: gMaster.add_node(node)
-
-# final clean-up of backward and forward dependencies
-lstClean = ["field_calculation_cleaned", "field_calculation_dependencies", 
-    "field_backward_dependencies", "field_forward_dependencies"]
-for col in lstClean:
-    df[col] = df.apply(lambda x: replaceSourceReference(x[col], x.source_label),
-     axis = 1)
 
 # calculate temporary version with parameter source references removed
 df["field_backward_dependencies_temp"] = \
@@ -165,7 +175,9 @@ colKeep = ["source_label", "field_label", "field_datatype", "field_role",
     "field_hidden", "field_category", "field_calculation_cleaned", 
     "field_calculation_dependencies", "field_backward_dependencies", 
     "field_forward_dependencies", "field_backward_dependencies_max_level", 
-    "field_forward_dependencies_max_level", "field_worksheets", "field_flagged"]
+    "field_forward_dependencies_max_level", "source_field_dependencies",
+    "n_source_field_dependencies", "field_worksheets", "n_worksheets", 
+    "field_flagged"]
 dfWrite = df[colKeep]
 
 # store results and finish
