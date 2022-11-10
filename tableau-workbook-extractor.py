@@ -134,15 +134,20 @@ for node in lstNodes: gMaster.add_node(node)
 
 # final clean-up of backward and forward dependencies
 lstClean = ["field_calculation_cleaned", "field_calculation_dependencies", 
-    "field_backward_dependencies", "field_backward_dependencies"]
+    "field_backward_dependencies", "field_forward_dependencies"]
 for col in lstClean:
-    df[col] = df.apply(lambda x: replaceSourceReference(x[col], x.source_label), axis = 1)
+    df[col] = df.apply(lambda x: replaceSourceReference(x[col], x.source_label),
+     axis = 1)
 
 # calculate temporary version with parameter source references removed
 df["field_backward_dependencies_temp"] = \
-    df["field_backward_dependencies"].apply(lambda x: replaceParamReference(x))
+    df.apply(lambda x: \
+        replaceSourceReference(x.field_backward_dependencies, "[Parameters]"), 
+        axis = 1)
 df["field_forward_dependencies_temp"] = \
-    df["field_forward_dependencies"].apply(lambda x: replaceParamReference(x))
+    df.apply(lambda x: \
+        replaceSourceReference(x.field_forward_dependencies, "[Parameters]"), 
+        axis = 1)
 
 # create dependency graphs per field
 for index, row in tqdm(df.iterrows(), total = df.shape[0]):

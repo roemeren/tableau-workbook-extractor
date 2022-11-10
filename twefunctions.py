@@ -9,10 +9,19 @@ import logging
 import random
 import string
 
-# suppress console output when workbook is opened
-# source: http://thesmithfam.org/blog/2012/10/25/temporarily-suppress-console-output-in-python/
 @contextmanager
 def suppress_stdout():
+    """
+    Temporarily suppress console output. 
+    Source: http://thesmithfam.org/blog/2012/10/25/temporarily-suppress-console-output-in-python/
+
+    Args:
+        message: Input data frame
+
+    Returns:
+        Suppress console output for following commands e.g. when 
+        opening a workbook
+    """
     with open(os.devnull, "w") as devnull:
         old_stdout = sys.stdout
         sys.stdout = devnull
@@ -22,8 +31,17 @@ def suppress_stdout():
             sys.stdout = old_stdout
 
 def stepLog(message, *args, **kwargs):
-  logging.info(" STEP %d: " % stepLog.counter + message, *args, **kwargs)
-  stepLog.counter += 1
+    """
+    Log a message that includes an incremental step counter in a main script
+
+    Args:
+        message: Input data frame
+
+    Returns:
+        Log message containing incremental step count
+    """
+    logging.info(" STEP %d: " % stepLog.counter + message, *args, **kwargs)
+    stepLog.counter += 1
 
 def getRandomReplacementID(df, c):
     """
@@ -50,6 +68,18 @@ def getRandomReplacementID(df, c):
     return res
 
 def sourceFieldMappingTable(df, colFrom, colTo):
+    """
+    Replace all external and internal field references by unique
+    source/field IDs
+
+    Args:
+        df: Input data frame
+        colFrom: Column name containing original values
+        colTo: Column name containing mapped values
+
+    Returns:
+        Dictionary containing (from: to) mappings
+    """
     dfRes = df.copy()
     dfRes = dfRes[[colFrom, colTo]]
     dfRes.columns = ["from", "to"]
@@ -98,21 +128,39 @@ def processCaptions(i, c):
         Processed caption enclosed in square brackets + any additional
         right square brackets doubled
     """
-    if c == '':
-        return i
+    if c == '': return i
     else:
         # right brackets are doubled in calculations
         return "[{0}]".format(c.replace("]", "]]"))
 
-# list direct dependencies in a calculation x based on a list l
 def fieldCalculationDependencies(l, x):
+    """
+    # List direct dependencies in a calculation x based on a list l
+
+    Args:
+        l: List of all possible values that can be matched
+        x: Input calculation string
+
+    Returns:
+        List of values from the list l that were matched in the string x
+    """
     return [s for s in l if s in x]
 
-# check if a field is a parameter duplicate
 def isParamDuplicate(p, s, x):
+    """
+    Checks if a field is a parameter duplicate
+
+    Args:
+        p: List of parameter fields
+        s: Source name
+        x: Field name
+
+    Returns:
+        True if the field is a parameter duplicate (and should be removed), 
+        False otherwise
+    """
     return x in p and s != "[Parameters]"
 
-# get field category (parameter, field or calculated field)
 def fieldCategory(s, d, c):
     """
     Returns the category of a source field 
@@ -130,8 +178,19 @@ def fieldCategory(s, d, c):
     if re.search(r"{[^'\"].*?[^'\"]}", c): return "Calculated Field (LOD)"
     else: return "Calculated Field"
 
-# recursively get all backward dependencies of a field
 def getBackwardDependencies(df, f, level = 0, c = None):
+    """
+    Recursively get all backward dependencies of a field
+
+    Args:
+        df: Input data frame
+        f: Source field name
+        level: Dependency level (0 = root, -1 = level 1 backwards, etc.)
+        c: Originating child source field name
+
+    Returns: 
+        List of all backward dependencies of the input source field
+    """
     x = df.loc[df.source_field_label == f]
     depList = list(x.field_calculation_dependencies)
     cat = list(x.field_category)[0]
@@ -148,8 +207,19 @@ def getBackwardDependencies(df, f, level = 0, c = None):
             lst += getBackwardDependencies(df, y, level + 1, f)
     return lst
 
-# recursively get all forward dependencies of a field
 def getForwardDependencies(df, f, level = 0, p = None):
+    """
+    Recursively get all forward dependencies of a field
+
+    Args:
+        df: Input data frame
+        f: Source field name
+        level: Dependency level (0 = root, -1 = level 1 backwards, etc.)
+        p: Originating parent source field name
+
+    Returns: 
+        List of all forward dependencies of the input source field
+    """
     x = df.loc[df.label == f][["category", "worksheets"]]
     cat, ws = x.head(1).values.flatten()
     depList = list(df.loc[df.dependency == f]["label"])
@@ -169,6 +239,18 @@ def getForwardDependencies(df, f, level = 0, p = None):
     return lst
 
 def addNode(sf, cat, shapes, colors):
+    """
+    Creates graph node objects for an input source field
+
+    Args:
+        sf: Input source field name
+        cat: Input source field category
+        shapes: List of shapes per source field category
+        colors: List of colors per source field category
+
+    Returns: 
+        List of 2 nodes related for resp. the field and source field name
+    """
     s = sf.split(".")[0]
     f = sf.split(".")[1]
     node1 = pydot.Node(name = f, shape = shapes[cat], \
@@ -177,23 +259,32 @@ def addNode(sf, cat, shapes, colors):
         fillcolor = colors[cat], style = "filled")
     return [node1, node2]
 
-# d: dictionary of dependencies (formatted as string)
 def replaceSourceReference(d, s):
-    # print("d: \n")
-    # print(str(d))
-    # print("s: \n")
-    # print(s)
-    # print("res: \n")
-    # print(str(d).replace(s + ".", ""))
+    """
+    Remove references to a given source for an input string or dictionary
+
+    Args:
+        d: Input string or dictionary
+        s: Source name
+
+    Returns: 
+        String with all references to the input source name removed
+    """
     return str(d).replace(s + ".", "")
-    
-# Replace all source references from the same source
-# s: source name
-# d: dictionary of dependencies (formatted as string)
-def replaceParamReference(x):
-    return str(x).replace("[Parameters].", "")
 
 def visualizeDependencies(df, sf, g, fin):
+    """
+    Creates output PNG file containing all dependencies for a given source field
+
+    Args:
+        df: Input data frame containing backward and forward dependencies
+        sf: Input source field name
+        g: Master graph containing all source field and field node objects
+        fin: Path to the input Tableau workbook
+
+    Returns: 
+        PNG file in "<workbook path> Files\Graphs\<source field name>.png"
+    """
     s = sf.split(".")[0]
     f = sf.split(".")[1]
     dictBackward = \
@@ -206,6 +297,7 @@ def visualizeDependencies(df, sf, g, fin):
             ["field_forward_dependencies_temp"])
     dictForward = [json.loads(idx.replace("'", '"')) for idx in dictForward][0]
     dictDependency = copy.deepcopy(dictBackward + dictForward)
+
     # only generate graph if there are dependencies
     if len(dictDependency) > 0:
 
