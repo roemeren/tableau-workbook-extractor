@@ -25,40 +25,29 @@ def stepLog(message, *args, **kwargs):
   logging.info(" STEP %d: " % stepLog.counter + message, *args, **kwargs)
   stepLog.counter += 1
 
-def getRandomBaseID(c):
+def getRandomReplacementID(df, c):
     """
-    Generate a random sequence of 10 lower case letters that will serve as a 
-    base for a generated field ID field
+    Generate a random ID of 10 lower case letters combined with the data frame 
+    index that will serve as a base for a generated field ID field
 
     Args:
-        c: list of unique field calculations
+        df: Input data frame
+        c: Column name that is used to check if none of the generated ID are 
+        accidentally matched in it
     
     Returns:
-        Random sequence of 10 lower case letters that can be used as a basis 
-        for an ID field
+        Random ID consisting of the combination if 10 lower case letters 
+        and the row index. This ID can be used to be replace references
+        to fields in calculations because it is ensured that none of the IDs
+        are accidentally matched
     """
+    uniqueVals = list(df[c].unique())
     flagSucceed = False
     while not flagSucceed:
-        res = ''.join(random.choice(string.ascii_lowercase) for x in range(10))
-        flagSucceed = not any(res in s for s in c)
+        baseID = ''.join(random.choice(string.ascii_lowercase) for x in range(10))
+        flagSucceed = not any(baseID in s for s in uniqueVals)
+    res = "[" + baseID + df.index.astype(str) + "]"
     return res
-
-# dictionary of [source ID].[field ID] -> [source caption].[label caption]
-def sourceFieldIDToLabelMappingTable(df, colFromSource, \
-    colToSource, colFromField, colToField):
-    dfRes = df.copy()
-    # original [source].[field]
-    dfRes["from"] = "[" + dfRes[colFromSource] + "]." + dfRes[colFromField]
-    # mapped [source].[field]
-    dfRes["to"] = ("[" + np.where(dfRes[colToSource] == '', \
-        dfRes[colFromSource], dfRes[colToSource]) 
-                   + "]." + np.where(dfRes[colToField] == '', \
-                    dfRes[colFromField], "[" + dfRes[colToField] + "]"))
-    dfRes = dfRes[["from", "to"]]
-    arrRes = np.array(dfRes)
-    # dict conversion automatically deduplicates mappings
-    dictRes = dict(arrRes[1:]) 
-    return dictRes
 
 def sourceFieldMappingTable(df, colFrom, colTo):
     dfRes = df.copy()
@@ -69,47 +58,33 @@ def sourceFieldMappingTable(df, colFrom, colTo):
     dictRes = dict(arrRes[1:]) 
     return dictRes
 
-def fieldCalculationRemoveComments(x):
-    """
-    Removes comments from a field calculation
-
-    Args:
-        x: Calculation string
-
-    Returns:
-        Calculation string without comments
-    """
-    res = re.sub(r"\/{2}.*\n", '', x)
-    return res
-
-def fieldCalculationMapping(c, d, s, l):
+def fieldCalculationMapping(c, s, d1, d2, l):
     """
     Replace all external and internal field references by unique
     source/field IDs
 
     Args:
         c: Source field calculation string
-        d: Dictionary of source field -> source field ID mappings
         s: Source field source name
+        d1: Dictionary of source field -> replacement ID mappings
+        d1: Dictionary of source field -> source label mappings
         l: List of unique field names
 
     Returns:
-        Calculation string without comments
+        Calculation string without comments and with all field ID references
+        replaced by field label references
     """
-    # map external [source].[field] combinations to id
-    res = c
-    for key in d: res = res.replace(key, d.get(key))
-    # add [source]. to internal [field]
+    # remove comments
+    res = re.sub(r"\/{2}.*\n", '', c)
+    # external: [source ID].[field ID] -> [replacement ID]
+    for key in d1: res = res.replace(key, d1.get(key))
+    # internal: [field ID] -> [source ID].[field ID]
     for fld in l: res = res.replace(fld, "{0}.{1}".format(s, fld))
-    # finally add external [source].[field] combinations again
-    for key in d: res = res.replace(d.get(key), key)
+    # external: [replacement ID] -> [source ID].[field ID]
+    for key in d1: res = res.replace(d1.get(key), key)
+    # [source ID].[field ID] -> [source label].[field label]
+    for key in d2: res = res.replace(key, d2.get(key))
     return res
-
-def fieldCalculationMapping2(d, x):
-    res = x
-    for key in d: res = res.replace(key, d.get(key))
-    return res
-
 
 def processCaptions(i, c):
     """
@@ -138,9 +113,21 @@ def isParamDuplicate(p, s, x):
     return x in p and s != "[Parameters]"
 
 # get field category (parameter, field or calculated field)
-def fieldCategory(s, d):
+def fieldCategory(s, d, c):
+    """
+    Returns the category of a source field 
+
+    Args:
+        s: Source field label
+        d: List of source field dependencies
+        c: Source field cleaned calculation
+
+    Returns: 
+        Category of the source field: parameter, field, calculated field (LOD)
+    """
     if s.startswith("[Parameters]."): return "Parameter"
     if len(d) == 0: return "Field"
+    if re.search(r"{[^'\"].*?[^'\"]}", c): return "Calculated Field (LOD)"
     else: return "Calculated Field"
 
 # recursively get all backward dependencies of a field
@@ -161,7 +148,7 @@ def getBackwardDependencies(df, f, level = 0, c = None):
             lst += getBackwardDependencies(df, y, level + 1, f)
     return lst
 
-# recursively get all forward dependencies of a field
+# recursively get all forward dependencies of a field (SLOW)
 def getForwardDependencies(df, f, level = 0, p = None):
     x = df.loc[df.source_field_label == f]
     depList = df.apply(lambda z: \

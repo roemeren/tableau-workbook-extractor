@@ -46,44 +46,23 @@ fieldAttr = ["id", "caption", "datatype", "role", "type", "alias", "aliases", \
 for attr in fieldAttr:
     df["field_" + attr] = df.apply(lambda x: getattr(x.value, attr), axis = 1)
 
+stepLog("Processing fields...")
 # additional transformations
 df["field_hidden"] = np.where(df["field_hidden"] == "true", 1, 0)
 df[["data_source_caption", "field_caption", "field_calculation"]] = \
     df[["data_source_caption", "field_caption",
      "field_calculation"]].fillna('')
 
-# add a randomly generated ID field for each unique field
-uniqueCalcs = list(df["field_calculation"].unique())
-baseID = getRandomBaseID(uniqueCalcs)
-df["field_sfid"] = "[" + baseID + df.index.astype(str) + "]"
-
-# modify source and field ID fields to match the calculations
+# data source and field IDs
 df["data_source_name"] = "[" + df["data_source_name"]+ "]"
-
-# create unique source field combinations
 df["source_field_id"] = df["data_source_name"] + "." + df["field_id"]
 
-# create source fields to ID mapping dictionary as well as the reverse
-dictMapping = sourceFieldMappingTable(df, "source_field_id", "field_sfid")
-
-# remove comments from calculations
-df["field_calculation_cleaned"] = df.apply(lambda x: \
-    fieldCalculationRemoveComments(x.field_calculation), 
-    axis = 1)
-
-# apply field mappings to calculations
-lstFieldID = list(df["field_id"].unique())
-df["field_calculation_cleaned"] = \
-    df.apply(lambda x: \
-    fieldCalculationMapping(x.field_calculation_cleaned, dictMapping, 
-    x.data_source_name, lstFieldID), 
-    axis = 1)
-
-# merge field and data source name fields
+# data source and field labels
 df["field_label"] = df.apply(lambda x: \
     processCaptions(x.field_id, x.field_caption), axis = 1)
 df["source_label"] = df.apply(lambda x: \
     processCaptions(x.data_source_name, x.data_source_caption), axis = 1)
+df["source_field_label"] = df["source_label"] + "." + df["field_label"]
 
 # filter out duplicate parameter rows
 lstParam = list(df[df["source_label"] == "[Parameters]"]["field_label"])
@@ -91,16 +70,23 @@ df["field_is_param_duplicate"] = df.apply(lambda x: \
     isParamDuplicate(lstParam, x.source_label, x.field_label), axis = 1)
 df = df[df["field_is_param_duplicate"] == 0]
 
-# create list of unique combinations of data sources + field names
-df["source_field_label"] = df["source_label"] + "." + df["field_label"]
+stepLog("Processing field calculations...")
+# add a randomly generated ID field for each unique field
+df["source_field_repl_id"] = getRandomReplacementID(df, "field_calculation")
 
-# replace [source ID].[field ID] by [source label].[field label]
-dictMapping = sourceFieldMappingTable(df, "source_field_id", \
-    "source_field_label")
+# create source fields to ID mapping dictionary as well as the reverse
+dictMapping1 = \
+    sourceFieldMappingTable(df, "source_field_id", "source_field_repl_id")
+dictMapping2 = \
+    sourceFieldMappingTable(df, "source_field_id", "source_field_label")
+
+# clean up field calculations
+lstFieldID = list(df["field_id"].unique())
 df["field_calculation_cleaned"] = \
-    df["field_calculation_cleaned"].apply(lambda x: \
-    fieldCalculationMapping2(dictMapping, x))
-
+    df.apply(lambda x: \
+    fieldCalculationMapping(x.field_calculation, x.data_source_name, 
+    dictMapping1, dictMapping2, lstFieldID), axis = 1)
+    
 # get list of field dependencies
 lstSourceFields = list(df["source_field_label"].unique())
 df["field_calculation_dependencies"] = \
@@ -110,8 +96,9 @@ df["field_calculation_dependencies"] = \
 # calculate type of field
 df["field_category"] = df.apply(lambda x: \
     fieldCategory(x.source_field_label, 
-    x.field_calculation_dependencies), axis = 1)
+    x.field_calculation_dependencies, x.field_calculation_cleaned), axis = 1)
 
+stepLog("Processing field dependencies...")
 # expand dependencies to full lists of backward and forward dependencies
 df["field_backward_dependencies"] = \
     df["source_field_label"].apply(lambda x: getBackwardDependencies(df, x))
@@ -127,9 +114,11 @@ df["field_flagged"] = df.apply(lambda x: \
 stepLog("Creating field dependency graphs...")
 # Create master node graph
 colors = {"Parameter": "#cbc3e3",
-    "Field": "green", "Calculated Field": "orange"}
+    "Field": "green", "Calculated Field (LOD)": "red", 
+    "Calculated Field": "orange"}
 shapes = {"Parameter": "parallelogram", 
-    "Field": "box", "Calculated Field": "oval"}
+    "Field": "box", "Calculated Field (LOD)": "oval", 
+    "Calculated Field": "oval"}
 nodes = df.apply(lambda x: \
     addNode(x.source_field_label, x.field_category, shapes, colors), axis = 1)
 lstNodes = []
