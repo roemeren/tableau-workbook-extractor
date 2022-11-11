@@ -297,18 +297,23 @@ def addNode(sf, cat, shapes, colors):
         fillcolor = colors[cat], style = "filled")
     return [node1, node2]
 
-def replaceSourceReference(d, s):
+def replaceSourceReference(x, s):
     """
-    Remove references to a given source for an input string or dictionary
+    Remove references to a given source for an input string or dict list
 
     Args:
-        d: Input string or dictionary
+        x: Input string or dict list
         s: Source name
 
     Returns: 
-        String with all references to the input source name removed
+        String or dict list with all references to the input source name removed
     """
-    return str(d).replace(s + ".", "")
+    # perform the replacement as a string
+    res = str(x).replace(s + ".", "")
+    # restore original structure if needed
+    if x.__class__.__name__ == 'list':
+        res = [json.loads(idx.replace("'", '"')) for idx in [res]][0]
+    return res
 
 def visualizeDependencies(df, sf, g, fin):
     """
@@ -327,13 +332,10 @@ def visualizeDependencies(df, sf, g, fin):
     f = sf.split(".")[1]
     dictBackward = \
         list(df[df.source_field_label == sf]\
-            ["field_backward_dependencies_temp"])
-    dictBackward = [json.loads(idx.replace("'", '"')) \
-        for idx in dictBackward][0]
+            ["field_backward_dependencies_temp"])[0]
     dictForward = \
         list(df[df.source_field_label == sf]\
-            ["field_forward_dependencies_temp"])
-    dictForward = [json.loads(idx.replace("'", '"')) for idx in dictForward][0]
+            ["field_forward_dependencies_temp"])[0]
     dictDependency = copy.deepcopy(dictBackward + dictForward)
 
     # only generate graph if there are dependencies
