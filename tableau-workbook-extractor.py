@@ -1,6 +1,5 @@
 from twefunctions import *
 from tableaudocumentapi import Workbook
-import pandas as pd
 import easygui
 import warnings
 from tqdm import tqdm
@@ -109,8 +108,19 @@ dfExplode = df[["source_field_label", "field_category", \
 dfExplode = dfExplode.explode("field_calculation_dependencies")
 dfExplode.columns = ["label", "category", "worksheets", "dependency"]
 df["field_forward_dependencies"] = \
-    df["source_field_label"].apply(lambda x: \
-        getForwardDependencies(dfExplode, x))
+    df.apply(lambda x: \
+        getForwardDependencies(dfExplode, x.source_field_label, 
+        x.field_worksheets), axis = 1)
+
+# only keep unique dependencies with their max level
+df["field_backward_dependencies"] = \
+    df.apply(lambda x: \
+        getUniqueDependencies(x.field_backward_dependencies, 
+        ["child", "parent", "category"], "level"), axis = 1)
+df["field_forward_dependencies"] = \
+    df.apply(lambda x: \
+        getUniqueDependencies(x.field_forward_dependencies, 
+        ["child", "parent", "category", "sheets"], "level"), axis = 1)
 
 # calculate max. forward and backward dependency levels
 df["field_backward_dependencies_max_level"] = \
@@ -130,7 +140,7 @@ df["source_field_dependencies"] = \
     "Field", True), axis = 1)
 df["n_source_field_dependencies"] = \
     df["source_field_dependencies"].apply(lambda x: len(x))
-df["n_worksheets"] = \
+df["n_worksheet_dependencies"] = \
     df["field_worksheets"].apply(lambda x: len(x))
 
 # final clean-up of backward and forward dependencies
@@ -177,8 +187,8 @@ colKeep = ["source_label", "field_label", "field_datatype", "field_role",
     "field_calculation_dependencies", "field_backward_dependencies", 
     "field_forward_dependencies", "field_backward_dependencies_max_level", 
     "field_forward_dependencies_max_level", "source_field_dependencies",
-    "n_source_field_dependencies", "field_worksheets", "n_worksheets", 
-    "field_flagged"]
+    "n_source_field_dependencies", "field_worksheets", 
+    "n_worksheet_dependencies", "field_flagged"]
 dfWrite = df[colKeep]
 
 # store results and finish

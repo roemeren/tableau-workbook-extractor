@@ -1,6 +1,7 @@
 import sys, os
 from contextlib import contextmanager
 import numpy as np
+import pandas as pd
 import re
 import json
 import copy
@@ -198,7 +199,7 @@ def getBackwardDependencies(df, f, level = 0, c = None):
     
     # add dependency
     if level > 0: lst += [{"child": c, "parent": f, \
-        "level": "-{0}".format(level), "parentCategory": cat}]
+        "level": "-{0}".format(level), "category": cat}]
     
     # add dependencies of dependency
     if len(depList) > 0:
@@ -207,13 +208,14 @@ def getBackwardDependencies(df, f, level = 0, c = None):
             lst += getBackwardDependencies(df, y, level + 1, f)
     return lst
 
-def getForwardDependencies(df, f, level = 0, p = None):
+def getForwardDependencies(df, f, w, level = 0, p = None, ):
     """
     Recursively get all forward dependencies of a field
 
     Args:
         df: Input data frame
         f: Source field name
+        w: List of root source field worksheet dependencies
         level: Dependency level (0 = root, -1 = level 1 backwards, etc.)
         p: Originating parent source field name
 
@@ -225,18 +227,50 @@ def getForwardDependencies(df, f, level = 0, p = None):
     depList = list(df.loc[df.dependency == f]["label"])
     lst = []
 
-    # add dependency (including its sheets)
-    if level > 0: lst += [{"child": f, "parent": p, \
-        "level": "+{0}".format(level), "childCategory": cat, 
-        "childSheets": ws}]
+    # get overlap of worksheets with root list
+    nSheet = len([x for x in w if x in ws])
+
+    if level > 0: 
+        # add field dependencies
+        lst += [{"child": f, "parent": p, \
+            "level": "+{0}".format(level), "category": cat, 
+            "sheets": nSheet}]
+    else:
+        # add root sheet dependencies (already is full list)
+        for sh in ws:
+            lst += [{"child": sh, "parent": "", \
+                "level": "0", "category": "Sheet", 
+            "sheets": 1}]
     
     # add dependencies of dependency
     if len(depList) > 0:
         # remove reference by copying the list
         for y in depList.copy(): 
-            lst += getForwardDependencies(df, y, level + 1, f)
+            lst += getForwardDependencies(df, y, w, level + 1, f)
 
     return lst
+
+def getUniqueDependencies(d, g, f):
+    """
+    Keep unique dependencies from a list of dependencies with their minimum
+    dependency level
+
+    Args:
+        d: input list of dependency dictionaries
+        g: grouping list
+        f: aggregation field
+
+    Returns:
+        Dependency dictionaries that only contains unique dependencies with 
+        their minimum dependency level
+    """
+    res = []
+    if len(d) > 0:
+        df = pd.DataFrame(d)
+        df = df.groupby(g)[f].min().reset_index()
+        # convert result back to dictionary
+        res = df.to_dict("records")
+    return res
 
 def getMaxLevel(l):
     """
@@ -269,9 +303,9 @@ def getFieldsFromCategory(l, c, f):
     res = []
     if len(l) > 0:
         if f == True:
-            res = [d.get("parent") for d in l if d.get("parentCategory") == c]
+            res = [d.get("parent") for d in l if d.get("category") == c]
         else:
-            res = [d.get("child") for d in l if d.get("childCategory") == c]
+            res = [d.get("child") for d in l if d.get("category") == c]
     # only keep unique values
     res = list(set(res))
     return res
@@ -350,27 +384,18 @@ def visualizeDependencies(df, sf, g, fin):
         G.add_node(MGCopy.get_node(subject)[0])
         G.get_node(subject)[0].set("fillcolor", "lightblue")
 
-        # retain unique (parent, child) relationships
-        keysKeep = {"key", "parent", "child"}
-        for d in dictDependency:
-            # add surrogate key that defines a unique edge
-            keyValue = "{0}->{1}".format(d.get("parent"), d.get("child"))
-            d.update(key = keyValue)
-            keysDict = set(dictDependency[0].keys())
-            keysRemove = keysDict - keysKeep
-            for k in keysRemove: del d[k]
-        dictDependency = list({v["key"]: v for v in dictDependency}.values())
-
         # add (parent -> child) edges to graph
         for d in dictDependency:
-            parent = '"' + d["parent"] + '"'
-            child = '"' + d["child"] + '"'
-            nodeParent = MGCopy.get_node(parent)[0]
-            nodeChild = MGCopy.get_node(child)[0]
-            G.add_node(nodeParent)
-            G.add_node(nodeChild)
-            edge = pydot.Edge(nodeParent, nodeChild)
-            G.add_edge(edge)
+            # don't visualize sheet dependencies
+            if d["category"] != "Sheet":
+                parent = '"' + d["parent"] + '"'
+                child = '"' + d["child"] + '"'
+                nodeParent = MGCopy.get_node(parent)[0]
+                nodeChild = MGCopy.get_node(child)[0]
+                G.add_node(nodeParent)
+                G.add_node(nodeChild)
+                edge = pydot.Edge(nodeParent, nodeChild)
+                G.add_edge(edge)
 
         # create output graphs folder if it doesn't exist yet
         specialChar = "[^A-Za-z0-9]+"
