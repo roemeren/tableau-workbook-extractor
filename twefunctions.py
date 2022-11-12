@@ -179,15 +179,13 @@ def fieldCategory(s, d, c):
     if re.search(r"{[^'\"].*?[^'\"]}", c): return "Calculated Field (LOD)"
     else: return "Calculated Field"
 
-def getBackwardDependencies(df, f, rs, rf, level = 0, c = None):
+def getBackwardDependencies(df, f, level = 0, c = None):
     """
     Recursively get all backward dependencies of a field
 
     Args:
         df: Input data frame
         f: Source field name
-        rs: Originating root source name
-        rf: Originating root field name
         level: Dependency level (0 = root, -1 = level 1 backwards, etc.)
         c: Originating child source field name
 
@@ -200,17 +198,17 @@ def getBackwardDependencies(df, f, rs, rf, level = 0, c = None):
     lst = []
 
     # add dependency
-    if level > 0: lst += [{"source": rs, "root": rf, "parent": f, "child": c, \
+    if level > 0: lst += [{"parent": f, "child": c, \
         "level": "-{0}".format(level), "category": cat}]
     
     # add dependencies of dependency
     if len(depList) > 0:
         # remove reference by copying the list
         for y in depList[0].copy():
-            lst += getBackwardDependencies(df, y, rs, rf, level + 1, f)
+            lst += getBackwardDependencies(df, y, level + 1, f)
     return lst
 
-def getForwardDependencies(df, f, w, rs, rf, level = 0, p = None, ):
+def getForwardDependencies(df, f, w, level = 0, p = None, ):
     """
     Recursively get all forward dependencies of a field
 
@@ -218,8 +216,6 @@ def getForwardDependencies(df, f, w, rs, rf, level = 0, p = None, ):
         df: Input data frame
         f: Source field name
         w: List of root source field worksheet dependencies
-        rs: Originating root source name
-        rf: Originating root field name
         level: Dependency level (0 = root, -1 = level 1 backwards, etc.)
         p: Originating parent source field name
 
@@ -236,13 +232,13 @@ def getForwardDependencies(df, f, w, rs, rf, level = 0, p = None, ):
 
     if level > 0: 
         # add field dependencies
-        lst += [{"source": rs, "root": rf, "parent": p, "child": f, \
+        lst += [{"parent": p, "child": f, \
             "level": "+{0}".format(level), "category": cat, 
             "sheets": nSheet}]
     else:
         # add root sheet dependencies (already is full list)
         for sh in ws:
-            lst += [{"source": rs, "root": rf, "parent": "", "child": sh, \
+            lst += [{"parent": "", "child": sh, \
                 "level": "0", "category": "Sheet", 
             "sheets": 1}]
     
@@ -250,7 +246,7 @@ def getForwardDependencies(df, f, w, rs, rf, level = 0, p = None, ):
     if len(depList) > 0:
         # remove reference by copying the list
         for y in depList.copy(): 
-            lst += getForwardDependencies(df, y, w, rs, rf, level + 1, f)
+            lst += getForwardDependencies(df, y, w, level + 1, f)
 
     return lst
 
@@ -413,3 +409,20 @@ def visualizeDependencies(df, sf, g, fin):
         outFile = "{0}{1}-{2}.png".format(dout, sout, fout)
         G.write_png(outFile)
         return outFile
+
+def appendFieldsToDicts(l, k, v):
+    """
+    Append fixed list of (key, value) to list of dictionaries
+
+    Args:
+        l: Input dict list
+        k: List of fixed key names
+        v: List of fixed values
+
+    Returns: 
+        Updated version of input dict with new (key, value) pairs appended
+    """
+    if len(l) > 0: 
+        for d in l:
+            for i in range(len(k)): d[k[i]] = v[i]
+    return l
