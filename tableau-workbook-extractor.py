@@ -16,7 +16,7 @@ stepLog("Prompt for input Tableau workbook...")
 # inpFilePath = easygui.fileopenbox(default = "*.twb*")
 inpFilePath = "C:\\Users\\remerencia\\Documents\\tableau-workbook-extractor\\notebooks\\Test Dashboard.twbx"
 inpFileName = os.path.splitext(os.path.basename(inpFilePath))[0]
-outFilePath = inpFilePath + ' Files\\Fields\\' + inpFileName + '.csv'
+outFilePath = inpFilePath + ' Files\\Fields\\' + inpFileName + '.xlsx'
 outFileDirectory = os.path.dirname(outFilePath)
 
 # initial data frame with nested data source and field objects
@@ -100,7 +100,8 @@ df["field_category"] = df.apply(lambda x: \
 stepLog("Processing field dependencies...")
 # get full list of backward dependencies
 df["field_backward_dependencies"] = \
-    df["source_field_label"].apply(lambda x: getBackwardDependencies(df, x))
+    df.apply(lambda x: getBackwardDependencies(df, x.source_field_label, 
+    x.source_label, x.field_label), axis = 1)
 
 # get full list of forward dependencies using exploded version of df (faster)
 dfExplode = df[["source_field_label", "field_category", \
@@ -110,17 +111,18 @@ dfExplode.columns = ["label", "category", "worksheets", "dependency"]
 df["field_forward_dependencies"] = \
     df.apply(lambda x: \
         getForwardDependencies(dfExplode, x.source_field_label, 
-        x.field_worksheets), axis = 1)
+        x.field_worksheets, x.source_label, x.field_label), axis = 1)
 
 # only keep unique dependencies with their max level
 df["field_backward_dependencies"] = \
     df.apply(lambda x: \
         getUniqueDependencies(x.field_backward_dependencies, 
-        ["child", "parent", "category"], "level"), axis = 1)
+        ["source", "root", "child", "parent", "category"], "level"), axis = 1)
 df["field_forward_dependencies"] = \
     df.apply(lambda x: \
         getUniqueDependencies(x.field_forward_dependencies, 
-        ["child", "parent", "category", "sheets"], "level"), axis = 1)
+        ["source", "root", "child", "parent", "category", "sheets"], 
+        "level"), axis = 1)
 
 # calculate max. forward and backward dependency levels
 df["field_backward_dependencies_max_level"] = \
@@ -134,14 +136,19 @@ df["field_flagged"] = df.apply(lambda x: \
         (len(x.field_forward_dependencies) == 0) & \
             (len(x.field_worksheets) == 0), 1, 0), axis = 1)
 
-# get list of source fields
+# get some dependency aggregates
 df["source_field_dependencies"] = \
     df.apply(lambda x: getFieldsFromCategory(x.field_backward_dependencies, 
     "Field", True), axis = 1)
+df["lod_backward_dependencies"] = \
+    df.apply(lambda x: getFieldsFromCategory(x.field_backward_dependencies, 
+    "Calculated Field (LOD)", True), axis = 1)
 df["n_source_field_dependencies"] = \
-    df["source_field_dependencies"].apply(lambda x: len(x))
+    df["source_field_dependencies"].apply(len)
+df["n_lod_backward_dependencies"] = \
+    df["lod_backward_dependencies"].apply(len)
 df["n_worksheet_dependencies"] = \
-    df["field_worksheets"].apply(lambda x: len(x))
+    df["field_worksheets"].apply(len)
 
 # final clean-up of backward and forward dependencies
 lstClean = ["field_calculation_cleaned", "field_calculation_dependencies", 
@@ -180,20 +187,35 @@ df["field_forward_dependencies_temp"] = \
 for index, row in tqdm(df.iterrows(), total = df.shape[0]):
     visualizeDependencies(df, row.source_field_label, gMaster, inpFilePath)
 
-# remove intermediate results and apply output table column order
-colKeep = ["source_label", "field_label", "field_datatype", "field_role", 
+# output 1: field info
+colKeep = ["source_label", "field_label", "source_field_label",
+    "field_datatype", "field_role", 
     "field_role", "field_type", "field_aliases", "field_description", 
     "field_hidden", "field_category", "field_calculation_cleaned", 
-    "field_calculation_dependencies", "field_backward_dependencies", 
-    "field_forward_dependencies", "field_backward_dependencies_max_level", 
+    "field_calculation_dependencies", "field_backward_dependencies_max_level", 
     "field_forward_dependencies_max_level", "source_field_dependencies",
-    "n_source_field_dependencies", "field_worksheets", 
+    "n_source_field_dependencies", "lod_backward_dependencies", 
+    "n_lod_backward_dependencies", "field_worksheets", 
     "n_worksheet_dependencies", "field_flagged"]
 dfWrite = df[colKeep]
+
+# output 2: dependency info
+lstBw = [item for x in list(df.field_backward_dependencies) for item in x]
+lstFw = [item for x in list(df.field_forward_dependencies) for item in x]
+dfWrite2 = pd.DataFrame(lstBw + lstFw)
+dfWrite2["source_field_label"] = dfWrite2["source"] + "." + dfWrite2["root"]
+dfWrite2 = dfWrite2[["source_field_label", "parent", "child", \
+    "level", "category", "sheets"]]
+dfWrite2.columns = ["source_field_label", "dependency_from", 
+"dependency_to", "dependency_level", "dependency_category", 
+"dependency_worksheets_overlap"]
 
 # store results and finish
 stepLog("Saving table result in " + outFilePath + "...")
 if not os.path.isdir(outFileDirectory):
     os.makedirs(outFileDirectory)
-dfWrite.to_csv(path_or_buf = outFilePath, index = False, sep = ',')
+
+with pd.ExcelWriter(outFilePath) as writer:
+    dfWrite.to_excel(writer, sheet_name = "fields", index = False)
+    dfWrite2.to_excel(writer, sheet_name = "dependencies", index = False)
 input("Done! Press Enter to continue...")
