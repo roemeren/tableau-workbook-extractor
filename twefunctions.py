@@ -95,7 +95,7 @@ def fieldCalculationMapping(c, s, d1, d2, l):
         c: Source field calculation string
         s: Source field source name
         d1: Dictionary of source field -> replacement ID mappings
-        d1: Dictionary of source field -> source label mappings
+        d2: Dictionary of source field -> source label mappings
         l: List of unique field names
 
     Returns:
@@ -109,7 +109,7 @@ def fieldCalculationMapping(c, s, d1, d2, l):
         incorrect results.
     """
     # remove comments
-    res = re.sub(r"\/{2}.*\n", '', c)
+    res = re.sub(r"\/{2}.*\n", "", c)
     # external: [source ID].[field ID] -> [replacement ID]
     for key in d1: res = res.replace(key, d1.get(key))
     # internal: [field ID] -> [source ID].[field ID]
