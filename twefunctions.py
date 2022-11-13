@@ -16,9 +16,6 @@ def suppress_stdout():
     Temporarily suppress console output. 
     Source: http://thesmithfam.org/blog/2012/10/25/temporarily-suppress-console-output-in-python/
 
-    Args:
-        message: Input data frame
-
     Returns:
         Suppress console output for following commands e.g. when 
         opening a workbook
@@ -175,9 +172,9 @@ def fieldCategory(s, d, c):
         Category of the source field: parameter, field, calculated field (LOD)
     """
     if s.startswith("[Parameters]."): return "Parameter"
-    if len(d) == 0: return "Field"
     if re.search(r"{[^'\"].*?[^'\"]}", c): return "Calculated Field (LOD)"
-    else: return "Calculated Field"
+    if c != "": return "Calculated Field"
+    else: return "Field"
 
 def getBackwardDependencies(df, f, level = 0, c = None):
     """

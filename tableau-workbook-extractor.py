@@ -64,11 +64,12 @@ df["source_label"] = df.apply(lambda x: \
     processCaptions(x.data_source_name, x.data_source_caption), axis = 1)
 df["source_field_label"] = df["source_label"] + "." + df["field_label"]
 
-# filter out duplicate parameter rows
+# filter out duplicate parameter rows and [:Measure Names] field
 lstParam = list(df[df["source_label"] == "[Parameters]"]["field_label"])
 df["field_is_param_duplicate"] = df.apply(lambda x: \
     isParamDuplicate(lstParam, x.source_label, x.field_label), axis = 1)
-df = df[df["field_is_param_duplicate"] == 0]
+df = df[(df["field_is_param_duplicate"] == 0) & 
+    (df["field_label"] != "[:Measure Names]")]
 
 # add a randomly generated ID field for each unique field
 df["source_field_repl_id"] = getRandomReplacementID(df, "field_calculation")
@@ -79,7 +80,7 @@ dictMapping1 = \
 dictMapping2 = \
     sourceFieldMappingTable(df, "source_field_id", "source_field_label")
 
-# clean up field calculations
+# clean up field calculations and aliases
 lstFieldID = list(df["field_id"].unique())
 df["field_calculation_cleaned"] = \
     df.apply(lambda x: \
@@ -125,12 +126,17 @@ df["field_forward_dependencies"] = \
 
 # calculate max. forward and backward dependency levels
 df["field_backward_dependencies_max_level"] = \
-    df["field_backward_dependencies"].apply(lambda x: getMaxLevel(x))
+    df["field_backward_dependencies"].apply(getMaxLevel)
 df["field_forward_dependencies_max_level"] = \
-    df["field_forward_dependencies"].apply(lambda x: getMaxLevel(x))
+    df["field_forward_dependencies"].apply(getMaxLevel)
 
-# flag fields with no dependencies and/or linked sheets
-df["field_flagged"] = df.apply(lambda x: \
+# flag (calculated) fields with no forward dependencies and linked sheets
+df["field_flagged_1"] = df.apply(lambda x: \
+    np.where((len(x.field_forward_dependencies) == 0) & \
+            (len(x.field_worksheets) == 0), 1, 0), axis = 1)
+
+# flag fields with no dependencies and linked sheets
+df["field_flagged_2"] = df.apply(lambda x: \
     np.where((len(x.field_backward_dependencies) == 0) & \
         (len(x.field_forward_dependencies) == 0) & \
             (len(x.field_worksheets) == 0), 1, 0), axis = 1)
@@ -142,9 +148,13 @@ df["source_field_dependencies"] = \
 df["lod_backward_dependencies"] = \
     df.apply(lambda x: getFieldsFromCategory(x.field_backward_dependencies, 
     "Calculated Field (LOD)", True), axis = 1)
-df["n_source_field_dependencies"] = \
+df["n_backward_dependencies"] = \
+    df["field_backward_dependencies"].apply(len)
+df["n_forward_dependencies"] = \
+    df["field_forward_dependencies"].apply(len)
+df["n_backward_dependencies_field"] = \
     df["source_field_dependencies"].apply(len)
-df["n_lod_backward_dependencies"] = \
+df["n_backward_dependencies_lod"] = \
     df["lod_backward_dependencies"].apply(len)
 df["n_worksheet_dependencies"] = \
     df["field_worksheets"].apply(len)
@@ -190,12 +200,13 @@ for index, row in tqdm(df.iterrows(), total = df.shape[0]):
 colKeep = ["source_label", "field_label", "source_field_label",
     "field_datatype", "field_role", 
     "field_role", "field_type", "field_aliases", "field_description", 
-    "field_hidden", "field_category", "field_calculation_cleaned", 
-    "field_calculation_dependencies", "field_backward_dependencies_max_level", 
-    "field_forward_dependencies_max_level", "source_field_dependencies",
-    "n_source_field_dependencies", "lod_backward_dependencies", 
-    "n_lod_backward_dependencies", "field_worksheets", 
-    "n_worksheet_dependencies", "field_flagged"]
+    "field_hidden", "field_worksheets", "field_category", 
+    "field_calculation_cleaned", "field_calculation_dependencies", 
+    "field_backward_dependencies_max_level", 
+    "field_forward_dependencies_max_level", 
+    "n_backward_dependencies", "n_forward_dependencies",
+    "n_backward_dependencies_field", "n_backward_dependencies_lod",
+    "n_worksheet_dependencies", "field_flagged_1", "field_flagged_2"]
 dfWrite = df[colKeep]
 
 # output 2: dependency info
