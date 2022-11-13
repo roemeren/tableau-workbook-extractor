@@ -83,7 +83,7 @@ def sourceFieldMappingTable(df, colFrom, colTo):
     dfRes.columns = ["from", "to"]
     arrRes = np.array(dfRes)
     # dict conversion automatically deduplicates mappings
-    dictRes = dict(arrRes[1:]) 
+    dictRes = dict(arrRes[:]) 
     return dictRes
 
 def fieldCalculationMapping(c, s, d1, d2, l):
@@ -101,6 +101,12 @@ def fieldCalculationMapping(c, s, d1, d2, l):
     Returns:
         Calculation string without comments and with all field ID references
         replaced by field label references
+
+    Notes:
+        The function assumes that external fields are 
+        referenced as [source ID].[field ID] and internal 
+        fields [field ID]. If this is not the case the function may return
+        incorrect results.
     """
     # remove comments
     res = re.sub(r"\/{2}.*\n", '', c)
