@@ -4,6 +4,8 @@ import easygui
 import warnings
 from tqdm import tqdm
 
+fTest = False
+
 # ignore future warnings when reading field attributes (not applicable)
 warnings.simplefilter(action = 'ignore', category = FutureWarning)
 
@@ -13,8 +15,11 @@ stepLog.counter = 1
 
 # prompt user for twb file and extract file/directory names
 stepLog("Prompt for input Tableau workbook...")
-# inpFilePath = easygui.fileopenbox(default = "*.twb*")
-inpFilePath = "C:\\Users\\remerencia\\Documents\\tableau-workbook-extractor\\notebooks\\Test Dashboard.twbx"
+if fTest:
+    inpFilePath = ("C:\\Users\\remerencia\\Documents\\" + 
+        "tableau-workbook-extractor\\notebooks\\Test Dashboard.twbx")
+else: 
+    inpFilePath = easygui.fileopenbox(default = "*.twb*")
 inpFileName = os.path.splitext(os.path.basename(inpFilePath))[0]
 outFilePath = inpFilePath + ' Files\\Fields\\' + inpFileName + '.xlsx'
 outFileDirectory = os.path.dirname(outFilePath)
