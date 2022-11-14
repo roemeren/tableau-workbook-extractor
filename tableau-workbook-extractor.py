@@ -219,20 +219,22 @@ dfWrite = df[colKeep]
 # output 2: dependency info
 df["field_backward_dependencies"] = \
     df.apply(lambda x: appendFieldsToDicts(x.field_backward_dependencies, 
-    ["source_label", "field_label", "source_field_label"], 
-    [x.source_label, x.field_label, x.source_field_label]), axis = 1)
+    ["source_label", "field_label", "source_field_label", "field_category"], 
+    [x.source_label, x.field_label, x.source_field_label, x.field_category]), 
+    axis = 1)
 df["field_forward_dependencies"] = \
     df.apply(lambda x: appendFieldsToDicts(x.field_forward_dependencies, 
-    ["source_label", "field_label", "source_field_label"], 
-    [x.source_label, x.field_label, x.source_field_label]), axis = 1)
+    ["source_label", "field_label", "source_field_label", "field_category"], 
+    [x.source_label, x.field_label, x.source_field_label, x.field_category]), 
+    axis = 1)
 lstBw = [item for x in list(df.field_backward_dependencies) for item in x]
 lstFw = [item for x in list(df.field_forward_dependencies) for item in x]
 dfWrite2 = pd.DataFrame(lstBw + lstFw)
 dfWrite2 = dfWrite2[["source_label", "field_label", "source_field_label", 
-"parent", "child", "level", "category", "sheets"]]
+"field_category", "parent", "child", "level", "category", "sheets"]]
 dfWrite2.columns = ["source_label", "field_label", "source_field_label", 
-"dependency_from", "dependency_to", "dependency_level", "dependency_category", 
-"dependency_worksheets_overlap"]
+"field_category", "dependency_from", "dependency_to", "dependency_level", 
+"dependency_category", "dependency_worksheets_overlap"]
 
 # store results and finish
 stepLog("Saving table result in " + outFilePath + "...")
