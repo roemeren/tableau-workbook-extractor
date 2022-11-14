@@ -53,7 +53,8 @@ for attr in fieldAttr:
 
 stepLog("Processing fields...")
 # additional transformations
-df["field_hidden"] = np.where(df["field_hidden"] == "true", 1, 0)
+df["field_hidden"] = df["field_hidden"].apply(lambda x: \
+    np.where(x == "true", 1, 0))
 df[["data_source_caption", "field_caption", "field_calculation"]] = \
     df[["data_source_caption", "field_caption",
      "field_calculation"]].fillna('')
