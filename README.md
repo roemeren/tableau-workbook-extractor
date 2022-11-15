@@ -1,5 +1,7 @@
 # tableau-workbook-extractor
 
+Python script to automatically analyze (possibly complex Tableau) workbooks.
+
 ## Getting started
 
 ### Cloning the repo
@@ -32,7 +34,18 @@ For creating graphs the `Graphviz` software is used and should be installed from
 
 ## Description
 
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+The script prompts the user to select a locally saved Tableau workbook (in `.twb` or `.twbx` format), after which 2 outputs are created:
+
+1. An Excel file `<workbook_name>.xlsx` containing a table of field information (sheet `fields`) and a table of field dependencies (sheet `dependencies`). The tables are a cleaned and processed version of information extracted from the [Tableau Document API](https://tableau.github.io/document-api-python/)
+2. A PNG `<source_name>-<field_name>.xlsx` for each field that has at least 1 dependency to ('forward' dependency) or from ('backward' dependency) another field or sheet, containing a graph of all the field's dependencies with different colors and shapes indicating the dependency types (parameter, data source field or calculated field). The graphs are generated using [Pydot](https://pypi.org/project/pydot/), a Python interfact to [Graphviz](https://graphviz.org/)
+
+These files could be useful for the following reasons:
+
+- Get a full overview of **how a field is calculated** (starting from the data source) and how (much) it is used in sheets and/or other calculations
+- Get an overview of **unused fields and calculations** that could be removed from the Tableau if needed to improve performance or to keep extract sizes as low as possible
+- Get an overview of **overall complexity** of the dashboard and check whether or not it is needed to simplify fields by pruning dependencies
+- Automate the **documentation** process of the dashboard
+
 
 ## Sources
 
@@ -41,16 +54,11 @@ Let people know what your project can do specifically. Provide context and add a
 - [Graphviz documentation](https://graphviz.org/docs/nodes/): node and graph attributes
 - [Google Python Style Guide](https://github.com/google/styleguide/blob/gh-pages/pyguide.md#38-comments-and-docstrings): information on docstrings
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
 ## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
 
-### Known issues
+*To be included: example with simple workbook & visuals of outputs*
+
+## Known issues
 
 - **Not all dependencies are captured**: it is possible that flagged fields/parameters are still used/useful in the workbook because they are for example used in a dashboard URL action. Deleting it in Tableau won't raise any warnings (surprisingly) but the field removal may cause issues.
 - **Not all field captions are captured**: some data source field captions (among other attributes) are missing when using the Tableau Document API while these captions can be located in the workbook's raw XML (within the `<metadata-record>`'s `<caption>` tag). It appears to be related to hidden fields (maybe previously unhidden?) in the data source.
@@ -64,12 +72,19 @@ Tell people where they can go to for help. It can be any combination of an issue
 ## Roadmap
 If you have ideas for releases in the future, it is a good idea to list them in the README.
 
+Some possible extensions:
+
+- Batch processing of a set or folder of workbooks at once
+- Code refactoring; the current pandas implementation may not be the fastest/shortest
+- Follow up the development of the Documentation API. Currently not all extracted information is 100% correct or directly usable which is why additional processiong is needed. The API may improve in the future, removing the need of some of the post-processing.
+- Include additional fields and information in the output Excel file
+- Improve the quality/readability of the output graphs
+
 ## Contributing
+
+Feel free to contribute or improve this tool! See the 'Roadmap' section for possible ideas and the 'Sources' section for background documentation on some of the external libraries that are used.
 State if you are open to contributions and what your requirements are for accepting them.
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
 ## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+
+Currently information can be extracted from a single workbook and should be accurate. There are however still some exceptional cases that may be improved further, possibly after future API update checks.
