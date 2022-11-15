@@ -313,7 +313,7 @@ def getFieldsFromCategory(l, c, f):
     res = list(set(res))
     return res
 
-def addNode(sf, cat, shapes, colors):
+def addNode(sf, cat, shapes, colors, calc):
     """
     Creates graph node objects for an input source field
 
@@ -322,16 +322,20 @@ def addNode(sf, cat, shapes, colors):
         cat: Input source field category
         shapes: List of shapes per source field category
         colors: List of colors per source field category
+        calc: Input source field calculation expression
 
     Returns: 
-        List of 2 nodes related for resp. the field and source field name
+        List of 2 nodes related for resp. the field and source field name. 
+        For calculated fields the expression is used as tooltip
     """
     s = sf.split(".")[0]
     f = sf.split(".")[1]
-    node1 = pydot.Node(name = f, shape = shapes[cat], \
-        fillcolor = colors[cat], style = "filled")
-    node2 = pydot.Node(name = sf, shape = shapes[cat], \
-        fillcolor = colors[cat], style = "filled")
+    if calc == "": c = " "
+    else: c = calc
+    node1 = pydot.Node(name = f, shape = shapes[cat],
+        fillcolor = colors[cat], style = "filled", tooltip = c)
+    node2 = pydot.Node(name = sf, shape = shapes[cat],
+        fillcolor = colors[cat], style = "filled", tooltip = c)
     return [node1, node2]
 
 def replaceSourceReference(x, s):
@@ -352,18 +356,21 @@ def replaceSourceReference(x, s):
         res = [json.loads(idx.replace("'", '"')) for idx in [res]][0]
     return res
 
-def visualizeDependencies(df, sf, g, fin):
+def visualizeDependencies(df, sf, g, fin, svg = False):
     """
-    Creates output PNG file containing all dependencies for a given source field
+    Creates output PNG/SVG files containing all dependencies for a 
+    given source field
 
     Args:
         df: Input data frame containing backward and forward dependencies
         sf: Input source field name
         g: Master graph containing all source field and field node objects
         fin: Path to the input Tableau workbook
+        svg: Indicator (T/F) whether or not to generate SVG as well
 
     Returns: 
-        PNG file in "<workbook path> Files\Graphs\<source field name>.png"
+        PNG file in "<workbook path> Files\Graphs\<source field name>.png" and 
+        additional SVG file (with extra attributes) if svg == True
     """
     s = sf.split(".")[0]
     f = sf.split(".")[1]
@@ -408,10 +415,13 @@ def visualizeDependencies(df, sf, g, fin):
         if not os.path.isdir(dout):
             os.makedirs(dout)
         
-        # write output file
+        # write output files with forced UTF-8 encoding to avoid errors
+        # see https://github.com/pydot/pydot/issues/142
         outFile = "{0}{1}-{2}.png".format(dout, sout, fout)
-        G.write_png(outFile)
-        return outFile
+        G.write_png(outFile, encoding = "utf-8")
+        if svg:
+            outFile = "{0}{1}-{2}.svg".format(dout, sout, fout)
+            G.write_svg(outFile, encoding = "utf-8")
 
 def appendFieldsToDicts(l, k, v):
     """

@@ -4,7 +4,9 @@ import easygui
 import warnings
 from tqdm import tqdm
 
-fTest = False
+# script parameters
+fTest = False # run without prompt or not?
+fSVG = True # add SVG outputs?
 
 # ignore future warnings when reading field attributes (not applicable)
 warnings.simplefilter(action = 'ignore', category = FutureWarning)
@@ -184,7 +186,8 @@ shapes = {"Parameter": "parallelogram",
     "Field": "box", "Calculated Field (LOD)": "oval", 
     "Calculated Field": "oval"}
 nodes = df.apply(lambda x: \
-    addNode(x.source_field_label, x.field_category, shapes, colors), axis = 1)
+    addNode(x.source_field_label, x.field_category, shapes, colors, 
+        x.field_calculation_cleaned), axis = 1)
 lstNodes = []
 for node in nodes: lstNodes += node
 gMaster = pydot.Dot()
@@ -202,7 +205,8 @@ df["field_forward_dependencies_temp"] = \
 
 # create dependency graphs per field
 for index, row in tqdm(df.iterrows(), total = df.shape[0]):
-    visualizeDependencies(df, row.source_field_label, gMaster, inpFilePath)
+    visualizeDependencies(df, row.source_field_label, gMaster, 
+        inpFilePath, fSVG)
 
 # output 1: field info
 colKeep = ["source_label", "field_label", "source_field_label",

@@ -60,7 +60,9 @@ These files could be useful for the following reasons:
 
 ## Known issues
 
-- **Not all dependencies are captured**: it is possible that flagged fields/parameters are still used/useful in the workbook because they are for example used in a dashboard URL action. Deleting it in Tableau won't raise any warnings (surprisingly) but the field removal may cause issues.
+- **Not all dependencies are captured**: 
+    - it is possible that flagged fields/parameters are still used/useful in the workbook because they are for example used in a dashboard URL action. Deleting it in Tableau won't raise any warnings (surprisingly) but the field removal may cause issues.
+    - if fields are based on hidden fields from a data source these dependencies won't be captured and/or shown in the outputs
 - **Not all field captions are captured**: some data source field captions (among other attributes) are missing when using the Tableau Document API while these captions can be located in the workbook's raw XML (within the `<metadata-record>`'s `<caption>` tag). It appears to be related to hidden fields (maybe previously unhidden?) in the data source.
 - **Not all fields are assigned to the correct data source**: for unknown reasons
 some (copies of) fields are assigned to a data source it doesn't belong to. This 
