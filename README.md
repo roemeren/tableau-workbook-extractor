@@ -66,11 +66,7 @@ These files could be useful for the following reasons:
 some (copies of) fields are assigned to a data source it doesn't belong to. This 
 may also be related to open issues in the Document API.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
 ## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
 
 Some possible extensions:
 
