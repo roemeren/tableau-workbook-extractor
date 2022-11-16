@@ -329,15 +329,16 @@ def addNode(sf, cat, shapes, colors, calc):
         List of 2 nodes related for resp. the field and source field name. 
         For calculated fields the expression is used as tooltip
     """
-    # field name: replace colon by semicolon to avoid problems in pydot
+    # node name: replace colon by semicolon to avoid problems in pydot
     # https://github.com/pydot/pydot/issues/224
     sf1 = sf.replace(":", ";")
     f = sf1.split(".")[1].replace(":", ";")
+    fLabel = sf.split(".")[1]
     if calc == "": c = " "
     else: c = calc
-    node1 = pydot.Node(name = f, shape = shapes[cat],
+    node1 = pydot.Node(name = f, label = fLabel, shape = shapes[cat],
         fillcolor = colors[cat], style = "filled", tooltip = c)
-    node2 = pydot.Node(name = sf1, shape = shapes[cat],
+    node2 = pydot.Node(name = sf1, label = sf, shape = shapes[cat],
         fillcolor = colors[cat], style = "filled", tooltip = c)
     return [node1, node2]
 
