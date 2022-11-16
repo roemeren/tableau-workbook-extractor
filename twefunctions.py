@@ -242,7 +242,7 @@ def getForwardDependencies(df, f, w, level = 0, p = None, ):
     else:
         # add root sheet dependencies (already is full list)
         for sh in ws:
-            lst += [{"parent": "", "child": sh, \
+            lst += [{"parent": f, "child": sh, \
                 "level": "+1", "category": "Sheet", 
             "sheets": 1}]
     
