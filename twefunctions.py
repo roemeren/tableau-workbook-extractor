@@ -395,7 +395,7 @@ def visualizeDependencies(df, sf, g, fin, svg = False):
         MGCopy = copy.deepcopy(g)
 
         # set properties for main node
-        G = pydot.Dot(graph_type = "digraph")
+        G = pydot.Dot(graph_type = "digraph", tooltip = " ")
         subject = '"' + f + '"'
         G.add_node(MGCopy.get_node(subject)[0])
         G.get_node(subject)[0].set("fillcolor", "lightblue")
@@ -410,7 +410,7 @@ def visualizeDependencies(df, sf, g, fin, svg = False):
                 nodeChild = MGCopy.get_node(child)[0]
                 G.add_node(nodeParent)
                 G.add_node(nodeChild)
-                edge = pydot.Edge(nodeParent, nodeChild)
+                edge = pydot.Edge(nodeParent, nodeChild, tooltip = " ")
                 G.add_edge(edge)
 
         # create output graphs folder if it doesn't exist yet
