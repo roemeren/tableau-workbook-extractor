@@ -140,17 +140,6 @@ df["field_backward_dependencies_max_level"] = \
 df["field_forward_dependencies_max_level"] = \
     df["field_forward_dependencies"].apply(getMaxLevel)
 
-# flag (calculated) fields with no forward dependencies and linked sheets
-df["field_flagged_1"] = df.apply(lambda x: \
-    np.where((len(x.field_forward_dependencies) == 0) & \
-            (len(x.field_worksheets) == 0), 1, 0), axis = 1)
-
-# flag fields with no dependencies and linked sheets
-df["field_flagged_2"] = df.apply(lambda x: \
-    np.where((len(x.field_backward_dependencies) == 0) & \
-        (len(x.field_forward_dependencies) == 0) & \
-            (len(x.field_worksheets) == 0), 1, 0), axis = 1)
-
 # get some dependency aggregates
 df["source_field_dependencies"] = \
     df.apply(lambda x: getFieldsFromCategory(x.field_backward_dependencies, 
@@ -170,6 +159,10 @@ df["n_backward_dependencies_field"] = \
     df["source_field_dependencies"].apply(len)
 df["n_backward_dependencies_lod"] = \
     df["lod_backward_dependencies"].apply(len)
+
+# flag unused fields (field and its forward dependencies not used in sheets)
+df["flag_unused"] = df.apply(lambda x: \
+    np.where(x.n_worksheet_dependencies == 0, 1, 0), axis = 1)
 
 # final clean-up of backward and forward dependencies
 lstClean = ["field_calculation_cleaned", "field_calculation_dependencies", 
@@ -220,7 +213,7 @@ colKeep = ["source_label", "field_label", "source_field_label",
     "field_forward_dependencies_max_level", 
     "n_backward_dependencies", "n_forward_dependencies",
     "n_backward_dependencies_field", "n_backward_dependencies_lod",
-    "n_worksheet_dependencies", "field_flagged_1", "field_flagged_2"]
+    "n_worksheet_dependencies", "flag_unused"]
 dfWrite = df[colKeep]
 
 # output 2: dependency info
