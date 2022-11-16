@@ -108,8 +108,8 @@ def fieldCalculationMapping(c, s, d1, d2, l):
         fields [field ID]. If this is not the case the function may return
         incorrect results.
     """
-    # remove comments
-    res = re.sub(r"\/{2}.*\n", "", c)
+    # remove comments (anything that starts with // until end of line)
+    res = re.sub(r"\/{2}.*$", "", c)
     # external: [source ID].[field ID] -> [replacement ID]
     for key in d1: res = res.replace(key, d1.get(key))
     # internal: [field ID] -> [source ID].[field ID]
