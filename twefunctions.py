@@ -329,13 +329,15 @@ def addNode(sf, cat, shapes, colors, calc):
         List of 2 nodes related for resp. the field and source field name. 
         For calculated fields the expression is used as tooltip
     """
-    s = sf.split(".")[0]
-    f = sf.split(".")[1]
+    # field name: replace colon by semicolon to avoid problems in pydot
+    # https://github.com/pydot/pydot/issues/224
+    sf1 = sf.replace(":", ";")
+    f = sf1.split(".")[1].replace(":", ";")
     if calc == "": c = " "
     else: c = calc
     node1 = pydot.Node(name = f, shape = shapes[cat],
         fillcolor = colors[cat], style = "filled", tooltip = c)
-    node2 = pydot.Node(name = sf, shape = shapes[cat],
+    node2 = pydot.Node(name = sf1, shape = shapes[cat],
         fillcolor = colors[cat], style = "filled", tooltip = c)
     return [node1, node2]
 
@@ -373,8 +375,10 @@ def visualizeDependencies(df, sf, g, fin, svg = False):
         PNG file in "<workbook path> Files\Graphs\<source field name>.png" and 
         additional SVG file (with extra attributes) if svg == True
     """
-    s = sf.split(".")[0]
-    f = sf.split(".")[1]
+    # convert names to node names (no colons, see addNode function)
+    sf1 = sf.replace(":", ";")
+    s = sf1.split(".")[0]
+    f = sf1.split(".")[1]
     dictBackward = \
         list(df[df.source_field_label == sf]\
             ["field_backward_dependencies_temp"])[0]
@@ -399,8 +403,8 @@ def visualizeDependencies(df, sf, g, fin, svg = False):
         for d in dictDependency:
             # don't visualize sheet dependencies
             if d["category"] != "Sheet":
-                parent = '"' + d["parent"] + '"'
-                child = '"' + d["child"] + '"'
+                parent = ('"' + d["parent"] + '"').replace(":", ";")
+                child = ('"' + d["child"] + '"').replace(":", ";")
                 nodeParent = MGCopy.get_node(parent)[0]
                 nodeChild = MGCopy.get_node(child)[0]
                 G.add_node(nodeParent)
