@@ -77,6 +77,7 @@ Some possible extensions:
 - Follow up the development of the Documentation API. Currently not all extracted information is 100% correct or directly usable which is why additional processiong is needed. The API may improve in the future, removing the need of some of the post-processing.
 - Include additional fields and information in the output Excel file
 - Improve the quality/readability of the output graphs
+- Test more workbooks to find additional edge cases e.g. field names with special characters that aren't processed correctly
 
 ## Contributing
 
