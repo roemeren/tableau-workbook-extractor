@@ -178,7 +178,8 @@ def fieldCategory(s, d, c):
         Category of the source field: parameter, field, calculated field (LOD)
     """
     if s.startswith("[Parameters]."): return "Parameter"
-    if re.search(r"{[^'\"].*?[^'\"]}", c): return "Calculated Field (LOD)"
+    # LOD matching: anything between curly brackets (lazy)
+    if re.search(r"{.*?}", c): return "Calculated Field (LOD)"
     if c != "": return "Calculated Field"
     else: return "Field"
 
