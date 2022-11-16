@@ -61,8 +61,10 @@ df[["data_source_caption", "field_caption", "field_calculation"]] = \
     df[["data_source_caption", "field_caption",
      "field_calculation"]].fillna('')
 
-# data source and field IDs
+# add brackets to data source and field IDs if needed
 df["data_source_name"] = "[" + df["data_source_name"]+ "]"
+df["field_id"] = df["field_id"].apply(lambda x: 
+    np.where(re.search(r"\[.*\]", x), x, "[{0}]".format(x)))
 df["source_field_id"] = df["data_source_name"] + "." + df["field_id"]
 
 # data source and field labels
@@ -196,12 +198,12 @@ for node in lstNodes: gMaster.add_node(node)
 # calculate temporary version with parameter source references removed
 df["field_backward_dependencies_temp"] = \
     df.apply(lambda x: \
-        replaceSourceReference(x.field_backward_dependencies, "[Parameters]"), 
-        axis = 1)
+        replaceSourceReference(x.field_backward_dependencies, 
+        "[Parameters]"), axis = 1)
 df["field_forward_dependencies_temp"] = \
     df.apply(lambda x: \
-        replaceSourceReference(x.field_forward_dependencies, "[Parameters]"), 
-        axis = 1)
+        replaceSourceReference(x.field_forward_dependencies, 
+        "[Parameters]"), axis = 1)
 
 # create dependency graphs per field
 for index, row in tqdm(df.iterrows(), total = df.shape[0]):
