@@ -87,7 +87,7 @@ df["source_field_repl_id"] = "[" + baseID + df.index.astype(str) + "]"
 
 # create source fields to ID mapping dictionary as well as the reverse
 dictFieldIDToID = \
-    sourceFieldMappingTable(df, "source_field_id", "source_field_repl_id")
+    fieldMappingTable(df, "source_field_id", "source_field_repl_id")
 
 # clean up field calculations and aliases
 lstFieldID = list(df["field_id"].unique())
@@ -114,7 +114,7 @@ df["field_category"] = df.apply(lambda x: \
 stepLog("Processing field dependencies...")
 # get full list of backward dependencies
 df["field_backward_dependencies"] = \
-    df["source_field_repl_id"].apply(lambda x: getBackwardDependencies(df, x))
+    df["source_field_repl_id"].apply(lambda x: backwardDependencies(df, x))
 
 # get full list of forward dependencies using exploded version of df (faster)
 dfExplode = df[["source_field_repl_id", "field_category", \
@@ -123,30 +123,30 @@ dfExplode = dfExplode.explode("field_calculation_dependencies")
 dfExplode.columns = ["id", "category", "worksheets", "dependency"]
 df["field_forward_dependencies"] = \
     df.apply(lambda x: \
-        getForwardDependencies(dfExplode, x.source_field_repl_id, 
+        forwardDependencies(dfExplode, x.source_field_repl_id, 
         x.field_worksheets_id), axis = 1)
 
 # only keep unique dependencies with their max level
 df["field_backward_dependencies"] = \
     df.apply(lambda x: \
-        getUniqueDependencies(x.field_backward_dependencies, 
+        uniqueDependencies(x.field_backward_dependencies, 
         ["child", "parent", "category"], "level"), axis = 1)
 df["field_forward_dependencies"] = \
     df.apply(lambda x: \
-        getUniqueDependencies(x.field_forward_dependencies, 
+        uniqueDependencies(x.field_forward_dependencies, 
         ["child", "parent", "category", "sheets"], 
         "level"), axis = 1)
 
 # get some dependency aggregates
 df["field_backward_dependencies_max_level"] = \
-    df["field_backward_dependencies"].apply(getMaxLevel)
+    df["field_backward_dependencies"].apply(maxDependencyLevel)
 df["field_forward_dependencies_max_level"] = \
-    df["field_forward_dependencies"].apply(getMaxLevel)
+    df["field_forward_dependencies"].apply(maxDependencyLevel)
 df["source_field_dependencies"] = \
-    df.apply(lambda x: getFieldsFromCategory(x.field_backward_dependencies, 
+    df.apply(lambda x: fieldsFromCategory(x.field_backward_dependencies, 
     "Field", True), axis = 1)
 df["lod_backward_dependencies"] = \
-    df.apply(lambda x: getFieldsFromCategory(x.field_backward_dependencies, 
+    df.apply(lambda x: fieldsFromCategory(x.field_backward_dependencies, 
     "Calculated Field (LOD)", True), axis = 1)
 df["n_backward_dependencies"] = \
     df["field_backward_dependencies"].apply(len)
@@ -174,7 +174,7 @@ shapes = {"Parameter": "parallelogram",
     "Field": "box", "Calculated Field (LOD)": "oval", 
     "Calculated Field": "oval"}
 nodes = df.apply(lambda x: \
-    addNode(x.source_field_repl_id, x.source_field_label, 
+    addFieldNode(x.source_field_repl_id, x.source_field_label, 
         x.field_category, shapes, colors, x.field_calculation_cleaned), 
         axis = 1)
 lstNodes = []
@@ -194,7 +194,7 @@ for index, row in tqdm(df.iterrows(), total = df.shape[0]):
         row.source_field_label, gMaster, inpFilePath, fSVG)
 
 # final clean-up of backward and forward dependencies
-dictFieldToID = sourceFieldMappingTable(df, "source_field_label", 
+dictFieldToID = fieldMappingTable(df, "source_field_label", 
     "source_field_repl_id")
 dictLabelToID = {**dictFieldToID, **dictSheetToID}
 
@@ -202,7 +202,7 @@ lstClean = ["field_calculation_cleaned", "field_calculation_dependencies",
    "field_backward_dependencies", "field_forward_dependencies", 
    "source_field_dependencies"]
 for col in lstClean:
-   df[col] = df.apply(lambda x: fieldLabelMapping(x[col], x.source_label, 
+   df[col] = df.apply(lambda x: fieldIDMapping(x[col], x.source_label, 
     dictLabelToID), axis = 1)
 
 # output 1: field info

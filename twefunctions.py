@@ -66,7 +66,7 @@ def getRandomReplacementBaseID(df, c, suffix = ""):
         flagSucceed = not any(res in s for s in uniqueVals)
     return res
 
-def sourceFieldMappingTable(df, colFrom, colTo):
+def fieldMappingTable(df, colFrom, colTo):
     """
     Replace all external and internal field references by unique
     source/field IDs
@@ -216,7 +216,7 @@ def fieldCategory(s, c):
     if c != "": return "Calculated Field"
     else: return "Field"
 
-def getBackwardDependencies(df, f, level = 0, c = None):
+def backwardDependencies(df, f, level = 0, c = None):
     """
     Recursively get all backward dependencies of a field
 
@@ -242,10 +242,10 @@ def getBackwardDependencies(df, f, level = 0, c = None):
     if len(depList) > 0:
         # remove reference by copying the list
         for y in depList[0].copy():
-            lst += getBackwardDependencies(df, y, level + 1, f)
+            lst += backwardDependencies(df, y, level + 1, f)
     return lst
 
-def getForwardDependencies(df, f, w, level = 0, p = None, ):
+def forwardDependencies(df, f, w, level = 0, p = None, ):
     """
     Recursively get all forward dependencies of a field
 
@@ -284,11 +284,11 @@ def getForwardDependencies(df, f, w, level = 0, p = None, ):
     if len(depList) > 0:
         # remove reference by copying the list
         for y in depList.copy(): 
-            lst += getForwardDependencies(df, y, w, level + 1, f)
+            lst += forwardDependencies(df, y, w, level + 1, f)
 
     return lst
 
-def getUniqueDependencies(d, g, f):
+def uniqueDependencies(d, g, f):
     """
     Keep unique dependencies from a list of dependencies with their minimum
     dependency level
@@ -310,7 +310,7 @@ def getUniqueDependencies(d, g, f):
         res = df.to_dict("records")
     return res
 
-def getMaxLevel(l):
+def maxDependencyLevel(l):
     """
     Return maximum forward or backward dependency level of a given input list
 
@@ -325,7 +325,7 @@ def getMaxLevel(l):
     if len(l) > 0: res = max([d.get("level") for d in l])
     return res
 
-def getFieldsFromCategory(l, c, f):
+def fieldsFromCategory(l, c, f):
     """
     Return list of fields of a given category from a list of 
     dependency dictionaries
@@ -348,7 +348,7 @@ def getFieldsFromCategory(l, c, f):
     res = list(set(res))
     return res
 
-def addNode(sf, l, cat, shapes, colors, calc):
+def addFieldNode(sf, l, cat, shapes, colors, calc):
     """
     Creates graph node objects for an input source field
 
@@ -371,7 +371,7 @@ def addNode(sf, l, cat, shapes, colors, calc):
         fillcolor = colors[cat], style = "filled", tooltip = c)
     return [node]
 
-def fieldLabelMapping(x, s, d):
+def fieldIDMapping(x, s, d):
     """
     Replace IDs by labels for an input string or dict list
 
