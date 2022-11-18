@@ -167,11 +167,7 @@ df["n_backward_dependencies_lod"] = \
 df["flag_unused"] = df.apply(lambda x: \
     np.where(x.n_worksheet_dependencies == 0, 1, 0), axis = 1)
 
-if fDepFields:
-    inpPath = "{0} Files\\Graphs\\".format(inpFilePath)
-
-    stepLog("Creating field dependency graphs per source in {0}..."
-        .format(inpPath))
+if fDepFields or fDepSheets:
     # Create master node graph
     colors = {"Parameter": "#cbc3e3",
         "Field": "green", "Calculated Field (LOD)": "red", 
@@ -193,6 +189,12 @@ if fDepFields:
         node = pydot.Node(name = dictSheetToID[x], label = x, shape = "box",
             fillcolor = "grey", style = "filled", tooltip = " ")
         gMaster.add_node(node)
+
+if fDepFields:
+    inpPath = "{0} Files\\Graphs\\".format(inpFilePath)
+
+    stepLog("Creating field dependency graphs per source in {0}..."
+        .format(inpPath))
     # create dependency graphs per field
     for index, row in tqdm(df.iterrows(), total = df.shape[0]):
         visualizeFieldDependencies(df, row.source_field_repl_id, 
