@@ -447,10 +447,12 @@ def visualizeDependencies(df, sf, l, g, fin, svg = False):
                 nodeChild = MGCopy.get_node(child)[0]
                 sourceParent = nodeParent.get("label").split(".")
                 # replace [s].[f] label by [f] if internal reference
-                if sourceParent[0] == s:
+                if (sourceParent[0] in [s, "[Parameters]"]) & \
+                    (len(sourceParent) == 2):
                     nodeParent.set("label", sourceParent[1])
                 sourceChild = nodeChild.get("label").split(".")
-                if sourceChild[0] == s:
+                if (sourceChild[0] in [s, "[Parameters]"]) & \
+                    (len(sourceChild) == 2):
                     nodeChild.set("label", sourceChild[1])
                 G.add_node(nodeParent)
                 G.add_node(nodeChild)
