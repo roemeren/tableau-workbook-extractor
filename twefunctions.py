@@ -41,7 +41,7 @@ def stepLog(message, *args, **kwargs):
     logging.info(" STEP %d: " % stepLog.counter + message, *args, **kwargs)
     stepLog.counter += 1
 
-def getRandomReplacementID(df, c):
+def getRandomReplacementBaseID(df, c, suffix = ""):
     """
     Generate a random ID of 10 lower case letters combined with the data frame 
     index that will serve as a base for a generated field ID field
@@ -50,6 +50,7 @@ def getRandomReplacementID(df, c):
         df: Input data frame
         c: Column name that is used to check if none of the generated ID are 
         accidentally matched in it
+        suffix: optional fixed suffix to add to random ID
     
     Returns:
         Random ID consisting of the combination if 10 lower case letters 
@@ -60,9 +61,9 @@ def getRandomReplacementID(df, c):
     uniqueVals = list(df[c].unique())
     flagSucceed = False
     while not flagSucceed:
-        baseID = ''.join(random.choice(string.ascii_lowercase) for x in range(10))
-        flagSucceed = not any(baseID in s for s in uniqueVals)
-    res = "[" + baseID + df.index.astype(str) + "]"
+        res = ''.join(random.choice(string.ascii_lowercase) 
+            for x in range(10)) + suffix
+        flagSucceed = not any(res in s for s in uniqueVals)
     return res
 
 def sourceFieldMappingTable(df, colFrom, colTo):
@@ -86,7 +87,27 @@ def sourceFieldMappingTable(df, colFrom, colTo):
     dictRes = dict(arrRes[:]) 
     return dictRes
 
-def fieldCalculationMapping(c, s, d1, d2, l):
+def sheetMappingTable(df, colFrom):
+    """
+    Create dictionary of (sheet name) -> (sheet ID) mappings
+
+    Args:
+        df: Input data frame
+        colFrom: Column name containing sheet lists
+
+    Returns:
+        Dictionary containing (from: to) mappings
+    """
+    # unique list of sheet names
+    lstFrom = list(set([x for l in list(df[colFrom]) for x in l]))
+    # sequential numbering of unique sheets
+    baseID = getRandomReplacementBaseID(df, "field_calculation", "sh")
+    lstTo = ["[" + baseID + str(s) + "]" for s in list(range(len(lstFrom)))]
+    # dictionary of from -> to
+    res = dict(zip(lstFrom, lstTo))
+    return res
+
+def fieldCalculationMapping(c, s, d, l):
     """
     Replace all external and internal field references by unique
     source/field IDs
@@ -94,13 +115,12 @@ def fieldCalculationMapping(c, s, d1, d2, l):
     Args:
         c: Source field calculation string
         s: Source field source name
-        d1: Dictionary of source field -> replacement ID mappings
-        d2: Dictionary of source field -> source label mappings
+        d: Dictionary of source field -> replacement ID mappings
         l: List of unique field names
 
     Returns:
         Calculation string without comments and with all field ID references
-        replaced by field label references
+        replaced by unique replacement ID references
 
     Notes:
         The function assumes that external fields are 
@@ -109,16 +129,30 @@ def fieldCalculationMapping(c, s, d1, d2, l):
         incorrect results.
     """
     # remove comments (anything that starts with // until end of line)
-    res = re.sub(r"\/{2}.*$", "", c)
+    res = re.sub(r"\/{2}.*\n", "", c)
+    res = re.sub(r"\/{2}.*", "", c)
     # external: [source ID].[field ID] -> [replacement ID]
-    for key in d1: res = res.replace(key, d1.get(key))
+    for key in d: res = res.replace(key, d.get(key))
     # internal: [field ID] -> [source ID].[field ID]
     for fld in l: res = res.replace(fld, "{0}.{1}".format(s, fld))
     # external: [replacement ID] -> [source ID].[field ID]
-    for key in d1: res = res.replace(d1.get(key), key)
-    # [source ID].[field ID] -> [source label].[field label]
-    for key in d2: res = res.replace(key, d2.get(key))
+    for key in d: res = res.replace(d.get(key), key)
+    # [source ID].[field ID] -> [replacement ID]
+    for key in d: res = res.replace(key, d.get(key))
     return res
+
+def sheetMapping(s, d):
+    """
+    Replace all sheet names by a sequential sheet ID
+
+    Args:
+        s: List of sheet names
+        d: Dictionary of sheet name -> sheet ID mappings
+
+    Returns:
+        List of mapped sheet names to sheet IDs
+    """
+    return list(map(d.get, s.copy()))
 
 def processCaptions(i, c):
     """
@@ -165,13 +199,12 @@ def isParamDuplicate(p, s, x):
     """
     return x in p and s != "[Parameters]"
 
-def fieldCategory(s, d, c):
+def fieldCategory(s, c):
     """
     Returns the category of a source field 
 
     Args:
         s: Source field label
-        d: List of source field dependencies
         c: Source field cleaned calculation
 
     Returns: 
@@ -189,14 +222,14 @@ def getBackwardDependencies(df, f, level = 0, c = None):
 
     Args:
         df: Input data frame
-        f: Source field name
+        f: Source field replacement ID
         level: Dependency level (0 = root, -1 = level 1 backwards, etc.)
-        c: Originating child source field name
+        c: Originating child source field replacement ID
 
     Returns: 
         List of all backward dependencies of the input source field
     """
-    x = df.loc[df.source_field_label == f]
+    x = df.loc[df.source_field_repl_id == f]
     depList = list(x.field_calculation_dependencies)
     cat = list(x.field_category)[0]
     lst = []
@@ -218,17 +251,18 @@ def getForwardDependencies(df, f, w, level = 0, p = None, ):
 
     Args:
         df: Input data frame
-        f: Source field name
-        w: List of root source field worksheet dependencies
+        f: Source field replacement ID
+        w: List of root source field worksheet ID dependencies
+        rs: Root source field source name
         level: Dependency level (0 = root, -1 = level 1 backwards, etc.)
-        p: Originating parent source field name
+        p: Originating parent source field replacement ID
 
     Returns: 
         List of all forward dependencies of the input source field
     """
-    x = df.loc[df.label == f][["category", "worksheets"]]
+    x = df.loc[df.id == f][["category", "worksheets"]]
     cat, ws = x.head(1).values.flatten()
-    depList = list(df.loc[df.dependency == f]["label"])
+    depList = list(df.loc[df.dependency == f]["id"])
     lst = []
 
     # get overlap of worksheets with root list
@@ -314,60 +348,62 @@ def getFieldsFromCategory(l, c, f):
     res = list(set(res))
     return res
 
-def addNode(sf, cat, shapes, colors, calc):
+def addNode(sf, l, cat, shapes, colors, calc):
     """
     Creates graph node objects for an input source field
 
     Args:
-        sf: Input source field name
+        sf: Input source field replacement ID
+        l: Input source field label
         cat: Input source field category
         shapes: List of shapes per source field category
         colors: List of colors per source field category
         calc: Input source field calculation expression
 
     Returns: 
-        List of 2 nodes related for resp. the field and source field name. 
-        For calculated fields the expression is used as tooltip
+        List of 2 node objects with name equal to the replacement ID, 
+        label equal to the source field label and shape/color/tooltip based on 
+        field type
     """
-    # node name: replace colon by semicolon to avoid problems in pydot
-    # https://github.com/pydot/pydot/issues/224
-    sf1 = sf.replace(":", ";")
-    f = sf1.split(".")[1].replace(":", ";")
-    fLabel = sf.split(".")[1]
     if calc == "": c = " "
     else: c = calc
-    node1 = pydot.Node(name = f, label = fLabel, shape = shapes[cat],
+    node = pydot.Node(name = sf, label = l, shape = shapes[cat],
         fillcolor = colors[cat], style = "filled", tooltip = c)
-    node2 = pydot.Node(name = sf1, label = sf, shape = shapes[cat],
-        fillcolor = colors[cat], style = "filled", tooltip = c)
-    return [node1, node2]
+    return [node]
 
-def replaceSourceReference(x, s):
+def fieldLabelMapping(x, s, d):
     """
-    Remove references to a given source for an input string or dict list
+    Replace IDs by labels for an input string or dict list
 
     Args:
         x: Input string or dict list
         s: Source name
+        d: Dictionary of (field/sheet) label -> ID mappings
 
     Returns: 
-        String or dict list with all references to the input source name removed
+        String or dict list with all field IDs replaced by labels 
+        and references to internal source fields removed
     """
-    # perform the replacement as a string
-    res = str(x).replace(s + ".", "")
+    # temporarily convert the input to a string
+    res = str(x)
+    # replace source field ID by source field name
+    for key in d: res = res.replace(d.get(key), key)
+    # internal source field references: only use field name
+    res = res.replace(s + ".", "")
     # restore original structure if needed
     if x.__class__.__name__ == 'list':
         res = [json.loads(idx.replace("'", '"')) for idx in [res]][0]
     return res
 
-def visualizeDependencies(df, sf, g, fin, svg = False):
+def visualizeDependencies(df, sf, l, g, fin, svg = False):
     """
     Creates output PNG/SVG files containing all dependencies for a 
     given source field
 
     Args:
         df: Input data frame containing backward and forward dependencies
-        sf: Input source field name
+        sf: Input source field replacement ID
+        l: Input source field label
         g: Master graph containing all source field and field node objects
         fin: Path to the input Tableau workbook
         svg: Indicator (T/F) whether or not to generate SVG as well
@@ -376,16 +412,15 @@ def visualizeDependencies(df, sf, g, fin, svg = False):
         PNG file in "<workbook path> Files\Graphs\<source field name>.png" and 
         additional SVG file (with extra attributes) if svg == True
     """
-    # convert names to node names (no colons, see addNode function)
-    sf1 = sf.replace(":", ";")
-    s = sf1.split(".")[0]
-    f = sf1.split(".")[1]
+    s = l.split(".")[0]
+    f = l.split(".")[1]
+
     dictBackward = \
-        list(df[df.source_field_label == sf]\
-            ["field_backward_dependencies_temp"])[0]
+        list(df[df.source_field_repl_id == sf]\
+            ["field_backward_dependencies"])[0]
     dictForward = \
-        list(df[df.source_field_label == sf]\
-            ["field_forward_dependencies_temp"])[0]
+        list(df[df.source_field_repl_id == sf]\
+            ["field_forward_dependencies"])[0]
     dictDependency = copy.deepcopy(dictBackward + dictForward)
 
     # only generate graph if there are dependencies
@@ -396,18 +431,27 @@ def visualizeDependencies(df, sf, g, fin, svg = False):
 
         # set properties for main node
         G = pydot.Dot(graph_type = "digraph", tooltip = " ")
-        subject = '"' + f + '"'
-        G.add_node(MGCopy.get_node(subject)[0])
-        G.get_node(subject)[0].set("fillcolor", "lightblue")
+        subject = '"' + sf + '"'
+        root = MGCopy.get_node(subject)[0]
+        root.set("fillcolor", "lightblue")
+        root.set("label", f)
+        G.add_node(root)
 
         # add (parent -> child) edges to graph
         for d in dictDependency:
             # don't visualize sheet dependencies
             if d["category"] != "Sheet":
-                parent = ('"' + d["parent"] + '"').replace(":", ";")
-                child = ('"' + d["child"] + '"').replace(":", ";")
+                parent = ('"' + d["parent"] + '"')
+                child = ('"' + d["child"] + '"')
                 nodeParent = MGCopy.get_node(parent)[0]
                 nodeChild = MGCopy.get_node(child)[0]
+                sourceParent = nodeParent.get("label").split(".")
+                # replace [s].[f] label by [f] if internal reference
+                if sourceParent[0] == s:
+                    nodeParent.set("label", sourceParent[1])
+                sourceChild = nodeChild.get("label").split(".")
+                if sourceChild[0] == s:
+                    nodeChild.set("label", sourceChild[1])
                 G.add_node(nodeParent)
                 G.add_node(nodeChild)
                 edge = pydot.Edge(nodeParent, nodeChild, tooltip = " ")

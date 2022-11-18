@@ -82,46 +82,49 @@ df = df[(df["field_is_param_duplicate"] == 0) &
     (df["field_label"] != "[:Measure Names]")]
 
 # add a randomly generated ID field for each unique field
-df["source_field_repl_id"] = getRandomReplacementID(df, "field_calculation")
+baseID = getRandomReplacementBaseID(df, "field_calculation")
+df["source_field_repl_id"] = "[" + baseID + df.index.astype(str) + "]"
 
 # create source fields to ID mapping dictionary as well as the reverse
-dictMapping1 = \
+dictFieldIDToID = \
     sourceFieldMappingTable(df, "source_field_id", "source_field_repl_id")
-dictMapping2 = \
-    sourceFieldMappingTable(df, "source_field_id", "source_field_label")
 
 # clean up field calculations and aliases
 lstFieldID = list(df["field_id"].unique())
 df["field_calculation_cleaned"] = \
     df.apply(lambda x: \
     fieldCalculationMapping(x.field_calculation, x.data_source_name, 
-    dictMapping1, dictMapping2, lstFieldID), axis = 1)
-    
+    dictFieldIDToID, lstFieldID), axis = 1)
+
+# map sheet names to sheet IDs
+dictSheetToID = sheetMappingTable(df, "field_worksheets")
+df["field_worksheets_id"] = df["field_worksheets"].apply(lambda x: 
+    sheetMapping(x, dictSheetToID))
+
 # get list of field dependencies
-lstSourceFields = list(df["source_field_label"].unique())
+lstSourceFields = list(df["source_field_repl_id"].unique())
 df["field_calculation_dependencies"] = \
     df["field_calculation_cleaned"].apply(lambda x: \
         fieldCalculationDependencies(lstSourceFields, x))
 
 # calculate type of field
 df["field_category"] = df.apply(lambda x: \
-    fieldCategory(x.source_field_label, 
-    x.field_calculation_dependencies, x.field_calculation_cleaned), axis = 1)
+    fieldCategory(x.source_field_label, x.field_calculation_cleaned), axis = 1)
 
 stepLog("Processing field dependencies...")
 # get full list of backward dependencies
 df["field_backward_dependencies"] = \
-    df["source_field_label"].apply(lambda x: getBackwardDependencies(df, x))
+    df["source_field_repl_id"].apply(lambda x: getBackwardDependencies(df, x))
 
 # get full list of forward dependencies using exploded version of df (faster)
-dfExplode = df[["source_field_label", "field_category", \
-    "field_worksheets", "field_calculation_dependencies"]]
+dfExplode = df[["source_field_repl_id", "field_category", \
+    "field_worksheets_id", "field_calculation_dependencies"]]
 dfExplode = dfExplode.explode("field_calculation_dependencies")
-dfExplode.columns = ["label", "category", "worksheets", "dependency"]
+dfExplode.columns = ["id", "category", "worksheets", "dependency"]
 df["field_forward_dependencies"] = \
     df.apply(lambda x: \
-        getForwardDependencies(dfExplode, x.source_field_label, 
-        x.field_worksheets), axis = 1)
+        getForwardDependencies(dfExplode, x.source_field_repl_id, 
+        x.field_worksheets_id), axis = 1)
 
 # only keep unique dependencies with their max level
 df["field_backward_dependencies"] = \
@@ -134,13 +137,11 @@ df["field_forward_dependencies"] = \
         ["child", "parent", "category", "sheets"], 
         "level"), axis = 1)
 
-# calculate max. forward and backward dependency levels
+# get some dependency aggregates
 df["field_backward_dependencies_max_level"] = \
     df["field_backward_dependencies"].apply(getMaxLevel)
 df["field_forward_dependencies_max_level"] = \
     df["field_forward_dependencies"].apply(getMaxLevel)
-
-# get some dependency aggregates
 df["source_field_dependencies"] = \
     df.apply(lambda x: getFieldsFromCategory(x.field_backward_dependencies, 
     "Field", True), axis = 1)
@@ -164,14 +165,6 @@ df["n_backward_dependencies_lod"] = \
 df["flag_unused"] = df.apply(lambda x: \
     np.where(x.n_worksheet_dependencies == 0, 1, 0), axis = 1)
 
-# final clean-up of backward and forward dependencies
-lstClean = ["field_calculation_cleaned", "field_calculation_dependencies", 
-    "field_backward_dependencies", "field_forward_dependencies", 
-    "source_field_dependencies"]
-for col in lstClean:
-    df[col] = df.apply(lambda x: replaceSourceReference(x[col], x.source_label),
-     axis = 1)
-
 stepLog("Creating field dependency graphs...")
 # Create master node graph
 colors = {"Parameter": "#cbc3e3",
@@ -181,34 +174,43 @@ shapes = {"Parameter": "parallelogram",
     "Field": "box", "Calculated Field (LOD)": "oval", 
     "Calculated Field": "oval"}
 nodes = df.apply(lambda x: \
-    addNode(x.source_field_label, x.field_category, shapes, colors, 
-        x.field_calculation_cleaned), axis = 1)
+    addNode(x.source_field_repl_id, x.source_field_label, 
+        x.field_category, shapes, colors, x.field_calculation_cleaned), 
+        axis = 1)
 lstNodes = []
 for node in nodes: lstNodes += node
 gMaster = pydot.Dot()
 for node in lstNodes: gMaster.add_node(node)
 
-# calculate temporary version with parameter source references removed
-df["field_backward_dependencies_temp"] = \
-    df.apply(lambda x: \
-        replaceSourceReference(x.field_backward_dependencies, 
-        "[Parameters]"), axis = 1)
-df["field_forward_dependencies_temp"] = \
-    df.apply(lambda x: \
-        replaceSourceReference(x.field_forward_dependencies, 
-        "[Parameters]"), axis = 1)
+# add sheet nodes
+for x in dictSheetToID:
+    node = pydot.Node(name = dictSheetToID[x], label = x, shape = "box",
+        fillcolor = "grey", style = "filled", tooltip = " ")
+    gMaster.add_node(node)
 
 # create dependency graphs per field
 for index, row in tqdm(df.iterrows(), total = df.shape[0]):
-    visualizeDependencies(df, row.source_field_label, gMaster, 
-        inpFilePath, fSVG)
+    visualizeDependencies(df, row.source_field_repl_id, 
+        row.source_field_label, gMaster, inpFilePath, fSVG)
+
+# final clean-up of backward and forward dependencies
+dictFieldToID = sourceFieldMappingTable(df, "source_field_label", 
+    "source_field_repl_id")
+dictLabelToID = {**dictFieldToID, **dictSheetToID}
+
+lstClean = ["field_calculation_cleaned", "field_calculation_dependencies", 
+   "field_backward_dependencies", "field_forward_dependencies", 
+   "source_field_dependencies"]
+for col in lstClean:
+   df[col] = df.apply(lambda x: fieldLabelMapping(x[col], x.source_label, 
+    dictLabelToID), axis = 1)
 
 # output 1: field info
 colKeep = ["source_label", "field_label", "source_field_label",
     "field_datatype", "field_role", 
     "field_role", "field_type", "field_aliases", "field_description", 
     "field_hidden", "field_worksheets", "field_category", 
-    "field_calculation_cleaned", "field_calculation_dependencies", 
+    "field_calculation_cleaned", "source_field_dependencies", 
     "field_backward_dependencies_max_level", 
     "field_forward_dependencies_max_level", 
     "n_backward_dependencies", "n_forward_dependencies",
@@ -219,17 +221,18 @@ dfWrite = df[colKeep]
 # output 2: dependency info
 df["field_backward_dependencies"] = \
     df.apply(lambda x: appendFieldsToDicts(x.field_backward_dependencies, 
-    ["source_label", "field_label", "source_field_label", "field_category"], 
-    [x.source_label, x.field_label, x.source_field_label, x.field_category]), 
-    axis = 1)
+    ["source_field_repl_id"], [x.source_field_repl_id]), axis = 1)
 df["field_forward_dependencies"] = \
     df.apply(lambda x: appendFieldsToDicts(x.field_forward_dependencies, 
-    ["source_label", "field_label", "source_field_label", "field_category"], 
-    [x.source_label, x.field_label, x.source_field_label, x.field_category]), 
-    axis = 1)
+    ["source_field_repl_id"], [x.source_field_repl_id]), axis = 1)
 lstBw = [item for x in list(df.field_backward_dependencies) for item in x]
 lstFw = [item for x in list(df.field_forward_dependencies) for item in x]
 dfWrite2 = pd.DataFrame(lstBw + lstFw)
+# join with other field attributes
+dfSel = df[["source_field_repl_id", "source_label", "field_label", 
+    "source_field_label", "field_category"]]
+dfWrite2 = pd.merge(left = dfWrite2, right = dfSel, on = "source_field_repl_id")
+
 dfWrite2 = dfWrite2[["source_label", "field_label", "source_field_label", 
 "field_category", "parent", "child", "level", "category", "sheets"]]
 dfWrite2.columns = ["source_label", "field_label", "source_field_label", 
