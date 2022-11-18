@@ -395,7 +395,7 @@ def fieldIDMapping(x, s, d):
         res = [json.loads(idx.replace("'", '"')) for idx in [res]][0]
     return res
 
-def visualizeDependencies(df, sf, l, g, fin, svg = False):
+def visualizeFieldDependencies(df, sf, l, g, din, svg = False):
     """
     Creates output PNG/SVG files containing all dependencies for a 
     given source field
@@ -405,7 +405,7 @@ def visualizeDependencies(df, sf, l, g, fin, svg = False):
         sf: Input source field replacement ID
         l: Input source field label
         g: Master graph containing all source field and field node objects
-        fin: Path to the input Tableau workbook
+        din: Full path to root directory where graphs will be saved
         svg: Indicator (T/F) whether or not to generate SVG as well
 
     Returns: 
@@ -441,8 +441,8 @@ def visualizeDependencies(df, sf, l, g, fin, svg = False):
         for d in dictDependency:
             # don't visualize sheet dependencies
             if d["category"] != "Sheet":
-                parent = ('"' + d["parent"] + '"')
-                child = ('"' + d["child"] + '"')
+                parent = '"' + d["parent"] + '"'
+                child = '"' + d["child"] + '"'
                 nodeParent = MGCopy.get_node(parent)[0]
                 nodeChild = MGCopy.get_node(child)[0]
                 sourceParent = nodeParent.get("label").split(".")
@@ -463,7 +463,7 @@ def visualizeDependencies(df, sf, l, g, fin, svg = False):
         specialChar = "[^A-Za-z0-9]+"
         sout = re.sub(specialChar, '', s)
         fout = re.sub(specialChar, '', f)
-        dout = "{0} Files\\Graphs\\{1}\\".format(fin, sout)
+        dout = "{0}{1}\\".format(din, sout)
         if not os.path.isdir(dout):
             os.makedirs(dout)
         
@@ -491,3 +491,79 @@ def appendFieldsToDicts(l, k, v):
         for d in l:
             for i in range(len(k)): d[k[i]] = v[i]
     return l
+
+def visualizeSheetDependencies(df, sh, g, din, svg = False):
+    """
+    Creates output PNG/SVG files containing all dependencies for a 
+    given source field
+
+    Args:
+        df: Input data frame containing backward and forward dependencies
+        sh: Input sheet ID
+        g: Master graph containing all source field and field node objects
+        din: Full path to root directory where graphs will be saved
+        svg: Indicator (T/F) whether or not to generate SVG as well
+
+    Returns: 
+        PNG file in "<workbook path> Files\Graphs\Sheets\<sheet name>.png" and 
+        additional SVG file (with extra attributes) if svg == True
+    """
+    # get field -> sheet edges
+    depSheet = df[(df.dependency_category == "Sheet") & 
+        (df.dependency_to == sh)][["dependency_from", "dependency_to", 
+        "dependency_category", "source_field_label", "source_field_repl_id"]]
+
+    # get field -> field edges
+    lstFields = list(depSheet["source_field_repl_id"])
+    depField = df[(df.dependency_category != "Sheet")]
+    flag = depField.apply(lambda x: 
+         (x.dependency_from in lstFields) & (x.dependency_to in lstFields), 
+         axis = 1)
+    depField = depField.loc[flag]
+    depField["dependency_category"] = "Field"
+    # remove field -> field edge duplicates
+    depField = depField.drop_duplicates(subset = ["dependency_from", "dependency_to"])
+
+    # prune all fields that are parents of other fields
+    lstParents = list(depField["dependency_from"].unique())
+    flag = depSheet["dependency_from"].apply(lambda x: x not in lstParents)
+    depSheet = depSheet.loc[flag]
+
+    depSheet = depSheet[["dependency_from", "dependency_to", 
+        "dependency_category", "source_field_label"]]
+    depSheet = depSheet.append(depField)
+    
+    MGCopy = copy.deepcopy(g)
+
+    # set properties for main node
+    G = pydot.Dot(graph_type = "digraph", tooltip = " ")
+    subject = '"' + sh + '"'
+    root = MGCopy.get_node(subject)[0]
+    l = root.get("label")
+    G.add_node(root)
+    
+    # add (parent -> child) edges to graph
+    for index, row in depSheet.iterrows():
+        parent = '"' + row.dependency_from + '"'
+        child = '"' + row.dependency_to + '"'
+        nodeParent = MGCopy.get_node(parent)[0]
+        nodeChild = MGCopy.get_node(child)[0]
+        sourceParent = nodeParent.get("label").split(".")
+        # replace [s].[f] label by [f] if internal reference
+        if len(sourceParent) == 2: nodeParent.set("label", sourceParent[1])
+        sourceChild = nodeChild.get("label").split(".")
+        if len(sourceChild) == 2: nodeChild.set("label", sourceChild[1])
+        G.add_node(nodeParent)
+        G.add_node(nodeChild)
+        edge = pydot.Edge(nodeParent, nodeChild, tooltip = " ")
+        G.add_edge(edge)
+
+    # write output files with forced UTF-8 encoding to avoid errors
+    # see https://github.com/pydot/pydot/issues/142
+    specialChar = "[^A-Za-z0-9]+"
+    fout = re.sub(specialChar, '', l)
+    outFile = "{0}{1}.png".format(din, fout)
+    G.write_png(outFile, encoding = "utf-8")
+    if svg:
+        outFile = "{0}{1}.svg".format(din, fout)
+        G.write_svg(outFile, encoding = "utf-8")

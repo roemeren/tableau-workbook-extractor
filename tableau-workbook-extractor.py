@@ -6,7 +6,9 @@ from tqdm import tqdm
 
 # script parameters
 fTest = False # run without prompt or not?
-fSVG = True # add SVG outputs?
+fDepFields = True # create field dependency graphs?
+fDepSheets = True # create sheet dependency graphs?
+fSVG = True # create SVG versions of dependency graphs next to PNG?
 
 # ignore future warnings when reading field attributes (not applicable)
 warnings.simplefilter(action = 'ignore', category = FutureWarning)
@@ -165,39 +167,81 @@ df["n_backward_dependencies_lod"] = \
 df["flag_unused"] = df.apply(lambda x: \
     np.where(x.n_worksheet_dependencies == 0, 1, 0), axis = 1)
 
-stepLog("Creating field dependency graphs...")
-# Create master node graph
-colors = {"Parameter": "#cbc3e3",
-    "Field": "green", "Calculated Field (LOD)": "red", 
-    "Calculated Field": "orange"}
-shapes = {"Parameter": "parallelogram", 
-    "Field": "box", "Calculated Field (LOD)": "oval", 
-    "Calculated Field": "oval"}
-nodes = df.apply(lambda x: \
-    addFieldNode(x.source_field_repl_id, x.source_field_label, 
-        x.field_category, shapes, colors, x.field_calculation_cleaned), 
-        axis = 1)
-lstNodes = []
-for node in nodes: lstNodes += node
-gMaster = pydot.Dot()
-for node in lstNodes: gMaster.add_node(node)
+if fDepFields:
+    inpPath = "{0} Files\\Graphs\\".format(inpFilePath)
 
-# add sheet nodes
-for x in dictSheetToID:
-    node = pydot.Node(name = dictSheetToID[x], label = x, shape = "box",
-        fillcolor = "grey", style = "filled", tooltip = " ")
-    gMaster.add_node(node)
+    stepLog("Creating field dependency graphs per source in {0}..."
+        .format(inpPath))
+    # Create master node graph
+    colors = {"Parameter": "#cbc3e3",
+        "Field": "green", "Calculated Field (LOD)": "red", 
+        "Calculated Field": "orange"}
+    shapes = {"Parameter": "parallelogram", 
+        "Field": "box", "Calculated Field (LOD)": "oval", 
+        "Calculated Field": "oval"}
+    nodes = df.apply(lambda x: \
+        addFieldNode(x.source_field_repl_id, x.source_field_label, 
+            x.field_category, shapes, colors, x.field_calculation_cleaned), 
+            axis = 1)
+    lstNodes = []
+    for node in nodes: lstNodes += node
+    gMaster = pydot.Dot()
+    for node in lstNodes: gMaster.add_node(node)
 
-# create dependency graphs per field
-for index, row in tqdm(df.iterrows(), total = df.shape[0]):
-    visualizeDependencies(df, row.source_field_repl_id, 
-        row.source_field_label, gMaster, inpFilePath, fSVG)
+    # add sheet nodes
+    for x in dictSheetToID:
+        node = pydot.Node(name = dictSheetToID[x], label = x, shape = "box",
+            fillcolor = "grey", style = "filled", tooltip = " ")
+        gMaster.add_node(node)
+    # create dependency graphs per field
+    for index, row in tqdm(df.iterrows(), total = df.shape[0]):
+        visualizeFieldDependencies(df, row.source_field_repl_id, 
+            row.source_field_label, gMaster, inpPath, fSVG)
 
+# create new data frame with flattened dependencies
+df["field_backward_dependencies"] = \
+    df.apply(lambda x: appendFieldsToDicts(x.field_backward_dependencies, 
+    ["source_field_repl_id"], [x.source_field_repl_id]), axis = 1)
+df["field_forward_dependencies"] = \
+    df.apply(lambda x: appendFieldsToDicts(x.field_forward_dependencies, 
+    ["source_field_repl_id"], [x.source_field_repl_id]), axis = 1)
+lstBw = [item for x in list(df.field_backward_dependencies) for item in x]
+lstFw = [item for x in list(df.field_forward_dependencies) for item in x]
+df2 = pd.DataFrame(lstBw + lstFw)
+# join with other field attributes
+dfSel = df[["source_field_repl_id", "source_label", "field_label", 
+    "source_field_label", "field_category"]]
+df2 = pd.merge(left = df2, right = dfSel, on = "source_field_repl_id")
+# reorder and rename columns
+df2 = df2[["source_label", "field_label", "source_field_label", 
+    "source_field_repl_id", "field_category", "parent", "child", 
+    "level", "category", "sheets"]]
+df2.columns = ["source_label", "field_label", "source_field_label",  
+                "source_field_repl_id", "field_category", "dependency_from",
+                    "dependency_to", "dependency_level", "dependency_category",
+                    "dependency_worksheets_overlap"]
+
+if fDepSheets:
+    # create output folder if it doesn't exist yet
+    inpPath = "{0} Files\\Graphs\\Sheets\\".format(inpFilePath)
+    if not os.path.isdir(inpPath): os.makedirs(inpPath)
+
+    stepLog("Creating sheet dependency graphs in {0}...".format(inpPath))
+    # get list of unique sheets
+    lstSheets = list(df2[df2.dependency_category == "Sheet"]
+                ["dependency_to"].unique())
+
+    # create dependency graphs per sheet
+    for sh in tqdm(lstSheets, total = len(lstSheets)):
+        visualizeSheetDependencies(df2, sh, gMaster, inpPath, fSVG)
+
+stepLog("Saving table results in " + outFilePath + "...")
 # final clean-up of backward and forward dependencies
 dictFieldToID = fieldMappingTable(df, "source_field_label", 
     "source_field_repl_id")
 dictLabelToID = {**dictFieldToID, **dictSheetToID}
 
+# output 1: field info
 lstClean = ["field_calculation_cleaned", "field_calculation_dependencies", 
    "field_backward_dependencies", "field_forward_dependencies", 
    "source_field_dependencies"]
@@ -205,7 +249,6 @@ for col in lstClean:
    df[col] = df.apply(lambda x: fieldIDMapping(x[col], x.source_label, 
     dictLabelToID), axis = 1)
 
-# output 1: field info
 colKeep = ["source_label", "field_label", "source_field_label",
     "field_datatype", "field_role", 
     "field_role", "field_type", "field_aliases", "field_description", 
@@ -216,35 +259,20 @@ colKeep = ["source_label", "field_label", "source_field_label",
     "n_backward_dependencies", "n_forward_dependencies",
     "n_backward_dependencies_field", "n_backward_dependencies_lod",
     "n_worksheet_dependencies", "flag_unused"]
-dfWrite = df[colKeep]
+df = df[colKeep]
 
-# output 2: dependency info
-df["field_backward_dependencies"] = \
-    df.apply(lambda x: appendFieldsToDicts(x.field_backward_dependencies, 
-    ["source_field_repl_id"], [x.source_field_repl_id]), axis = 1)
-df["field_forward_dependencies"] = \
-    df.apply(lambda x: appendFieldsToDicts(x.field_forward_dependencies, 
-    ["source_field_repl_id"], [x.source_field_repl_id]), axis = 1)
-lstBw = [item for x in list(df.field_backward_dependencies) for item in x]
-lstFw = [item for x in list(df.field_forward_dependencies) for item in x]
-dfWrite2 = pd.DataFrame(lstBw + lstFw)
-# join with other field attributes
-dfSel = df[["source_field_repl_id", "source_label", "field_label", 
-    "source_field_label", "field_category"]]
-dfWrite2 = pd.merge(left = dfWrite2, right = dfSel, on = "source_field_repl_id")
-
-dfWrite2 = dfWrite2[["source_label", "field_label", "source_field_label", 
-"field_category", "parent", "child", "level", "category", "sheets"]]
-dfWrite2.columns = ["source_label", "field_label", "source_field_label", 
-"field_category", "dependency_from", "dependency_to", "dependency_level", 
-"dependency_category", "dependency_worksheets_overlap"]
+# output 2: dependencies info
+lstClean = ["dependency_from", "dependency_to"]
+for col in lstClean:
+   df2[col] = df2.apply(lambda x: fieldIDMapping(x[col], x.source_label, 
+    dictLabelToID), axis = 1)
+df2 = df2.drop(["source_field_repl_id"], axis = 1)
 
 # store results and finish
-stepLog("Saving table result in " + outFilePath + "...")
 if not os.path.isdir(outFileDirectory):
     os.makedirs(outFileDirectory)
 
 with pd.ExcelWriter(outFilePath) as writer:
-    dfWrite.to_excel(writer, sheet_name = "fields", index = False)
-    dfWrite2.to_excel(writer, sheet_name = "dependencies", index = False)
+    df.to_excel(writer, sheet_name = "fields", index = False)
+    df2.to_excel(writer, sheet_name = "dependencies", index = False)
 input("Done! Press Enter to continue...")
