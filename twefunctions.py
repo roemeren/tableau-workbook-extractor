@@ -423,57 +423,54 @@ def visualizeFieldDependencies(df, sf, l, g, din, svg = False):
             ["field_forward_dependencies"])[0]
     dictDependency = copy.deepcopy(dictBackward + dictForward)
 
-    # only generate graph if there are dependencies
-    if len(dictDependency) > 0:
+    # create a copy of the master node list in order to not modify it
+    MGCopy = copy.deepcopy(g)
 
-        # create a copy of the master node list in order to not modify it
-        MGCopy = copy.deepcopy(g)
+    # set properties for main node
+    G = pydot.Dot(graph_type = "digraph", tooltip = " ")
+    subject = '"' + sf + '"'
+    root = MGCopy.get_node(subject)[0]
+    root.set("fillcolor", "lightblue")
+    root.set("label", f)
+    G.add_node(root)
 
-        # set properties for main node
-        G = pydot.Dot(graph_type = "digraph", tooltip = " ")
-        subject = '"' + sf + '"'
-        root = MGCopy.get_node(subject)[0]
-        root.set("fillcolor", "lightblue")
-        root.set("label", f)
-        G.add_node(root)
+    # add (parent -> child) edges to graph
+    for d in dictDependency:
+        # don't visualize sheet dependencies
+        if d["category"] != "Sheet":
+            parent = '"' + d["parent"] + '"'
+            child = '"' + d["child"] + '"'
+            nodeParent = MGCopy.get_node(parent)[0]
+            nodeChild = MGCopy.get_node(child)[0]
+            sourceParent = nodeParent.get("label").split(".")
+            # replace [s].[f] label by [f] if internal reference
+            if (sourceParent[0] in [s, "[Parameters]"]) & \
+                (len(sourceParent) == 2):
+                nodeParent.set("label", sourceParent[1])
+            sourceChild = nodeChild.get("label").split(".")
+            if (sourceChild[0] in [s, "[Parameters]"]) & \
+                (len(sourceChild) == 2):
+                nodeChild.set("label", sourceChild[1])
+            G.add_node(nodeParent)
+            G.add_node(nodeChild)
+            edge = pydot.Edge(nodeParent, nodeChild, tooltip = " ")
+            G.add_edge(edge)
 
-        # add (parent -> child) edges to graph
-        for d in dictDependency:
-            # don't visualize sheet dependencies
-            if d["category"] != "Sheet":
-                parent = '"' + d["parent"] + '"'
-                child = '"' + d["child"] + '"'
-                nodeParent = MGCopy.get_node(parent)[0]
-                nodeChild = MGCopy.get_node(child)[0]
-                sourceParent = nodeParent.get("label").split(".")
-                # replace [s].[f] label by [f] if internal reference
-                if (sourceParent[0] in [s, "[Parameters]"]) & \
-                    (len(sourceParent) == 2):
-                    nodeParent.set("label", sourceParent[1])
-                sourceChild = nodeChild.get("label").split(".")
-                if (sourceChild[0] in [s, "[Parameters]"]) & \
-                    (len(sourceChild) == 2):
-                    nodeChild.set("label", sourceChild[1])
-                G.add_node(nodeParent)
-                G.add_node(nodeChild)
-                edge = pydot.Edge(nodeParent, nodeChild, tooltip = " ")
-                G.add_edge(edge)
-
-        # create output graphs folder if it doesn't exist yet
-        specialChar = "[^A-Za-z0-9]+"
-        sout = re.sub(specialChar, '', s)
-        fout = re.sub(specialChar, '', f)
-        dout = "{0}{1}\\".format(din, sout)
-        if not os.path.isdir(dout):
-            os.makedirs(dout)
-        
-        # write output files with forced UTF-8 encoding to avoid errors
-        # see https://github.com/pydot/pydot/issues/142
-        outFile = "{0}{1}-{2}.png".format(dout, sout, fout)
-        G.write_png(outFile, encoding = "utf-8")
-        if svg:
-            outFile = "{0}{1}-{2}.svg".format(dout, sout, fout)
-            G.write_svg(outFile, encoding = "utf-8")
+    # create output graphs folder if it doesn't exist yet
+    specialChar = "[^A-Za-z0-9]+"
+    sout = re.sub(specialChar, '', s)
+    fout = re.sub(specialChar, '', f)
+    dout = "{0}{1}\\".format(din, sout)
+    if not os.path.isdir(dout):
+        os.makedirs(dout)
+    
+    # write output files with forced UTF-8 encoding to avoid errors
+    # see https://github.com/pydot/pydot/issues/142
+    outFile = "{0}{1}-{2}.png".format(dout, sout, fout)
+    G.write_png(outFile, encoding = "utf-8")
+    if svg:
+        outFile = "{0}{1}-{2}.svg".format(dout, sout, fout)
+        G.write_svg(outFile, encoding = "utf-8")
 
 def appendFieldsToDicts(l, k, v):
     """

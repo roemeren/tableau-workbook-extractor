@@ -197,8 +197,11 @@ if fDepFields:
         .format(inpPath))
     # create dependency graphs per field
     for index, row in tqdm(df.iterrows(), total = df.shape[0]):
-        visualizeFieldDependencies(df, row.source_field_repl_id, 
-            row.source_field_label, gMaster, inpPath, fSVG)
+        # only generate graph if there are dependencies
+        nDependency = row.n_backward_dependencies + row.n_forward_dependencies
+        if nDependency > 0: 
+            visualizeFieldDependencies(df, row.source_field_repl_id, 
+                row.source_field_label, gMaster, inpPath, fSVG)
 
 # create new data frame with flattened dependencies
 df["field_backward_dependencies"] = \
