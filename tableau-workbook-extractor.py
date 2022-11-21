@@ -76,12 +76,19 @@ df["source_label"] = df.apply(lambda x: \
     processCaptions(x.data_source_name, x.data_source_caption), axis = 1)
 df["source_field_label"] = df["source_label"] + "." + df["field_label"]
 
+# remove duplicate rows based on source field ID
+df, nDupl = removeDuplicatesByRowLength(df, "source_field_id")
+print("\t{0} duplicate fields removed".format(nDupl))
+
 # filter out duplicate parameter rows and [:Measure Names] field
-lstParam = list(df[df["source_label"] == "[Parameters]"]["field_label"])
+lstParam = list(df[df["data_source_name"] == "[Parameters]"]["field_id"])
 df["field_is_param_duplicate"] = df.apply(lambda x: \
-    isParamDuplicate(lstParam, x.source_label, x.field_label), axis = 1)
+    isParamDuplicate(lstParam, x.data_source_name, x.field_id), axis = 1)
+nDupl2 = df.shape[0]
 df = df[(df["field_is_param_duplicate"] == 0) & 
-    (df["field_label"] != "[:Measure Names]")]
+    (df["field_id"] != "[:Measure Names]")]
+nDupl2 -= df.shape[0]
+print("\t{0} duplicate parameters and/or measure names removed".format(nDupl2))
 
 # add a randomly generated ID field for each unique field
 baseID = getRandomReplacementBaseID(df, "field_calculation")

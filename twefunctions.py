@@ -184,6 +184,31 @@ def fieldCalculationDependencies(l, x):
     """
     return [s for s in l if s in x]
 
+def removeDuplicatesByRowLength(df, x):
+    """
+    Remove duplicates from an input frame by retaining per grouping only 
+    the row with the largest concatenated string length
+
+    Args:
+        df: input data frame
+        x: grouping column name
+
+    Returns:
+        Copy of input data frame with per unique grouping value the row 
+        with the largest concatenated string length + no. duplicates removed
+    """
+    # initialize result by copying original data frame
+    res = df.copy()
+    # calculate concatenated string length
+    res["row_len"] = res.fillna("").astype(str).values.sum(axis = 1)
+    res["row_len"] = res["row_len"].apply(len)
+    # calculate unique ranking and only keep first rank
+    res["rank"] = res.groupby(x)["row_len"].rank(method = "first", 
+        ascending = False)
+    res = res[res["rank"] == 1][df.columns].reset_index(drop = True)
+    nDupl = df.shape[0] - res.shape[0]
+    return res, nDupl
+
 def isParamDuplicate(p, s, x):
     """
     Checks if a field is a parameter duplicate
