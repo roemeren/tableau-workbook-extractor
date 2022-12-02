@@ -30,7 +30,11 @@ pip install -r requirements.txt
 
 ### Install Graphviz
 
-For creating graphs the `Graphviz` software is used and should be installed from here: https://graphviz.org/.
+For exporting the graphs as images the `Graphviz` software is used and 
+should be installed from here: https://graphviz.org/. 
+
+For Windows it is important to add the Graphviz `bin` subdirectory to the 
+`Path` environment variable (otherwise the `dot` command used by pydot won't be recognized).
 
 ## Description
 
@@ -45,7 +49,6 @@ These files could be useful for the following reasons:
 - Get an overview of **unused fields and calculations** that could be removed from the Tableau if needed to improve performance or to keep extract sizes as low as possible
 - Get an overview of **overall complexity** of the dashboard and check whether or not it is needed to simplify fields by pruning dependencies
 - Automate the **documentation** process of the dashboard
-
 
 ## Sources
 
