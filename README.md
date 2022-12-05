@@ -20,8 +20,7 @@ These files could be useful for the following reasons:
 
 ### Step 1: Install Graphviz
 
-For exporting the graphs as images the `Graphviz` software is used and 
-should be installed from here: https://graphviz.org/. 
+For exporting the graphs as images the `Graphviz` software is used and should be installed from here: https://graphviz.org/download/. 
 
 For Windows it is important to add the Graphviz `bin` subdirectory to the 
 `Path` environment variable (otherwise the `dot` command used by `pydot` won't be recognized).
@@ -32,7 +31,10 @@ For Windows it is important to add the Graphviz `bin` subdirectory to the
 
 The tool can be run on Windows by double-clicking on the executable `tableau-workbook-extractor.exe` inside the `dist` subfolder, which will run a packaged version of the main script `tableau-workbook-extractor.py`.
 
-*Note: separate Linux/MacOS versions can be created by running PyInstaller resp. on Linux or MacOS.*
+Notes: 
+
+- The tool has been created using version 6.0.2. on Windows (graphviz-6.0.2 64-bit EXE installer). Installing more recent versions may be blocked by Microsoft Defender SmartScreen.
+- separate Linux/MacOS versions can be created by running PyInstaller resp. on Linux or MacOS.
 
 #### Method 2: Run Python script (using Anaconda)
 
