@@ -2,40 +2,6 @@
 
 Python script to automatically analyze (possibly complex Tableau) workbooks.
 
-## Getting started
-
-### Cloning the repo
-
-Open a terminal and execute the following commands:
-
-```
-cd C:\path\to\root\
-git clone https://git.bdbelux.be/remerencia/tableau-workbook-extractor.git
-```
-
-### Replicating the environment
-
-To be sure that the code will work correctly a `requirements.txt` file has been included.
-
-In case Anaconda has been installed the following commands can be executed to replicate the environment:
-
-1. Open Anaconda and open a terminal for example in the `base` environment
-2. Create a new conda environment (for example `myenv`) using the following commands:
-```
-conda create --name myenv python=3.10
-conda activate myenv
-cd C:\path\to\root\myrepo
-pip install -r requirements.txt
-```
-
-### Install Graphviz
-
-For exporting the graphs as images the `Graphviz` software is used and 
-should be installed from here: https://graphviz.org/. 
-
-For Windows it is important to add the Graphviz `bin` subdirectory to the 
-`Path` environment variable (otherwise the `dot` command used by pydot won't be recognized).
-
 ## Description
 
 The script prompts the user to select a locally saved Tableau workbook (in `.twb` or `.twbx` format), after which 2 outputs are created:
@@ -50,12 +16,52 @@ These files could be useful for the following reasons:
 - Get an overview of **overall complexity** of the dashboard and check whether or not it is needed to simplify fields by pruning dependencies
 - Automate the **documentation** process of the dashboard
 
+## How to run the script
+
+### Step 1: Install Graphviz
+
+For exporting the graphs as images the `Graphviz` software is used and 
+should be installed from here: https://graphviz.org/. 
+
+For Windows it is important to add the Graphviz `bin` subdirectory to the 
+`Path` environment variable (otherwise the `dot` command used by `pydot` won't be recognized).
+
+### Step 2: Run the tool
+
+#### Method 1: Run Executable (Windows Only)
+
+The tool can be run on Windows by double-clicking on the executable `tableau-workbook-extractor.exe` inside the `dist` subfolder, which will run a packaged version of the main script `tableau-workbook-extractor.py`.
+
+*Note: separate Linux/MacOS versions can be created by running PyInstaller resp. on Linux or MacOS.*
+
+#### Method 2: Run Python script (using Anaconda)
+
+1. **Clone the GitLab repo** by opening a terminal and executing the following commands:
+
+    ```
+    cd C:\path\to\root\
+    git clone https://git.bdbelux.be/remerencia/tableau-workbook-extractor.git
+    ```
+
+2. **Replicate the environment** by creating a new Python 3.8 environment and installing the package versions listed in `requirements.txt`. In Anaconda:
+
+    a. Open a new terminal in Anaconda for example in the `base` environment
+    
+    b. Create a new conda environment (for example `myenv`) using the following commands:
+
+    ```
+    conda create --name myenv python=3.8
+    conda activate myenv
+    cd C:\path\to\root\myrepo
+    pip install -r requirements.txt
+    ```
+
 ## Sources
 
 - [Document API Python documentation](https://tableau.github.io/document-api-python/): describes how workbook and field information can be extracted
 - [Pydot repository](https://github.com/pydot/pydot): methods and attributes in `pydot` package used for visualizing graphs
 - [Graphviz documentation](https://graphviz.org/docs/nodes/): node and graph attributes
-- [Google Python Style Guide](https://github.com/google/styleguide/blob/gh-pages/pyguide.md#38-comments-and-docstrings): information on docstrings
+- [PyInstaller documentation](https://graphviz.org/docs/nodes/): bundling a Python application and all its dependencies into a single packages (i.e. Windows executable)
 
 ## Usage
 
