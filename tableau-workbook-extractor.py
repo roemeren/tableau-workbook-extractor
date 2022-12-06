@@ -174,6 +174,13 @@ df["flag_unused"] = df.apply(lambda x: \
     np.where(x.n_worksheet_dependencies == 0, 1, 0), axis = 1)
 
 if fDepFields or fDepSheets:
+    # Finalize calculated field expressions
+    dictFieldToID = fieldMappingTable(df, "source_field_label", 
+    "source_field_repl_id")
+    dictLabelToID = {**dictFieldToID, **dictSheetToID}
+    df["field_calculation_cleaned"] = df.apply(lambda x: 
+        fieldIDMapping(x.field_calculation_cleaned, x.source_label, 
+            dictLabelToID), axis = 1)
     # Create master node graph
     colors = {"Parameter": "#cbc3e3",
         "Field": "green", "Calculated Field (LOD)": "red", 
@@ -247,13 +254,8 @@ if fDepSheets:
         visualizeSheetDependencies(df2, sh, gMaster, inpPath, fSVG)
 
 stepLog("Saving table results in " + outFilePath + "...")
-# final clean-up of backward and forward dependencies
-dictFieldToID = fieldMappingTable(df, "source_field_label", 
-    "source_field_repl_id")
-dictLabelToID = {**dictFieldToID, **dictSheetToID}
-
 # output 1: field info
-lstClean = ["field_calculation_cleaned", "field_calculation_dependencies", 
+lstClean = ["field_calculation_dependencies", 
    "field_backward_dependencies", "field_forward_dependencies", 
    "source_field_dependencies"]
 for col in lstClean:

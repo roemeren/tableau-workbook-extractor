@@ -140,7 +140,9 @@ def fieldCalculationMapping(c, s, d, l):
     """
     # remove comments (anything that starts with // until end of line)
     res = re.sub(r"\/{2}.*\n", "", c)
-    res = re.sub(r"\/{2}.*", "", c)
+    res = re.sub(r"\/{2}.*", "", res)
+    # remove empty lines
+    res = re.sub(r"^\n", "", res)
     # external: [source ID].[field ID] -> [replacement ID]
     for key in d: res = res.replace(key, d.get(key))
     # internal: [field ID] -> [source ID].[field ID]
