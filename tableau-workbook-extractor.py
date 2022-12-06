@@ -160,18 +160,14 @@ df["source_field_dependencies"] = \
 df["lod_backward_dependencies"] = \
     df.apply(lambda x: fieldsFromCategory(x.field_backward_dependencies, 
     "Calculated Field (LOD)", True), axis = 1)
-df["n_backward_dependencies"] = \
-    df["field_backward_dependencies"].apply(len)
-df["n_worksheet_dependencies"] = \
-    df["field_worksheets"].apply(len)
-df["n_forward_dependencies"] = \
-    df["field_forward_dependencies"].apply(len)
+df[["n_backward_dependencies", "n_worksheet_dependencies", 
+    "n_forward_dependencies", "n_backward_dependencies_field", 
+    "n_backward_dependencies_lod"]] = \
+    df[["field_backward_dependencies", "field_worksheets", 
+    "field_forward_dependencies", "source_field_dependencies", 
+    "lod_backward_dependencies"]].apply(lambda x: x.str.len(), axis = 1)
 df["n_forward_dependencies"] = df["n_forward_dependencies"] - \
     df["n_worksheet_dependencies"] 
-df["n_backward_dependencies_field"] = \
-    df["source_field_dependencies"].apply(len)
-df["n_backward_dependencies_lod"] = \
-    df["lod_backward_dependencies"].apply(len)
 
 # flag unused fields (field and its forward dependencies not used in sheets)
 df["flag_unused"] = df.apply(lambda x: \
