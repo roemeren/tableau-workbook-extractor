@@ -173,11 +173,12 @@ df["n_forward_dependencies"] = df["n_forward_dependencies"] - \
 df["flag_unused"] = df.apply(lambda x: \
     np.where(x.n_worksheet_dependencies == 0, 1, 0), axis = 1)
 
-if fDepFields or fDepSheets:
-    # Finalize calculated field expressions
-    dictFieldToID = fieldMappingTable(df, "source_field_label", 
+# Finalize calculated field expressions
+dictFieldToID = fieldMappingTable(df, "source_field_label", 
     "source_field_repl_id")
-    dictLabelToID = {**dictFieldToID, **dictSheetToID}
+dictLabelToID = {**dictFieldToID, **dictSheetToID}
+
+if fDepFields or fDepSheets:
     df["field_calculation_cleaned"] = df.apply(lambda x: 
         fieldIDMapping(x.field_calculation_cleaned, x.source_label, 
             dictLabelToID), axis = 1)

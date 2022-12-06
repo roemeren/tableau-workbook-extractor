@@ -168,7 +168,8 @@ def sheetMapping(s, d):
 
 def processCaptions(i, c):
     """
-    Process captions to the format in which they are used in calculations
+    Process captions to the format in which they are used in calculations and 
+    with single or double quotes removed
 
     Args:
         i: Source or field ID value
@@ -176,16 +177,21 @@ def processCaptions(i, c):
 
     Returns:
         Processed caption enclosed in square brackets + any additional
-        right square brackets doubled
+        right square brackets doubled. Single and double quotes are also 
+        replaced by HTML codes resp. &apos and &quot.
     """
     if c == '': return i
     else:
         # right brackets are doubled in calculations
-        return "[{0}]".format(c.replace("]", "]]"))
+        res = "[{0}]".format(c.replace("]", "]]"))
+        # replace auotes by HTML codes (may cause JSON conversion issues)
+        res = res.replace("'", "&apos")
+        res = res.replace('"', "&quot")
+        return res
 
 def fieldCalculationDependencies(l, x):
     """
-    # List direct dependencies in a calculation x based on a list l
+    List direct dependencies in a calculation x based on a list l
 
     Args:
         l: List of all possible values that can be matched
@@ -427,6 +433,7 @@ def fieldIDMapping(x, s, d):
     for key in d: res = res.replace(d.get(key), key)
     # internal source field references: only use field name
     res = res.replace(s + ".", "")
+
     # restore original structure if needed
     if x.__class__.__name__ == 'list':
         res = [json.loads(idx.replace("'", '"')) for idx in [res]][0]
