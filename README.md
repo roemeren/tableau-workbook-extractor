@@ -29,12 +29,13 @@ For Windows it is important to add the Graphviz `bin` subdirectory to the
 
 #### Method 1: Run Executable (Windows Only)
 
-The tool can be run on Windows by double-clicking on the executable `tableau-workbook-extractor.exe` inside the `dist` subfolder, which will run a packaged version of the main script `tableau-workbook-extractor.py`.
+The tool can be run on Windows by double-clicking on the executable `tableau-workbook-extractor.exe` inside the `dist` subfolder.
 
 Notes: 
 
 - The tool has been created using version 6.0.2. on Windows (graphviz-6.0.2 64-bit EXE installer). Installing more recent versions may be blocked by Microsoft Defender SmartScreen.
 - separate Linux/MacOS versions can be created by running PyInstaller resp. on Linux or MacOS.
+- the executable is a packaged version of the main script `tableau-workbook-extractor.py`, created with [PyInstaller](https://pyinstaller.org/en/stable/). A new version of the executable can be created by changing the directory to the one containing the `tableau-workbook-extractor.py` and then running the command `pyinstaller --onefile tableau-workbook-extractor.py`.
 
 #### Method 2: Run Python script (using Anaconda)
 

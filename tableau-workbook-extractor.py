@@ -4,6 +4,9 @@ import easygui
 import warnings
 from tqdm import tqdm
 
+# keep application alive when unhandled exception occurs
+sys.excepthook = show_exception_and_exit
+
 # script parameters
 fTest = False # run without prompt or not?
 fDepFields = True # create field dependency graphs?
@@ -120,7 +123,7 @@ df["field_calculation_dependencies"] = \
 df["field_category"] = df.apply(lambda x: \
     fieldCategory(x.source_field_label, x.field_calculation_cleaned), axis = 1)
 
-stepLog("Processing field dependencies...")
+stepLog("Processing dependencies...")
 # get full list of backward dependencies
 df["field_backward_dependencies"] = \
     df["source_field_repl_id"].apply(lambda x: backwardDependencies(df, x))

@@ -28,6 +28,16 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
+def show_exception_and_exit(exc_type, exc_value, tb):
+    """
+    Keeps the application alive when an unhandled exception occurs
+    Source: https://stackoverflow.com/questions/779675/stop-python-from-closing-on-error
+    """
+    import traceback
+    traceback.print_exception(exc_type, exc_value, tb)
+    input("Error encountered. Press Enter to continue...")
+    sys.exit(-1)
+
 def stepLog(message, *args, **kwargs):
     """
     Log a message that includes an incremental step counter in a main script
