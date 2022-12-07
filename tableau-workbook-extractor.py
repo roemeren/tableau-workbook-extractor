@@ -305,4 +305,4 @@ if not os.path.isdir(outFileDirectory):
 with pd.ExcelWriter(outFilePath) as writer:
     df.to_excel(writer, sheet_name = "fields", index = False)
     df2.to_excel(writer, sheet_name = "dependencies", index = False)
-input("Done! Press Enter to continue...")
+input("Done! Press Enter to exit...")

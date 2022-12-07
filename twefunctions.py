@@ -38,7 +38,7 @@ def show_exception_and_exit(exc_type, exc_value, tb):
     """
     import traceback
     traceback.print_exception(exc_type, exc_value, tb)
-    input("Error encountered. Press Enter to continue...")
+    input("Error encountered. Press Enter to exit...")
     sys.exit(-1)
 
 def stepLog(message, *args, **kwargs):
