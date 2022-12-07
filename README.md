@@ -20,22 +20,28 @@ These files could be useful for the following reasons:
 
 ### Step 1: Install Graphviz
 
-For exporting the graphs as images the `Graphviz` software is used and should be installed from here: https://graphviz.org/download/. 
+For exporting the graphs as images the `Graphviz` software is used and should be installed from here: https://graphviz.org/download/.
 
-For Windows it is important to add the Graphviz `bin` subdirectory to the 
-`Path` environment variable (otherwise the `dot` command used by `pydot` won't be recognized).
+Notes for Windows users:
+
+- Some versions may be blocked by Microsoft Defender Smartscreen. It should however be possible to install version 6.0.2 (graphviz-6.0.2 64-bit EXE installer)
+- The Graphviz `bin` subdirectory should be added to the `Path` environment variable, otherwise the `dot` command used by `pydot` won't be recognized. This option is off by default but should be applied.
+
+The tool has been created using version 6.0.2. on Windows . Installing more recent versions may be blocked by Microsoft Defender SmartScreen.
 
 ### Step 2: Run the tool
 
 #### Method 1: Run Executable (Windows Only)
 
-The tool can be run on Windows by double-clicking on the executable `tableau-workbook-extractor.exe` inside the `dist` subfolder.
+1. **Go to the [project GitLab repo](https://git.bdbelux.be/remerencia/tableau-workbook-extractor)** and click on the releases at the top (rocket symbol).
+2. **Download the latest release** by clicking on the 'Windows Executable' asset of the latest release 
+3. **Unzip the downloaded file** and place the executable somewhere convenient
+4. **Run the executable** by double-clicking on it
 
-Notes: 
+Technical notes: 
 
-- The tool has been created using version 6.0.2. on Windows (graphviz-6.0.2 64-bit EXE installer). Installing more recent versions may be blocked by Microsoft Defender SmartScreen.
-- separate Linux/MacOS versions can be created by running PyInstaller resp. on Linux or MacOS.
-- the executable is a packaged version of the main script `tableau-workbook-extractor.py`, created with [PyInstaller](https://pyinstaller.org/en/stable/). A new version of the executable can be created by changing the directory to the one containing the `tableau-workbook-extractor.py` and then running the command `pyinstaller --onefile tableau-workbook-extractor.py`.
+- Separate Linux/MacOS versions can be created by running PyInstaller resp. on Linux or MacOS.
+- The executable is a packaged version of the main script `tableau-workbook-extractor.py`, created with [PyInstaller](https://pyinstaller.org/en/stable/). A new version of the executable can be created by changing the directory to the one containing the `tableau-workbook-extractor.py` and then running the command `pyinstaller --onefile tableau-workbook-extractor.py`.
 
 #### Method 2: Run Python script (using Anaconda)
 
