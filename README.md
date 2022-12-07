@@ -7,7 +7,7 @@ Python script to automatically analyze (possibly complex Tableau) workbooks.
 The script prompts the user to select a locally saved Tableau workbook (in `.twb` or `.twbx` format), after which 2 outputs are created:
 
 1. An Excel file `<workbook_name>.xlsx` containing a table of field information (sheet `fields`) and a table of field dependencies (sheet `dependencies`). The tables are a cleaned and processed version of information extracted from the [Tableau Document API](https://tableau.github.io/document-api-python/)
-2. A PNG `<source_name>-<field_name>.xlsx` for each field that has at least 1 dependency to ('forward' dependency) or from ('backward' dependency) another field or sheet, containing a graph of all the field's dependencies with different colors and shapes indicating the dependency types (parameter, data source field or calculated field). The graphs are generated using [Pydot](https://pypi.org/project/pydot/), a Python interfact to [Graphviz](https://graphviz.org/)
+2. A PNG and SVG file `<source_name>/<field_name>.png/svg` for each field that has at least 1 dependency to ('forward' dependency) or from ('backward' dependency) another field or sheet, containing a graph of all the field's dependencies with different colors and shapes indicating the dependency types (parameter, data source field or calculated field). The graphs are generated using [Pydot](https://pypi.org/project/pydot/), a Python interfact to [Graphviz](https://graphviz.org/). The output graphs are organized in subfolders per data source as well as a separate subfolder for sheets.
 
 These files could be useful for the following reasons:
 
