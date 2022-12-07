@@ -72,6 +72,7 @@ def getRandomReplacementBaseID(df, c, suffix = ""):
         are accidentally matched
     """
     uniqueVals = list(df[c].unique())
+    random.seed(10)
     flagSucceed = False
     while not flagSucceed:
         res = ''.join(random.choice(string.ascii_lowercase) 
@@ -172,25 +173,31 @@ def sheetMapping(s, d):
 def processCaptions(i, c):
     """
     Process captions to the format in which they are used in calculations and 
-    with single or double quotes removed
+    with some invalid characters removed for JSON parsing
 
     Args:
         i: Source or field ID value
         x: Source or field caption value
 
     Returns:
-        Processed caption enclosed in square brackets + any additional
-        right square brackets doubled. Single and double quotes are also 
-        replaced by HTML codes resp. &apos and &quot.
+        lbl: Original field name enclosed with brackets
+        res: Processed caption enclosed in square brackets + any additional
+        right square brackets doubled. Single and double quotes are 
+        replaced by HTML codes resp. &apos and &quot while a backslash (\)
+        is replaced by 2 backslashes (\\)
     """
-    if c == '': return i
+    if c == '': 
+        lbl = i
+        res = i
     else:
+        lbl = "[{0}]".format(c)
         # right brackets are doubled in calculations
         res = "[{0}]".format(c.replace("]", "]]"))
-        # replace auotes by HTML codes (may cause JSON conversion issues)
-        res = res.replace("'", "&apos")
-        res = res.replace('"', "&quot")
-        return res
+    # replace invalid characters for later json.loads use
+    res = res.replace("'", "&apos")
+    res = res.replace('"', "&quot")
+    res = res.replace("\\", '\\\\')
+    return lbl, res
 
 def fieldCalculationDependencies(l, x):
     """

@@ -72,12 +72,28 @@ df["field_id"] = df["field_id"].apply(lambda x:
     np.where(re.search(r"\[.*\]", x), x, "[{0}]".format(x)))
 df["source_field_id"] = df["data_source_name"] + "." + df["field_id"]
 
-# data source and field labels
-df["field_label"] = df.apply(lambda x: \
-    processCaptions(x.field_id, x.field_caption), axis = 1)
-df["source_label"] = df.apply(lambda x: \
-    processCaptions(x.data_source_name, x.data_source_caption), axis = 1)
+# process data source and field labels
+df[["field_label_orig", "field_label"]] = df.apply(lambda x: \
+    processCaptions(x.field_id, x.field_caption), axis = 1, 
+    result_type = "expand")
+df[["source_label_orig", "source_label"]] = df.apply(lambda x: \
+    processCaptions(x.data_source_name, x.data_source_caption), axis = 1, 
+    result_type = "expand")
 df["source_field_label"] = df["source_label"] + "." + df["field_label"]
+
+# print out unique field renamings
+df["f_field"] = df["field_label_orig"] != df["field_label"]
+df["d_field"] = df["field_label_orig"].astype(str) + " -> " + \
+    df["field_label"].astype(str)
+fldModified = df[df["f_field"]]["d_field"]
+for fld in fldModified: print("\tRenamed field: {}".format(fld))
+
+# print out unique source renamings
+df["f_source"] = df["source_label_orig"] != df["source_label"]
+df["d_source"] = df["source_label_orig"].astype(str) + " -> " + \
+    df["source_label"].astype(str)
+fldModified = set(df[df["f_source"]]["d_source"])
+for fld in fldModified: print("\tRenamed source: {}".format(fld))
 
 # remove duplicate rows based on source field ID
 df, nDupl = removeDuplicatesByRowLength(df, "source_field_id")
