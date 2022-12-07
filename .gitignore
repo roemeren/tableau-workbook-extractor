@@ -1,4 +1,5 @@
 notebooks
 __pycache__
 build
+dist
 *.spec
