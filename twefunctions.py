@@ -10,6 +10,9 @@ import logging
 import random
 import string
 
+# constants
+MAXPATHSIZE = 260
+
 @contextmanager
 def suppress_stdout():
     """
@@ -510,10 +513,17 @@ def visualizeFieldDependencies(df, sf, l, g, din, svg = False):
     
     # write output files with forced UTF-8 encoding to avoid errors
     # see https://github.com/pydot/pydot/issues/142
-    outFile = "{0}{1}-{2}.png".format(dout, sout, fout)
+    outFile = "{0}{1}.png".format(dout, fout)
+    if len(outFile) > MAXPATHSIZE:
+        raise Exception(("Output graph path size for source {0} and " + 
+        "field {1} ({2}) exceeds the path size " +
+        "limit ({3}). Try shortening the path to the workbook, " + 
+        "workbook name and/or field/parameter names. \n" + 
+        "Output graph path: {4}")
+            .format(s, f, len(outFile), MAXPATHSIZE, outFile))
     G.write_png(outFile, encoding = "utf-8")
     if svg:
-        outFile = "{0}{1}-{2}.svg".format(dout, sout, fout)
+        outFile = "{0}{1}.svg".format(dout, fout)
         G.write_svg(outFile, encoding = "utf-8")
 
 def appendFieldsToDicts(l, k, v):
@@ -604,6 +614,13 @@ def visualizeSheetDependencies(df, sh, g, din, svg = False):
     specialChar = "[^A-Za-z0-9]+"
     fout = re.sub(specialChar, '', l)
     outFile = "{0}{1}.png".format(din, fout)
+    if len(outFile) > MAXPATHSIZE:
+        raise Exception(("Output graph path size for sheet {0} " + 
+        "({1}) exceeds the path size " +
+        "limit ({2}). Try shortening the path to the workbook, " + 
+        "workbook name and/or field/parameter names. \n" + 
+        "Output graph path: {3}")
+            .format(l, len(outFile), MAXPATHSIZE, outFile))
     G.write_png(outFile, encoding = "utf-8")
     if svg:
         outFile = "{0}{1}.svg".format(din, fout)
