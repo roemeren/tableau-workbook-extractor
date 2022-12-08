@@ -1,41 +1,53 @@
 # Tableau Workbook Extractor
 
-Python script + Windows executable to automatically analyze fields and calculations in Tableau workbooks.
+Python script & Windows executable to automatically analyze fields and calculations in Tableau workbooks.
 
 ## Description
 
-The script prompts the user to select a locally saved Tableau workbook (in `.twb` or `.twbx` format), after which 2 outputs are created:
+The script prompts the user to browse to a local Tableau workbook (in `.twb` or ` twbx` format), after which 2 types of output are created:
 
 1. An Excel file containing a table of field information and a table of field dependencies. The tables are a cleaned and processed version of information extracted from the [Tableau Document API](https://tableau.github.io/document-api-python/)
-2. PNG/SVG image files `<source_name>/<field_name>.png/svg` for each field that has at least 1 dependency to ('forward' dependency) or from ('backward' dependency) another field or sheet, containing a directed graph of all the field's dependencies with different colors and shapes indicating the dependency types (parameter, data source field or calculated field). The graphs are generated using [Pydot](https://pypi.org/project/pydot/), a Python interfact to [Graphviz](https://graphviz.org/). The output graphs are organized in subfolders per data source as well as a separate subfolder for sheets.
+2. PNG/SVG images for each field that has at least 1 forward or backward dependency to another field or sheet, consisting of a directed graph of all the field's dependencies. Different colors and shapes indicate dependency types (parameter, data source field, calculated field or sheet). The images are organized in different subfolders. The graphs are generated using [Pydot](https://pypi.org/project/pydot/), a Python interface to [Graphviz](https://graphviz.org/).
 
 ## Possible use cases
 
-The outputs from this tool could be useful for the following reasons:
+The tool could be used for the following reasons:
 
-- Get a full overview of **how a field is calculated** (starting from the data source) and how (much) it is used in sheets and/or other calculations
-- Get an overview of **unused fields and calculations** that could be removed from the Tableau if needed to improve performance or to keep extract sizes as low as possible
-- Get an overview of **overall complexity** of the dashboard and check whether or not it is needed to simplify fields by pruning dependencies
-- Automate the **documentation** process of the dashboard
+- Get a full overview of **how a field is calculated** (starting from data source fields) and how (much) it is used in sheets and/or other calculations
+- Get an overview of **unused fields and calculations**. These could be removed from the workbook or data source if needed to improve performance or to keep extract sizes as low as possible
+- Get an overview of the **overall complexity** of the dashboard and check whether or not it is needed to simplify fields by pruning dependencies and fields
+- Automate part of the **documentation** process of a dashboard
 
-## What it can't do (yet)
+## What it can't do
 
-Information that **cannot** be extracted from this tool:
+Information that **cannot** be extracted from this tool (yet):
 
-- **Role of a field** in visualizations (dimension/measure/filter/tooltip/etc.)
-- **Parameter dependencies** e.g. initialization of parameter that depends on a (calculated) field when loading the workbook
-- **Hidden data source fields** processing; the focus is on fields that are effectively used in a dashboard and doesn't necessarily correspond to the full list of available (possibly hidden) data source fields
-- **Dashboard actions** processing: dashboard actions may include fields as well as other sheets. These dependencies are currently not captured by the Document API and/or this tool.
-- **Filter** processing: similar to dashboard actions filters include fields as well as a set of sheets they are applied to.
-- **Direct sheet dependencies**: the current sheet dependencies of a field can be direct (= directly applied as tooltip/text/dimension/etc.) or indirect (= calculated field *based on this field* is applied as tooltip/text/dimension etc. but not the field itself). Currently there is no way to known if a sheet dependency is direct or indirect.
+- **Role of a field** in sheets: there is no indication if a field in a particular sheet is used as a dimension, measure, filter, tooltip, etc.
+- **Direct or indirect dependency** in sheets: there is no indication if a field in a particular sheet is used *directly* in the sheet or *indirectly* through a calculated field that depends on the field
+- **Parameter dependencies**: during loading/opening of the workbook some parameters may be initialized by a calculated field in the workbook (e.g. most recent date). These (backward) dependencies are not captured.
+- **Full data source dependencies**: fields from a data source are analyzed from the point of view of a particular dashboard. The used data source itself may contain calculated fields that depend on hidden fields that are not available in the workbook. These 'hidden dependencies' from the data source therefore will not be captured. This may be overcome by running the tool separately for the technical workbook that defines the data source.
+- **Dashboard actions** processing: dashboard actions depend on fields as well as sheets, and have various other properties (source and target fields/sheets, action type, etc.) that are currently not exposed in the Document API.
+- **Filter** processing: filters are related to fields but have various other properties (filter expression, filter scope, etc.)
+
+These items may or may not be included in future versions of the [Tableau Document API](https://tableau.github.io/document-api-python/). 
+
 
 ## How to run the script on Windows (Executable)
+
+In short:
+
+1. Install [Graphviz](https://graphviz.org/download/) and make sure that it is added to the Path environment variable
+2. Download the latest Windows executable in the [releases](https://git.bdbelux.be/remerencia/tableau-workbook-extractor/-/releases)
+3. Run the tool (exe file) and browse to the Tableau workbook (twb/twbx) to be analyzed. Tableau doesn't need to be installed to run the tool. After the tool has finished check the output files (Excel + PNG + SVG) created in a newly created folder `<workbook name> Files` inside the workbook's folder
+
+In case the different `.exe` are blocked by the system it can be bypassed by checking the Unblocked property in the executable's file properties.
+
+Each of these steps is explained in detail in the following subsections.
 
 ### Step 1: Install Graphviz
 
 Graphviz is open source graph visualization software that is used by the tool 
-to export field dependency graphs as images. It should be downloaded before 
-running the tool. It can be downloaded here: https://graphviz.org/download/ (section 'Windows').
+to export field dependency graphs as images. It should be installed and recognized by the system before running the tool. It can be downloaded here: https://graphviz.org/download/ (section 'Windows').
 
 **Some versions may be blocked** by Microsoft Defender Smartscreen:
 
@@ -45,7 +57,7 @@ This can be bypassed by **right-clicking** on the file and clicking on **Propert
 
 <img src="images/08-unblock-exe.png" alt="Microsoft Defender Smartscreen" width="350"/>
 
-Another method is to run the exe using the **Command Prompt**: change the directory to the file's download location and then Run the executable with the command `myfile` or  `myfile.exe`.
+An alternative method is to run the exe using the **Command Prompt**: change the directory to the file's download location and then Run the executable with the command `my-executable` or  `my-executable.exe`.
 
 During installation one of the options to **add Graphviz to the PATH variable** should be chosen (by default this is not done):
 
@@ -59,19 +71,21 @@ The latest release of the tool can be downloaded as an exe file from https://git
 
 <img src="images/03-releases.png" alt="Microsoft Defender Smartscreen" width="500"/>
 
-The URL points to a shared file on OneDrive that can be downloaded. After downloading it can be moved to a convenient location (it can be run from anywhere).
+The URL points to a shared file on OneDrive that can be downloaded. After downloading it can be moved to a convenient location since it can be run from anywhere. It is however recommended to keep the **path to the executable as short as possible** to avoid exceeding the maximum path length of generated output files.
 
 ### Step 3: Run the tool
 
 By **double-clicking** on the downloaded file `tableau-workbook-extractor-<version>.exe` the tool will run and a black window will open to show its progress. 
 
-**Note**: if the executable is **blocked** again by Microsoft Defender Smartscreen it can be run by unblocking it in the file's properties or by running it in the Command Prompt (see also previous section wrt Graphviz executable).
+**It's not necessary to have Tableau Desktop or Public installed**, but it may be useful to verify some of the results.
+
+If the executable is **blocked** again by Microsoft Defender Smartscreen it can be bypassed in the same way as for the Graphviz installer file (see previous subsection).
 
 After initial loading it will prompt the user to **browse to a Tableau workbook** (`.twb` or `.twbx` format):
 
 <img src="images/04-browse-file.png" alt="Microsoft Defender Smartscreen" width="500"/>
 
-Next, the **workbook is opened and processed** which includes using the Tableau Document API to extract fields and some cleaning (duplicate removal, removal of certain characters, cleaning up calculated field expressions, etc.). Depending on the number of extracted fields and dependencies this may take a while.
+Next, the **workbook is opened and processed** which includes using the Tableau Document API to extract fields and some cleaning (duplicate removal, cleaning up field names and calculations, etc.). Depending on the number of extracted fields and dependencies this may take a while.
 
 A folder `<workbook name> Files` is created to store all output files:
 
@@ -117,35 +131,37 @@ The tool can also be executed by running the `tableau-workbook-extractor.py` fro
     ```
 3. **Run the Python script** by running the command `python tableau-workbook-extractor.py` inside the working directory (= downloaded repo folder)
 
-**Important note**: the script **hasn't been tested on Linux and MacOS** and still have a known **open issue** related to backward vs forward path separators when reading/writing files.
+**Note**: the script **hasn't been tested on Linux and MacOS** and still have a known **open issue** related to backward vs forward file path separators.
 
 ## Other ways to run the script (not available yet)
 
 In the future other ways to run the tool may be implemented:
 
 - **Separate Linux and/or MacOS executables**: these can be created by running [PyInstaller](https://pyinstaller.org/en/stable/) separately on these operations systems. 
-- **Docker containers**: this is a platform-independent solution that only requires the user to have [Docker](https://www.docker.com/) installed. Running the container will automatically create the environment (Graphviz + Python + proper package versions) and run the tool. Disadvantages: Docker should be installed + GUI elements (like the file browser in the first step) may not work anymore and should be replaced by command-line argumants (in this case the full path to the Tableau workbook)
+- **Docker containers**: this is a platform-independent solution that only requires the installation of [Docker](https://www.docker.com/). Running the container will automatically create the environment (Graphviz + Python + package versions) and run the tool. It however has some disadvantages: 
+    - Docker should be installed and run from the command line (= less user-friendly)
+    - GUI elements (file browsers) may not work correctly anymore on 1 or more operating systems. This means that the GUI elements should be replaced by specifying arguments (like the full path to the workbook) in text format in the command line (= less user-friendly)
 
 ## How to create the Windows Executable and release
 
-If the repo is updated a new executable can be created using the [PyInstaller](https://pyinstaller.org/en/stable/) package:
+The tool's executable is created using the [PyInstaller](https://pyinstaller.org/en/stable/) package. It bundles a Python application and all its dependencies into a single package, in this case an exe file.
 
-- Check out the commit/tag (= version) locally for which the executable should be created
-- Open a terminal and make sure that the proper environment is active (Python version + all package requirements installed, see before)
-- Change the working directory to the one containg the `tableau-workbook-extractor.py` script
-- Run the command `pyinstaller --onefile tableau-workbook-extractor.py`. This will create a new executable `tableau-workbook-extractor.exe` in a subfolder `dist` as well as some other files/folders (`build`, `tableau-workbook-extractor.spec`). All created files are ignored for version tracking.
-- Rename the file `tableau-workbook-extractor.exe` to `tableau-workbook-extractor-<version>.exe` which can be added to a new release (associated with the tag/version)
+For any commit in the repo an executable version `tableau-workbook-extractor.exe` of the main script `tableau-workbook-extractor.py` can be created as follows:
 
+1. Clone the repo locally and replicate the environment (see section 'How to run the script on Windows/Linux/MacOS (Python)'). This will make sure that the PyInstaller package gets installed as well.
+2. Activate the environment and change the directory to the repo directory (that contains the `tableau-workbook-extractor.py` script)
+3. Run the command `pyinstaller --onefile tableau-workbook-extractor.py`. This will create a new executable `tableau-workbook-extractor.exe` in a subfolder `dist`. This file as well as other files that are created (e.g. in the `build` subfolder) are not tracked and therefore will not impact the repository.
+4. This file can be renamed and used in the next releases of the tool
 
 ## Known issues
 
 - **Not all dependencies are captured**: 
-    - it is possible that flagged fields/parameters are still used/useful in the workbook because they are for example used in a dashboard URL action. Deleting it in Tableau will (surprisingly) not raise any warnings but the field removal may cause issues.
-    - if fields are based on hidden fields from a data source these dependencies won't be captured and/or shown in the outputs
-- **Not all field captions are captured**: some data source field captions (among other attributes) are missing when using the Tableau Document API while these captions can be located in the workbook's raw XML (within the `<metadata-record>`'s `<caption>` tag). It appears to be related to hidden fields (maybe previously unhidden?) in the data source.
-- **Not all fields are assigned to the correct data source**: for unknown reasons some (copies of) fields are assigned to a data source it doesn't belong to. This may also be related to open issues in the Document API.
-- **Path separators in non-Windows OS**: the tool doesn't process output file paths correctly yet since it assumes Windows-style paths with backslashes (\) rather than forward slashes (/) used in other OS. In case the tool is used in these OS a fix should be implemented.
-
+    - fields may not be used in sheets but to *initialize parameter values* when the workbook is opened/loaded
+    - data source fields may depend on fields that *hidden in the data source* and are not visible in the dashboard
+    - fields and parameters may be used in *dashboard actions*
+- **Not all field captions are captured**: field captions may be missing and therefore their internal ID will be used in the outputs (may be related to hidden fields and dependencies)
+- **Not all extracted fields are assigned to the correct data source**: some (copies of) fields may be linked to a data source it doesn't belong to
+- **Path separators in non-Windows OS**: currently the tool processes file path using backslashes (\) as in Windows. Linux and MacOS use forward slashes which will lead to incorrect output file paths.
 
 ## Roadmap
 
@@ -154,10 +170,9 @@ Some possible extensions/fixes:
 - **Batch processing** of a set or folder of workbooks at once
 - **Remove multi-line comments** from cleaned calculated fields (anything between /* and */)
 - **General code refactoring**: the current pandas implementation may not be the fastest/shortest
-- **Check for new versions of the Document API**: Currently not all extracted information is 100% correct or directly usable which is why additional processing is needed to fix some known issues. The API may improve in the future, removing the need of some of these processing operations.
-- **Evaluate the included field information & structure and modify if needed**: Not all possible field information from the API is included at the moment. Additional information may be extracted (specially if a new version is used in the future).
-- **Improve the quality/readability of the output graphs** (e.g. colors, fonts, node arrangement)
-- **Implement fixes for additional edge cases**: There may still be notebooks that cause errors in the tool e.g. because of invalid characters that are used in field names.
+- **Evaluate included field information**: currently not all available field attributes from the API are included (only the ones that were initially considered the most relevant). It may be useful to include more or unprocessed versions of attributes in the next releases.
+- **Improve the quality/readability of the output graphs** e.g. colors, fonts, node arrangement of the PNG/SVG images
+- **Implement fixes for additional edge cases**: there may still be workbooks that cause errors in the tool e.g. because of unusual field names with invalid characters
 - **Expand to multiple OS**: modify the script and executable to be able to run the tool (correctly) on Linux and/or MacOS. The first fix would be to modify the input/output file paths such that they are processed correctly on all OS (forward and backward slashes)
 
 ## Sources
