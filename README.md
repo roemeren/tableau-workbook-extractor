@@ -41,7 +41,11 @@ running the tool. It can be downloaded here: https://graphviz.org/download/ (sec
 
 <img src="images/01-microsoft-defender.png" alt="Microsoft Defender Smartscreen" width="350"/>
 
-In that case another version of the executable should be downloaded and tried out.
+This can be bypassed by **right-clicking** on the file and clicking on **Properties**. Next, the **Unblock** option should be checked after which the executable can be run.
+
+<img src="images/08-unblock-exe.png" alt="Microsoft Defender Smartscreen" width="350"/>
+
+Another method is to run the exe using the **Command Prompt**: change the directory to the file's download location and then Run the executable with the command `myfile` or  `myfile.exe`.
 
 During installation one of the options to **add Graphviz to the PATH variable** should be chosen (by default this is not done):
 
@@ -61,11 +65,7 @@ The URL points to a shared file on OneDrive that can be downloaded. After downlo
 
 By **double-clicking** on the downloaded file `tableau-workbook-extractor-<version>.exe` the tool will run and a black window will open to show its progress. 
 
-**Note**: if the executable is blocked by Microsoft Defender Smartscreen the file can be run as follows:
-
-1. Open the Command Prompt
-2. Change directory to the folder where the executable is stored e.g. `cd C:\Users\<user>\Documents`
-3. Run the executable with the command `tableau-workbook-extractor-<version>` or  `tableau-workbook-extractor-<version>.exe`
+**Note**: if the executable is **blocked** again by Microsoft Defender Smartscreen it can be run by unblocking it in the file's properties or by running it in the Command Prompt (see also previous section wrt Graphviz executable).
 
 After initial loading it will prompt the user to **browse to a Tableau workbook** (`.twb` or `.twbx` format):
 
