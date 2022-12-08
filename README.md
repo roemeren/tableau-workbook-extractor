@@ -61,6 +61,12 @@ The URL points to a shared file on OneDrive that can be downloaded. After downlo
 
 By **double-clicking** on the downloaded file `tableau-workbook-extractor-<version>.exe` the tool will run and a black window will open to show its progress. 
 
+**Note**: if the executable is blocked by Microsoft Defender Smartscreen the file can be run as follows:
+
+1. Open the Command Prompt
+2. Change directory to the folder where the executable is stored e.g. `cd C:\Users\<user>\Documents`
+3. Run the executable with the command `tableau-workbook-extractor-<version>` or  `tableau-workbook-extractor-<version>.exe`
+
 After initial loading it will prompt the user to **browse to a Tableau workbook** (`.twb` or `.twbx` format):
 
 <img src="images/04-browse-file.png" alt="Microsoft Defender Smartscreen" width="500"/>
