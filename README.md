@@ -155,7 +155,6 @@ For any commit in the repo an executable version `tableau-workbook-extractor.exe
 
 ## Known issues
 
-- **Some LODs are not captured**: some cleaned field calculations are incorrectly classified as calculated field instead of LOD expressions.
 - **Not all dependencies are captured**: 
     - fields may not be used in sheets but to *initialize parameter values* when the workbook is opened/loaded
     - data source fields may depend on fields that *hidden in the data source* and are not visible in the dashboard
