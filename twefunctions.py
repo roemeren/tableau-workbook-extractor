@@ -324,7 +324,7 @@ def forwardDependencies(df, f, w, level = 0, p = None, ):
     if level > 0: 
         # add field dependencies
         lst += [{"parent": p, "child": f, \
-            "level": "+{0}".format(level), "category": cat, 
+            "level": "{0}".format(level), "category": cat, 
             "sheets": nSheet}]
     else:
         # add root sheet dependencies (already is full list)
