@@ -177,7 +177,7 @@ def processCaptions(i, c):
 
     Args:
         i: Source or field ID value
-        x: Source or field caption value
+        c: Source or field caption value
 
     Returns:
         lbl: Original field name enclosed with brackets
@@ -198,6 +198,19 @@ def processCaptions(i, c):
     res = res.replace('"', "&quot")
     res = res.replace("\\", '\\\\')
     return lbl, res
+
+def processSheetNames(s):
+    """
+    Remove invalid characters from sheet names for JSON parsing
+    Args:
+        s: input list of sheets
+    Returns:
+        res: processed list of sheet names without quotes or backslashes
+    """
+    res = [x.replace("'", "&apos") for x in s]
+    res = [x.replace('"', "&quot") for x in res]
+    res = [x.replace("\\", '\\\\') for x in res]
+    return res
 
 def fieldCalculationDependencies(l, x):
     """

@@ -72,7 +72,7 @@ df["field_id"] = df["field_id"].apply(lambda x:
     np.where(re.search(r"\[.*\]", x), x, "[{0}]".format(x)))
 df["source_field_id"] = df["data_source_name"] + "." + df["field_id"]
 
-# process data source and field labels
+# process data source, field and sheet labels
 df[["field_label_orig", "field_label"]] = df.apply(lambda x: \
     processCaptions(x.field_id, x.field_caption), axis = 1, 
     result_type = "expand")
@@ -80,6 +80,9 @@ df[["source_label_orig", "source_label"]] = df.apply(lambda x: \
     processCaptions(x.data_source_name, x.data_source_caption), axis = 1, 
     result_type = "expand")
 df["source_field_label"] = df["source_label"] + "." + df["field_label"]
+df["field_worksheets_orig"] = df["field_worksheets"]
+df["field_worksheets"] = df["field_worksheets_orig"].apply(lambda x: \
+     processSheetNames(x))
 
 # print out unique field renamings
 df["f_field"] = df["field_label_orig"] != df["field_label"]
