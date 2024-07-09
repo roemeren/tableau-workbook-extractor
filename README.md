@@ -185,7 +185,6 @@ Some possible extensions/fixes:
 ## Contributing
 
 Feel free to contribute or improve this tool! See the 'Roadmap' section for possible ideas and the 'Sources' section for background documentation on some of the external libraries that are used.
-State if you are open to contributions and what your requirements are for accepting them.
 
 ## Project status
 
