@@ -92,7 +92,8 @@ A folder `<workbook name> Files` is created to store all output files:
     - one subfolder for sheets
     <img src="images/05-output-file.png" alt="Microsoft Defender Smartscreen" width="500"/>
 - The subfolder `/Fields` contains an Excel file with field information and dependencies in 2 sheets `fields` and `dependencies`.
-    <img src="images/06-output-file-2.png" alt="Microsoft Defender Smartscreen" width="600"/>
+
+<img src="images/06-output-file-2.png" alt="Microsoft Defender Smartscreen" width="600"/>
 
 If everything runs as expected the user is prompted to **press Enter to exit** the program.
 
