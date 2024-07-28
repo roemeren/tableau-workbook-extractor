@@ -177,7 +177,7 @@ Some possible extensions/fixes:
 - [Document API Python documentation](https://tableau.github.io/document-api-python/): describes how workbook and field information can be extracted
 - [Pydot repository](https://github.com/pydot/pydot): methods and attributes in `pydot` package used for visualizing graphs
 - [Graphviz documentation](https://graphviz.org/docs/nodes/): node and graph attributes
-- [PyInstaller documentation](https://graphviz.org/docs/nodes/): bundling a Python application and all its dependencies into a single packages (i.e. Windows executable)
+- [PyInstaller documentation](https://pyinstaller.org/en/v5.6.2/): bundling a Python application and all its dependencies into a single packages (i.e. Windows executable)
 
 ## Contributing
 
