@@ -129,7 +129,7 @@ The tool can also be executed by running the `tableau-workbook-extractor.py` fro
     ```
 3. **Run the Python script** by running the command `python tableau-workbook-extractor.py` inside the working directory (= downloaded repo folder)
 
-**Note**: the script **hasn't been tested on Linux and MacOS** and still have a known **open issue** related to backward vs forward file path separators.
+**Note**: the script **hasn't been tested on Linux and MacOS** and still has a known **open issue** related to backward vs forward file path separators.
 
 ## Other ways to run the script (not available yet)
 
