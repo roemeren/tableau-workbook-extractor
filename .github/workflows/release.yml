@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
+    runs-on: windows-latest  # Use the latest Windows runner
     permissions:
       contents: write  # Needed to create and upload releases
     steps:
@@ -28,12 +28,9 @@ jobs:
         run: |
           pyinstaller --onefile tableau-workbook-extractor.py  # Build the executable
 
-      - name: List dist directory
-        run: ls -la dist/  # List files in the dist directory to verify the file exists
-
       - name: Upload release
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ github.ref }}  # Use the tag from the workflow
-          artifacts: dist/tableau-workbook-extractor # Path to the executable to upload
+          artifacts: dist/tableau-workbook-extractor.exe # Path to the executable to upload
           token: ${{ secrets.GITHUB_TOKEN }}  # Use the built-in GITHUB_TOKEN
