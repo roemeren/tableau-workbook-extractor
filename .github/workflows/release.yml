@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest  # Use the latest Ubuntu runner
+    permissions:
+      contents: write  # Needed to create and upload releases
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4  # Check out the code from the repository
@@ -30,3 +32,5 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           files: dist/tableau-workbook-extractor.exe  # Path to the executable to upload
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}  # Use the built-in GITHUB_TOKEN
