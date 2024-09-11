@@ -39,7 +39,7 @@ These items may or may not be included in future versions of the [Tableau Docume
 In short:
 
 1. Install [Graphviz](https://graphviz.org/download/) and make sure that it is added to the Path environment variable
-2. Download the [latest release of the Windows executable](https://github.com/roemeren/tableau-workbook-extractor/releases/latest)].
+2. Download the [latest release of the Windows executable](https://github.com/roemeren/tableau-workbook-extractor/releases/latest).
 3. Run the downloaded exe file and browse to the Tableau workbook (twb/twbx) to be analyzed. Tableau doesn't need to be installed to run the tool. After the execution has finished check the output files (Excel + PNG + SVG) created in a newly created folder `<workbook name> Files` inside the workbook's folder
 
 In case the different `.exe` are blocked by the system it can be bypassed by checking the 'Unblock' property in the executable's file properties.
