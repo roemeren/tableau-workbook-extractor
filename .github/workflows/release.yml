@@ -9,17 +9,17 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest  # Use the latest Windows runner
+    runs-on: windows-latest  # Use latest Windows runner to create Windows executable
     permissions:
       contents: write  # Needed to create and upload releases
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4  # Check out the code from the repository
+        uses: actions/checkout@v4  # Check out code from the repository
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'  # Specify the Python version (must include distutils module)
+          python-version: '3.10'  # Use downgraded Python version (must include distutils module)
 
       - name: Install dependencies
         run: |
@@ -28,17 +28,18 @@ jobs:
 
       - name: Build executable with PyInstaller
         run: |
+          # Extract version number from refs/tags/v*.*.*
           $tag = "${env:GITHUB_REF}"
           $version = $tag -replace 'refs/tags/', ''
           pyinstaller --onefile tableau-workbook-extractor.py
-          # Add the version number to the output executable
+          # Add version number to the output executable
           $exeName = "tableau-workbook-extractor-$version.exe"
           Rename-Item -Path dist\tableau-workbook-extractor.exe -NewName $exeName
-          # Make the exe file nmae available for the next step as well
+          # Make exe file name available for the next step as well
           echo "EXE_NAME=$exeName" >> $env:GITHUB_ENV
 
       - name: Upload release
         uses: ncipollo/release-action@v1
         with:
           artifacts: dist/${{env.EXE_NAME}} # Path to the executable to upload
-          token: ${{ secrets.GITHUB_TOKEN }}  # Use the built-in GITHUB_TOKEN
+          token: ${{secrets.GITHUB_TOKEN}}  # Use the built-in GITHUB_TOKEN
