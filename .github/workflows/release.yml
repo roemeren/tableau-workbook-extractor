@@ -35,5 +35,5 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ github.ref }}  # Use the tag from the workflow
-          artifacts: dist/tableau-workbook-extractor.exe  # Path to the executable to upload
+          artifacts: dist/tableau-workbook-extractor # Path to the executable to upload
           token: ${{ secrets.GITHUB_TOKEN }}  # Use the built-in GITHUB_TOKEN
