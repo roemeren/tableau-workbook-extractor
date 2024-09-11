@@ -4,7 +4,7 @@ Python script & Windows executable to automatically analyze fields and calculati
 
 ## Description
 
-The script prompts the user to browse to a local Tableau workbook (in `.twb` or ` twbx` format), after which 2 types of output are created:
+The script prompts the user to browse to a local Tableau workbook (in `.twb` or `.twbx` format), after which 2 types of output are created:
 
 1. An Excel file containing a table of field information and a table of field dependencies. The tables are a cleaned and processed version of information extracted from the [Tableau Document API](https://tableau.github.io/document-api-python/)
 2. PNG/SVG images for each field that has at least 1 forward or backward dependency to another field or sheet, consisting of a directed graph of all the field's dependencies. Different colors and shapes indicate dependency types (parameter, data source field, calculated field or sheet). The images are organized in different subfolders. The graphs are generated using [Pydot](https://pypi.org/project/pydot/), a Python interface to [Graphviz](https://graphviz.org/).
