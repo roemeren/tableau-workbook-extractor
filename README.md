@@ -133,7 +133,7 @@ To do this please follow these steps:
     ```
 4. **Run the Python script** by running the command `python tableau-workbook-extractor.py` inside the working directory (= downloaded repo folder)
 
-**Note**: the script **hasn't been tested on Linux and MacOS** and still has a known **open issue** related to backward vs forward file path separators. This may be fixed in future releases.
+**Note**: the script **hasn't been tested on Linux and MacOS** and still has a known **open issue** related to backward vs forward file path separators. This may be fixed in future releases which will make it possible to extend the GitHub Actions workflow files with additional jobs to create and include Linux and/or MacOS executables as well.
 
 ## Other ways to run the script (not available yet)
 
@@ -163,7 +163,7 @@ As previously mentioned, these steps are automated for the Windows executable vi
     - fields and parameters may be used in *dashboard actions*
 - **Not all field captions are captured**: field captions may be missing and therefore their internal ID will be used in the outputs (may be related to hidden fields and dependencies)
 - **Not all extracted fields are assigned to the correct data source**: some (copies of) fields may be linked to a data source it doesn't belong to
-- **Path separators in non-Windows OS**: currently the tool processes file path using backslashes (\) as in Windows. Linux and MacOS use forward slashes which will lead to incorrect output file paths.
+- **Path separators in non-Windows OS**: currently the tool processes file path using backslashes (\) as in Windows. Linux and MacOS use forward slashes which will lead to incorrect output file paths. This is why at the moment there is only a Windows executable created in the automated workflow.
 
 ## Roadmap
 
