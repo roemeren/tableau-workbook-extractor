@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - 'v*.*.*'  # This pattern matches tags like 'v1.0.3'
+    branches:
+      - 'main' # Tag is pushed on main branch
 
 jobs:
   build:
