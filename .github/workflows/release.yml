@@ -28,11 +28,10 @@ jobs:
 
       - name: Build executable with PyInstaller
         run: |
-          # Extract version number from refs/tags/v*.*.*
+          pyinstaller --onefile tableau-workbook-extractor.py
+          # Extract version number and add it to the output executable
           $tag = "${env:GITHUB_REF}"
           $version = $tag -replace 'refs/tags/', ''
-          pyinstaller --onefile tableau-workbook-extractor.py
-          # Add version number to the output executable
           $exeName = "tableau-workbook-extractor-$version.exe"
           Rename-Item -Path dist\tableau-workbook-extractor.exe -NewName $exeName
           # Make exe file name available for the next step as well
