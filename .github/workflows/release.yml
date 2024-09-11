@@ -24,9 +24,13 @@ jobs:
           python -m pip install --upgrade pip  # Upgrade pip
           pip install -r requirements.txt  # Install dependencies from requirements.txt
 
-      - name: Build executable
+      - name: Build executable with PyInstaller
         run: |
-          pyinstaller --onefile tableau-workbook-extractor.py  # Build the executable
+          VERSION=$(echo "${GITHUB_REF#refs/tags/v}")
+          pyinstaller --onefile tableau-workbook-extractor.py
+          # Add the version number to the output executable
+          EXE_NAME="tableau-workbook-extractor-${VERSION}.exe"
+          mv dist/tableau-workbook-extractor dist/$EXE_NAME
 
       - name: Upload release
         uses: ncipollo/release-action@v1
