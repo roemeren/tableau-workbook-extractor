@@ -28,6 +28,9 @@ jobs:
         run: |
           pyinstaller --onefile tableau-workbook-extractor.py  # Build the executable
 
+      - name: List dist directory
+        run: ls -la dist/  # List files in the dist directory to verify the file exists
+
       - name: Upload release
         uses: ncipollo/release-action@v1
         with:
