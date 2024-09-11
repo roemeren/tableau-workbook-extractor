@@ -24,7 +24,7 @@ jobs:
           python -m pip install --upgrade pip  # Upgrade pip
           pip install -r requirements.txt  # Install dependencies from requirements.txt
 
-      - name: Build executable with PyInstaller
+      - name: Build executable with PyInstaller (CI)
         run: |
           pyinstaller --onefile tableau-workbook-extractor.py
           # Extract version number and add it to the output executable
@@ -35,7 +35,7 @@ jobs:
           # Make exe file name available for the next step as well
           echo "EXE_NAME=$exeName" >> $env:GITHUB_ENV
 
-      - name: Upload release
+      - name: Upload release (CD)
         uses: ncipollo/release-action@v1
         with:
           artifacts: dist/${{env.EXE_NAME}} # Path to the executable to upload
