@@ -26,7 +26,8 @@ jobs:
 
       - name: Build executable with PyInstaller
         run: |
-          VERSION="${GITHUB_REF#refs/tags/v}"
+          $tag = "${env:GITHUB_REF}"
+          $version = $tag -replace 'refs/tags/', ''
           pyinstaller --onefile tableau-workbook-extractor.py
           # Add the version number to the output executable
           EXE_NAME="tableau-workbook-extractor-${VERSION}.exe"
