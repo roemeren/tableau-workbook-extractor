@@ -17,7 +17,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.8'  # Specify the Python version (must include distutils module)
+          python-version: '3.10'  # Specify the Python version (must include distutils module)
 
       - name: Install dependencies
         run: |
@@ -31,6 +31,6 @@ jobs:
       - name: Upload release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ github.ref }}  # Use the tag from the workflow
+          # tag: ${{ github.ref }}  # Use the tag from the workflow
           artifacts: dist/tableau-workbook-extractor.exe # Path to the executable to upload
           token: ${{ secrets.GITHUB_TOKEN }}  # Use the built-in GITHUB_TOKEN
