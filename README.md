@@ -70,7 +70,7 @@ This way the installation will be recognized while running the tool.
 
 The latest version of the tool is available as a Windows executable here: https://github.com/roemeren/tableau-workbook-extractor/releases/latest.
 
-New releases are automatically created via a GitHub Actions workflow whenever a new release tag is pushed to the main branch (see `/.github/workflows/release.yml` file).
+New releases are automatically created via a GitHub Actions workflow whenever a new release tag is pushed (see `/.github/workflows/release.yml` file).
 
 ### Step 3: Run the tool
 
