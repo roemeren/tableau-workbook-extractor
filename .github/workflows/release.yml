@@ -30,8 +30,8 @@ jobs:
           $version = $tag -replace 'refs/tags/', ''
           pyinstaller --onefile tableau-workbook-extractor.py
           # Add the version number to the output executable
-          EXE_NAME="tableau-workbook-extractor-${VERSION}.exe"
-          mv dist/tableau-workbook-extractor dist/$EXE_NAME
+          $exeName = "tableau-workbook-extractor-$version.exe"
+          Rename-Item -Path dist\tableau-workbook-extractor.exe -NewName $exeName
 
       - name: Upload release
         uses: ncipollo/release-action@v1
