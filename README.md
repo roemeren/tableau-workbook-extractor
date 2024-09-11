@@ -9,6 +9,8 @@ The script prompts the user to browse to a local Tableau workbook (in `.twb` or 
 1. An Excel file containing a table of field information and a table of field dependencies. The tables are a cleaned and processed version of information extracted from the [Tableau Document API](https://tableau.github.io/document-api-python/)
 2. PNG/SVG images for each field that has at least 1 forward or backward dependency to another field or sheet, consisting of a directed graph of all the field's dependencies. Different colors and shapes indicate dependency types (parameter, data source field, calculated field or sheet). The images are organized in different subfolders. The graphs are generated using [Pydot](https://pypi.org/project/pydot/), a Python interface to [Graphviz](https://graphviz.org/).
 
+The tool can be run either by either running the `tableau-workbook-extractor.py` file in the command-line interface or (in case of Windows) downloading and running the latest release of the executable `tableau-workbook-extractor-<version>.exe`. More instructions can be found below.
+
 ## Possible use cases
 
 The tool could be used for the following reasons:
@@ -32,23 +34,21 @@ Information that **cannot** be extracted from this tool (yet):
 
 These items may or may not be included in future versions of the [Tableau Document API](https://tableau.github.io/document-api-python/). 
 
-
-## How to run the script on Windows (Executable)
+## How to run the tool using the executable (Windows only)
 
 In short:
 
 1. Install [Graphviz](https://graphviz.org/download/) and make sure that it is added to the Path environment variable
-2. Create the Windows executable (see section below: "How to create the Windows Executable and release)"
-3. Run the tool (exe file) and browse to the Tableau workbook (twb/twbx) to be analyzed. Tableau doesn't need to be installed to run the tool. After the tool has finished check the output files (Excel + PNG + SVG) created in a newly created folder `<workbook name> Files` inside the workbook's folder
+2. Download the [latest release of the Windows executable](https://github.com/roemeren/tableau-workbook-extractor/releases/latest)].
+3. Run the downloaded exe file and browse to the Tableau workbook (twb/twbx) to be analyzed. Tableau doesn't need to be installed to run the tool. After the execution has finished check the output files (Excel + PNG + SVG) created in a newly created folder `<workbook name> Files` inside the workbook's folder
 
-In case the different `.exe` are blocked by the system it can be bypassed by checking the Unblocked property in the executable's file properties.
+In case the different `.exe` are blocked by the system it can be bypassed by checking the 'Unblock' property in the executable's file properties.
 
 Each of these steps is explained in detail in the following subsections.
 
 ### Step 1: Install Graphviz
 
-Graphviz is open source graph visualization software that is used by the tool 
-to export field dependency graphs as images. It should be installed and recognized by the system before running the tool. It can be downloaded here: https://graphviz.org/download/ (section 'Windows').
+Graphviz is open source graph visualization software that is used by the tool to export field dependency graphs as images. It should be installed and recognized by the system before running the tool. It can be downloaded here: https://graphviz.org/download/ (section 'Windows').
 
 **Some versions may be blocked** by Microsoft Defender Smartscreen:
 
@@ -68,15 +68,17 @@ This way the installation will be recognized while running the tool.
 
 ### Step 2: Download the tool
 
-See section below: "How to create the Windows Executable and release".
+The latest version of the tool is available as a Windows executable here: https://github.com/roemeren/tableau-workbook-extractor/releases/latest.
+
+New releases are automatically created via a GitHub Actions workflow whenever a new release tag is pushed to the main branch (see `/.github/workflows/release.yml` file).
 
 ### Step 3: Run the tool
 
-By **double-clicking** on the downloaded file `tableau-workbook-extractor-<version>.exe` the tool will run and a black window will open to show its progress. 
+Run the tool by **double-clicking** on the downloaded file `tableau-workbook-extractor-<version>.exe`. A black window will open to show its progress.
 
-**It's not necessary to have Tableau Desktop or Public installed**, but it may be useful to verify some of the results.
+**It's not necessary to have Tableau Desktop or Public installed**, but it may be useful to verify (or visualize) some of the results.
 
-If the executable is **blocked** again by Microsoft Defender Smartscreen it can be bypassed in the same way as for the Graphviz installer file (see previous subsection).
+If the executable is **blocked** again by Microsoft Defender Smartscreen it can be bypassed in the same way as for the Graphviz installer file (by checking the Unblock option in the Properties window; see previous subsection).
 
 After initial loading it will prompt the user to **browse to a Tableau workbook** (`.twb` or `.twbx` format):
 
@@ -103,19 +105,21 @@ In case something goes the error is printed out after which the user is also pro
 
 <img src="images/08-error.png" alt="Error prompt" width="700"/>
 
-## How to run the script on Windows/Linux/MacOS (Python)
+## How to run the script using Python
 
-The tool can also be executed by running the `tableau-workbook-extractor.py` from the repository. 
+The tool can also be executed by running the `tableau-workbook-extractor.py` Python script from the repository. 
+
+To do this please follow these steps:
 
 1. Install Graphviz
     - Windows: see previous section
     - Other: see https://graphviz.org/download/
-1. **Clone the GitLab repo** by opening a terminal and executing the following commands:
+2. **Clone the GitLab repo** by opening a terminal and executing the following commands:
     ```
     cd C:\path\to\root\
     git clone https://git.bdbelux.be/remerencia/tableau-workbook-extractor.git
     ```
-2. **Replicate the environment** by creating a new Python 3.8 environment and installing the package versions listed in `requirements.txt`. For example in Anaconda (if Anaconda is not installed use `venv`):
+3. **Replicate the environment** by creating a new Python 3.8 environment and installing the package versions listed in `requirements.txt`. For example in Anaconda (if Anaconda is not installed use `venv`):
 
     a. Open a new terminal in Anaconda for example in the `base` environment
     
@@ -127,29 +131,29 @@ The tool can also be executed by running the `tableau-workbook-extractor.py` fro
     cd C:\path\to\root\myrepo
     pip install -r requirements.txt
     ```
-3. **Run the Python script** by running the command `python tableau-workbook-extractor.py` inside the working directory (= downloaded repo folder)
+4. **Run the Python script** by running the command `python tableau-workbook-extractor.py` inside the working directory (= downloaded repo folder)
 
-**Note**: the script **hasn't been tested on Linux and MacOS** and still has a known **open issue** related to backward vs forward file path separators.
+**Note**: the script **hasn't been tested on Linux and MacOS** and still has a known **open issue** related to backward vs forward file path separators. This may be fixed in future releases.
 
 ## Other ways to run the script (not available yet)
 
 In the future other ways to run the tool may be implemented:
 
-- **Separate Linux and/or MacOS executables**: these can be created by running [PyInstaller](https://pyinstaller.org/en/stable/) separately on these operations systems. 
-- **Docker containers**: this is a platform-independent solution that only requires the installation of [Docker](https://www.docker.com/). Running the container will automatically create the environment (Graphviz + Python + package versions) and run the tool. It however has some disadvantages: 
-    - Docker should be installed and run from the command line (= less user-friendly)
-    - GUI elements (file browsers) may not work correctly anymore on 1 or more operating systems. This means that the GUI elements should be replaced by specifying arguments (like the full path to the workbook) in text format in the command line (= less user-friendly)
+- **Separate Linux and/or MacOS executables**: these can be created by running [PyInstaller](https://pyinstaller.org/en/stable/) separately on machines containing these operations systems.
+- **Docker containers**: this is a platform-independent solution that only requires the installation of [Docker](https://www.docker.com/). Running the container will automatically create the environment (Graphviz + Python + package versions) and run the tool. To make this work however some significant changes will have to be made to the GUI elements and the used run environment.
 
-## How to create the Windows Executable and release
+## How the executable is created
 
 The tool's executable is created using the [PyInstaller](https://pyinstaller.org/en/stable/) package. It bundles a Python application and all its dependencies into a single package, in this case an exe file.
 
-For any commit in the repo an executable version `tableau-workbook-extractor.exe` of the main script `tableau-workbook-extractor.py` can be created as follows:
+For any commit in the repo an executable version `tableau-workbook-extractor.exe` of the main script `tableau-workbook-extractor.py` can be created locally as follows:
 
 1. Clone the repo locally and replicate the environment (see section 'How to run the script on Windows/Linux/MacOS (Python)'). This will make sure that the PyInstaller package gets installed as well.
 2. Activate the environment and change the directory to the repo directory (that contains the `tableau-workbook-extractor.py` script)
 3. Run the command `pyinstaller --onefile tableau-workbook-extractor.py`. This will create a new executable `tableau-workbook-extractor.exe` in a subfolder `dist`. This file as well as other files that are created (e.g. in the `build` subfolder) are not tracked and therefore will not impact the repository.
 4. This file can be renamed and used in the next releases of the tool
+
+As previously mentioned, these steps are automated for the Windows executable via a GitHub Actions workflow.
 
 ## Known issues
 
@@ -171,14 +175,15 @@ Some possible extensions/fixes:
 - **Evaluate included field information**: currently not all available field attributes from the API are included (only the ones that were initially considered the most relevant). It may be useful to include more or unprocessed versions of attributes in the next releases.
 - **Improve the quality/readability of the output graphs** e.g. colors, fonts, node arrangement of the PNG/SVG images
 - **Implement fixes for additional edge cases**: there may still be workbooks that cause errors in the tool e.g. because of unusual field names with invalid characters
-- **Expand to multiple OS**: modify the script and executable to be able to run the tool (correctly) on Linux and/or MacOS. The first fix would be to modify the input/output file paths such that they are processed correctly on all OS (forward and backward slashes)
+- **Expand to multiple OS**: modify the scripts to be able to run the tool (correctly) on Linux and/or MacOS. The first fix would be to modify the input/output file paths such that they are processed correctly on all OS (forward and backward slashes)
 
 ## Sources
 
-- [Document API Python documentation](https://tableau.github.io/document-api-python/): describes how workbook and field information can be extracted
+- [Document API Python documentation](https://tableau.github.io/document-api-python): describes how workbook and field information can be extracted
 - [Pydot repository](https://github.com/pydot/pydot): methods and attributes in `pydot` package used for visualizing graphs
-- [Graphviz documentation](https://graphviz.org/docs/nodes/): node and graph attributes
-- [PyInstaller documentation](https://pyinstaller.org/en/v5.6.2/): bundling a Python application and all its dependencies into a single packages (i.e. Windows executable)
+- [Graphviz documentation](https://graphviz.org/docs/nodes): node and graph attributes
+- [PyInstaller documentation](https://pyinstaller.org/en/v5.6.2): bundling a Python application and all its dependencies into a single package (i.e. Windows executable)
+- [GitHub Actions documentation](https://docs.github.com/en/actions): used to automate the creation of Windows executables whenever a new version is released
 
 ## Contributing
 
