@@ -8,7 +8,6 @@ from tqdm import tqdm
 sys.excepthook = show_exception_and_exit
 
 # script parameters
-fTest = False # run without prompt or not?
 fDepFields = True # create field dependency graphs?
 fDepSheets = True # create sheet dependency graphs?
 fSVG = True # create SVG versions of dependency graphs next to PNG?
@@ -22,13 +21,10 @@ stepLog.counter = 1
 
 # prompt user for twb file and extract file/directory names
 stepLog("Prompt for input Tableau workbook...")
-if fTest:
-    inpFilePath = ("C:\\Users\\remerencia\\Documents\\" + 
-        "tableau-workbook-extractor\\notebooks\\Test Dashboard.twbx")
-else: 
-    inpFilePath = easygui.fileopenbox(default = "*.twb*")
+inpFilePath = easygui.fileopenbox(default = "*.twb*")
 inpFileName = os.path.splitext(os.path.basename(inpFilePath))[0]
-outFilePath = inpFilePath + ' Files\\Fields\\' + inpFileName + '.xlsx'
+outFilePath = os.path.join(os.path.dirname(inpFilePath), 'Files', 'Fields', \
+                            inpFileName + '.xlsx')
 outFileDirectory = os.path.dirname(outFilePath)
 
 # initial data frame with nested data source and field objects
@@ -224,7 +220,7 @@ if fDepFields or fDepSheets:
         gMaster.add_node(node)
 
 if fDepFields:
-    inpPath = "{0} Files\\Graphs\\".format(inpFilePath)
+    inpPath = os.path.join(f"{inpFilePath} Files", 'Graphs')
 
     stepLog("Creating field dependency graphs per source in {0}..."
         .format(inpPath))
@@ -261,7 +257,7 @@ df2.columns = ["source_label", "field_label", "source_field_label",
 
 if fDepSheets:
     # create output folder if it doesn't exist yet
-    inpPath = "{0} Files\\Graphs\\Sheets\\".format(inpFilePath)
+    inpPath = os.path.join(f"{inpFilePath} Files", 'Graphs', 'Sheets')
     if not os.path.isdir(inpPath): os.makedirs(inpPath)
 
     stepLog("Creating sheet dependency graphs in {0}...".format(inpPath))

@@ -527,13 +527,13 @@ def visualizeFieldDependencies(df, sf, l, g, din, svg = False):
     specialChar = "[^A-Za-z0-9]+"
     sout = re.sub(specialChar, '', s)
     fout = re.sub(specialChar, '', f)
-    dout = "{0}{1}\\".format(din, sout)
+    dout = os.path.join(din, sout)
     if not os.path.isdir(dout):
         os.makedirs(dout)
     
     # write output files with forced UTF-8 encoding to avoid errors
     # see https://github.com/pydot/pydot/issues/142
-    outFile = "{0}{1}.png".format(dout, fout)
+    outFile = os.path.join(dout, f"{fout}.png")
     if len(outFile) > MAXPATHSIZE:
         raise Exception(("Output graph path size for source {0} and " + 
         "field {1} ({2}) exceeds the path size " +
@@ -543,7 +543,7 @@ def visualizeFieldDependencies(df, sf, l, g, din, svg = False):
             .format(s, f, len(outFile), MAXPATHSIZE, outFile))
     G.write_png(outFile, encoding = "utf-8")
     if svg:
-        outFile = "{0}{1}.svg".format(dout, fout)
+        outFile = os.path.join(dout, f"{fout}.svg")
         G.write_svg(outFile, encoding = "utf-8")
 
 def appendFieldsToDicts(l, k, v):
