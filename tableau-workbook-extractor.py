@@ -23,7 +23,7 @@ stepLog.counter = 1
 stepLog("Prompt for input Tableau workbook...")
 inpFilePath = easygui.fileopenbox(default = "*.twb*")
 inpFileName = os.path.splitext(os.path.basename(inpFilePath))[0]
-outFilePath = os.path.join(f"{os.path.dirname(inpFilePath)} Files", 'Fields', \
+outFilePath = os.path.join(f"{inpFilePath} Files", 'Fields', \
                             inpFileName + '.xlsx')
 outFileDirectory = os.path.dirname(outFilePath)
 
