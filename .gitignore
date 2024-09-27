@@ -2,4 +2,8 @@ notebooks
 __pycache__
 build
 dist
+data
 *.spec
+data/
+app/web/static
+*.pyc

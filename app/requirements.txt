@@ -6,4 +6,4 @@ pydot==1.4.2
 tqdm==4.66.3
 openpyxl==3.0.10
 pyinstaller==5.13.1
-Flask==2.3.3
+flask==2.3.3
