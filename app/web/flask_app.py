@@ -25,6 +25,7 @@ import os
 from flask import Flask, render_template, request, jsonify
 from shared.processing import process_twb
 from shared.common import progress_data
+import threading
 
 app = Flask(__name__)
 
@@ -54,14 +55,34 @@ def index():
             progress_data['progress'] = 0
             progress_data['filename'] = None
 
-            # Start processing the CSV file in the background
-            process_twb(filepath=filepath, uploadfolder=app.config['UPLOAD_FOLDER'], is_executable=False)
+            # Start a new thread to run the processing function in the background
+            # This allows the Flask app to remain responsive
+            thread = threading.Thread(target=run_processing, args=(filepath,))
+            thread.start()
 
     return render_template("index.html")
 
 @app.route("/progress", methods=["GET"])
 def progress():
     return jsonify(progress=progress_data['progress'], filename=progress_data['filename'])
+
+def run_processing(filepath):
+    """
+    Processes a Tableau workbook file in the background.
+
+    This function calls the `process_twb` function to handle the 
+    processing of the specified Tableau workbook file. The processing 
+    is done using the filepath provided as an argument, with a 
+    predefined upload folder and a flag indicating the executable state.
+
+    Args:
+        filepath (str): The path to the Tableau workbook file to be processed.
+
+    Returns:
+        None
+    """
+    process_twb(filepath=filepath, uploadfolder=app.config['UPLOAD_FOLDER'], 
+                is_executable=False)
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')

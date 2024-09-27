@@ -17,6 +17,7 @@ Usage:
 """
 import warnings
 import shutil
+import time
 from tqdm import tqdm
 from shared.logging import setup_logging, stepLog, logger
 from shared.common import *
@@ -292,9 +293,10 @@ def process_twb(filepath, uploadfolder=None, is_executable=True):
                 visualizeFieldDependencies(df, row.source_field_repl_id, 
                     row.source_field_label, gMaster, inpPath, fSVG)
 
-            if not is_executable:
-                current_progress += 1
-                progress_data['progress'] = int((current_progress / nField) * 100)
+            #if not is_executable:
+                #time.sleep(1)
+                #current_progress += 1
+                #progress_data['progress'] = int((current_progress / nField) * 100)
 
     # Create new data frame with flattened dependencies
     df["field_backward_dependencies"] = \
@@ -336,8 +338,13 @@ def process_twb(filepath, uploadfolder=None, is_executable=True):
         iterator = tqdm(lstSheets, total=nSheet) if is_executable else lstSheets
 
         # Create dependency graphs per sheet
+        current_progress = 0
         for sh in iterator:
             visualizeSheetDependencies(df2, sh, gMaster, inpPath, fSVG)
+            #if not is_executable:
+                #time.sleep(1)
+                #current_progress += 1
+                #progress_data['progress'] = int((current_progress / nSheet) * 100)
 
     outSheetDirectory = os.path.join(outFileDirectory, 'Fields')
     outFilePath = os.path.join(outSheetDirectory, inpFileName + '.xlsx')
