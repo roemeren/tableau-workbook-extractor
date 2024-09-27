@@ -40,7 +40,6 @@ def setup_logging(is_executable, uploadfolder):
     log_file = os.path.join(log_directory, 'log_file.log')
 
     # Create a custom logger
-    logger = logging.getLogger("my_logger")
     logger.setLevel(logging.DEBUG)
 
     # Check if logging should go to console or file
