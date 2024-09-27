@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Tableau Workbook Extractor</title>
+
+    <!-- 
+    This HTML file provides a user interface for uploading Tableau workbooks, 
+    tracking processing progress with AJAX, and downloading generated 
+    results as a ZIP file. 
+    -->
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Progress bar styling */
+        #progress-container {
+            width: 25%;
+            background-color: #f3f3f3;
+            border: 1px solid #ccc;
+            margin-top: 20px;
+            display: none;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 25px;
+            background-color: #4caf50;
+            text-align: center;
+            line-height: 25px;
+            color: white;
+        }
+
+        /* Styling for the download section */
+        #download-section {
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload Tableau Workbook</h1>
+    <form id="upload-form" action="/" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <input type="submit" value="Upload & Process">
+    </form>
+
+    <div id="progress-container">
+        <div id="progress-bar">0%</div>
+    </div>
+
+    <div id="download-section">
+        <h2>Graphs Generated</h2>
+        <p>Download your ZIP file:</p>
+        <a id="download-link" href="#" download>
+            <button>Download ZIP File</button>
+        </a>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Submit form and start progress
+            $('#upload-form').on('submit', function (e) {
+                e.preventDefault();
+
+                // Show the progress bar and reset it
+                $('#progress-container').show();
+                $('#progress-bar').css('width', '0%').text('0%');
+                // Hide the download link initially/again
+                $('#download-section').hide(); 
+
+                var formData = new FormData(this);
+
+                // Send the form data using AJAX
+                $.ajax({
+                    url: '/',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        checkProgress(); // Start polling for progress updates
+                    }
+                });
+            });
+
+            // Poll the server for progress updates
+            function checkProgress() {
+                $.ajax({
+                    url: '/progress',
+                    success: function (data) {
+                        var progress = data.progress;
+                        var filename = data.filename;
+                        $('#progress-bar').css('width', progress + '%').text(progress + '%');
+
+                        if (progress < 100) {
+                            setTimeout(checkProgress, 1000); // Continue polling
+                        } else if (filename) {
+                            // When processing is done, show the download link
+                            $('#download-link').attr('href', '/static/uploads/' + filename);
+                            $('#download-section').show();
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

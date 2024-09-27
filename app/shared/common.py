@@ -1,35 +1,37 @@
-import sys, os
-from contextlib import contextmanager
+"""
+common.py
+
+This module contains shared variables and utility functions
+used across the Flask application for processing uploaded files.
+
+Usage:
+Import this module in both `app.py` and `processing.py` to access and modify 
+the shared `progress_data`.
+"""
+
+import logging
+import os
+import sys
 import numpy as np
 import pandas as pd
 import re
 import json
 import copy
 import pydot
-import logging
 import random
 import string
+import zipfile
 
-# constants
+# Script parameters
+fDepFields = True # create field dependency graphs?
+fDepSheets = True # create sheet dependency graphs?
+fSVG = True # create SVG versions of dependency graphs next to PNG?
+
+# Keep track of progress and filename
+progress_data = {'progress': 0, 'filename': None}
+
+# Constants
 MAXPATHSIZE = 260
-
-@contextmanager
-def suppress_stdout():
-    """
-    Temporarily suppress console output. 
-    Source: http://thesmithfam.org/blog/2012/10/25/temporarily-suppress-console-output-in-python/
-
-    Returns:
-        Suppress console output for following commands e.g. when 
-        opening a workbook
-    """
-    with open(os.devnull, "w") as devnull:
-        old_stdout = sys.stdout
-        sys.stdout = devnull
-        try:  
-            yield
-        finally:
-            sys.stdout = old_stdout
 
 def show_exception_and_exit(exc_type, exc_value, tb):
     """
@@ -41,25 +43,12 @@ def show_exception_and_exit(exc_type, exc_value, tb):
     input("Error encountered. Press Enter to exit...")
     sys.exit(-1)
 
-def stepLog(message, *args, **kwargs):
-    """
-    Log a message that includes an incremental step counter in a main script
-
-    Args:
-        message: Input data frame
-
-    Returns:
-        Log message containing incremental step count
-    """
-    logging.info(" STEP %d: " % stepLog.counter + message, *args, **kwargs)
-    stepLog.counter += 1
-
 def getRandomReplacementBaseID(df, c, suffix = ""):
     """
     Generate a random ID of 10 lower case letters combined with the data frame 
     index that will serve as a base for a generated field ID field
 
-    Args:
+    Parameters:
         df: Input data frame
         c: Column name that is used to check if none of the generated ID are 
         accidentally matched in it
@@ -85,7 +74,7 @@ def fieldMappingTable(df, colFrom, colTo):
     Replace all external and internal field references by unique
     source/field IDs
 
-    Args:
+    Parameters:
         df: Input data frame
         colFrom: Column name containing original values
         colTo: Column name containing mapped values
@@ -105,7 +94,7 @@ def sheetMappingTable(df, colFrom):
     """
     Create dictionary of (sheet name) -> (sheet ID) mappings
 
-    Args:
+    Parameters:
         df: Input data frame
         colFrom: Column name containing sheet lists
 
@@ -126,7 +115,7 @@ def fieldCalculationMapping(c, s, d, l):
     Replace all external and internal field references by unique
     source/field IDs
 
-    Args:
+    Parameters:
         c: Source field calculation string
         s: Source field source name
         d: Dictionary of source field -> replacement ID mappings
@@ -161,7 +150,7 @@ def sheetMapping(s, d):
     """
     Replace all sheet names by a sequential sheet ID
 
-    Args:
+    Parameters:
         s: List of sheet names
         d: Dictionary of sheet name -> sheet ID mappings
 
@@ -175,7 +164,7 @@ def processCaptions(i, c):
     Process captions to the format in which they are used in calculations and 
     with some invalid characters removed for JSON parsing
 
-    Args:
+    Parameters:
         i: Source or field ID value
         c: Source or field caption value
 
@@ -202,7 +191,7 @@ def processCaptions(i, c):
 def processSheetNames(s):
     """
     Remove invalid characters from sheet names for JSON parsing
-    Args:
+    Parameters:
         s: input list of sheets
     Returns:
         res: processed list of sheet names without quotes or backslashes
@@ -216,7 +205,7 @@ def fieldCalculationDependencies(l, x):
     """
     List direct dependencies in a calculation x based on a list l
 
-    Args:
+    Parameters:
         l: List of all possible values that can be matched
         x: Input calculation string
 
@@ -230,7 +219,7 @@ def removeDuplicatesByRowLength(df, x):
     Remove duplicates from an input frame by retaining per grouping only 
     the row with the largest concatenated string length
 
-    Args:
+    Parameters:
         df: input data frame
         x: grouping column name
 
@@ -254,7 +243,7 @@ def isParamDuplicate(p, s, x):
     """
     Checks if a field is a parameter duplicate
 
-    Args:
+    Parameters:
         p: List of parameter fields
         s: Source name
         x: Field name
@@ -269,7 +258,7 @@ def fieldCategory(s, c):
     """
     Returns the category of a source field 
 
-    Args:
+    Parameters:
         s: Source field label
         c: Source field cleaned calculation
 
@@ -286,7 +275,7 @@ def backwardDependencies(df, f, level = 0, c = None):
     """
     Recursively get all backward dependencies of a field
 
-    Args:
+    Parameters:
         df: Input data frame
         f: Source field replacement ID
         level: Dependency level (0 = root, -1 = level 1 backwards, etc.)
@@ -315,7 +304,7 @@ def forwardDependencies(df, f, w, level = 0, p = None, ):
     """
     Recursively get all forward dependencies of a field
 
-    Args:
+    Parameters:
         df: Input data frame
         f: Source field replacement ID
         w: List of root source field worksheet ID dependencies
@@ -359,7 +348,7 @@ def uniqueDependencies(d, g, f):
     Keep unique dependencies from a list of dependencies with their minimum
     dependency level
 
-    Args:
+    Parameters:
         d: input list of dependency dictionaries
         g: grouping list
         f: aggregation field
@@ -380,7 +369,7 @@ def maxDependencyLevel(l):
     """
     Return maximum forward or backward dependency level of a given input list
 
-    Args:
+    Parameters:
         l: input list of dependency dictionaries
 
     Returns: 
@@ -396,7 +385,7 @@ def fieldsFromCategory(l, c, f):
     Return list of fields of a given category from a list of 
     dependency dictionaries
 
-    Args:
+    Parameters:
         l: input list of dependency dictionaries
         c: category type
         f: flag indicating backward (True) or forward (False) dependencies
@@ -418,7 +407,7 @@ def addFieldNode(sf, l, cat, shapes, colors, calc):
     """
     Creates graph node objects for an input source field
 
-    Args:
+    Parameters:
         sf: Input source field replacement ID
         l: Input source field label
         cat: Input source field category
@@ -441,7 +430,7 @@ def fieldIDMapping(x, s, d):
     """
     Replace IDs by labels for an input string or dict list
 
-    Args:
+    Parameters:
         x: Input string or dict list
         s: Source name
         d: Dictionary of (field/sheet) label -> ID mappings
@@ -467,7 +456,7 @@ def visualizeFieldDependencies(df, sf, l, g, din, svg = False):
     Creates output PNG/SVG files containing all dependencies for a 
     given source field
 
-    Args:
+    Parameters:
         df: Input data frame containing backward and forward dependencies
         sf: Input source field replacement ID
         l: Input source field label
@@ -550,7 +539,7 @@ def appendFieldsToDicts(l, k, v):
     """
     Append fixed list of (key, value) to list of dictionaries
 
-    Args:
+    Parameters:
         l: Input dict list
         k: List of fixed key names
         v: List of fixed values
@@ -568,7 +557,7 @@ def visualizeSheetDependencies(df, sh, g, din, svg = False):
     Creates output PNG/SVG files containing all dependencies for a 
     given source field
 
-    Args:
+    Parameters:
         df: Input data frame containing backward and forward dependencies
         sh: Input sheet ID
         g: Master graph containing all source field and field node objects
@@ -633,7 +622,7 @@ def visualizeSheetDependencies(df, sh, g, din, svg = False):
     # see https://github.com/pydot/pydot/issues/142
     specialChar = "[^A-Za-z0-9]+"
     fout = re.sub(specialChar, '', l)
-    outFile = "{0}{1}.png".format(din, fout)
+    outFile = os.path.join(din, f"{fout}.png")
     if len(outFile) > MAXPATHSIZE:
         raise Exception(("Output graph path size for sheet {0} " + 
         "({1}) exceeds the path size " +
@@ -643,5 +632,22 @@ def visualizeSheetDependencies(df, sh, g, din, svg = False):
             .format(l, len(outFile), MAXPATHSIZE, outFile))
     G.write_png(outFile, encoding = "utf-8")
     if svg:
-        outFile = "{0}{1}.svg".format(din, fout)
+        outFile = os.path.join(din, f"{fout}.svg")
         G.write_svg(outFile, encoding = "utf-8")
+
+def zip_folder(folder_path, output_zip_path):
+    """
+    Zips the contents of a folder, preserving the folder structure.
+
+    Parameters:
+        folder_path (str): The path to the folder to zip
+        output_zip_path (str): The path where the output zip file will be created
+    """
+    with zipfile.ZipFile(output_zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        # Walk through the folder
+        for root, _, files in os.walk(folder_path):
+            for file in files:
+                # Create the full path to the file
+                file_path = os.path.join(root, file)
+                # Add the file to the zip file with the correct folder structure
+                zipf.write(file_path, os.path.relpath(file_path, folder_path))
