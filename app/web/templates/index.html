@@ -91,10 +91,12 @@
                         var progress = data.progress;
                         var filename = data.filename;
                         $('#progress-bar').css('width', progress + '%').text(progress + '%');
-
                         if (progress < 100) {
-                            setTimeout(checkProgress, 1000); // Continue polling
+                            console.log('Progress is less than 100:', progress);  // Print progress to the console
+                            setTimeout(checkProgress, 2000); // Continue polling
                         } else if (filename) {
+                             // Print filename to the console
+                            console.log('Processing complete, file is ready for download:', filename); 
                             // When processing is done, show the download link
                             $('#download-link').attr('href', '/static/uploads/' + filename);
                             $('#download-section').show();
