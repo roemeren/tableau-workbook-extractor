@@ -274,30 +274,6 @@ def process_twb(filepath, uploadfolder=None, is_executable=True):
                 fillcolor = "grey", style = "filled", tooltip = " ")
             gMaster.add_node(node)
 
-    if fDepFields:
-        inpPath = os.path.join(outFileDirectory, 'Graphs')
-
-        stepLog("Creating field dependency graphs per source in {0}..."
-            .format(inpPath))
-
-        # Use tqdm for progress bar if executable, else simple progress
-        nField = df.shape[0]
-        iterator = tqdm(df.iterrows(), total=nField) if is_executable else df.iterrows()
-
-        # Create dependency graphs per field
-        current_progress = 0
-        for _, row in iterator:
-            # Only generate graph if there are dependencies
-            nDependency = row.n_backward_dependencies + row.n_forward_dependencies
-            if nDependency > 0:
-                visualizeFieldDependencies(df, row.source_field_repl_id, 
-                    row.source_field_label, gMaster, inpPath, fSVG)
-
-            #if not is_executable:
-                #time.sleep(1)
-                #current_progress += 1
-                #progress_data['progress'] = int((current_progress / nField) * 100)
-
     # Create new data frame with flattened dependencies
     df["field_backward_dependencies"] = \
         df.apply(lambda x: appendFieldsToDicts(x.field_backward_dependencies, 
@@ -321,6 +297,39 @@ def process_twb(filepath, uploadfolder=None, is_executable=True):
                     "source_field_repl_id", "field_category", "dependency_from",
                         "dependency_to", "dependency_level", "dependency_category",
                         "dependency_worksheets_overlap"]
+    
+    # Get list of unique sheets
+    lstSheets = list(df2[df2.dependency_category == "Sheet"]
+                ["dependency_to"].unique())
+
+    # Progress bar: calculate total length
+    nField = df.shape[0] if fDepFields else 0
+    nSheet = len(lstSheets) if fDepSheets else 0
+    nTot = nField + nSheet
+    current_progress = 0
+
+    if fDepFields:
+        inpPath = os.path.join(outFileDirectory, 'Graphs')
+
+        stepLog("Creating field dependency graphs per source in {0}..."
+            .format(inpPath))
+
+        # Use tqdm for progress bar if executable, else simple progress
+        iterator = tqdm(df.iterrows(), total=nField) if is_executable else df.iterrows()
+
+        # Create dependency graphs per field
+        
+        for _, row in iterator:
+            # Only generate graph if there are dependencies
+            nDependency = row.n_backward_dependencies + row.n_forward_dependencies
+            if nDependency > 0:
+                visualizeFieldDependencies(df, row.source_field_repl_id, 
+                    row.source_field_label, gMaster, inpPath, fSVG)
+
+            if not is_executable:
+                time.sleep(0.1)
+                current_progress += 1
+                progress_data['progress'] = int((current_progress / nTot) * 100)
 
     if fDepSheets:
         # Create output folder if it doesn't exist yet
@@ -329,22 +338,19 @@ def process_twb(filepath, uploadfolder=None, is_executable=True):
 
         stepLog("Creating sheet dependency graphs in {0}...".format(inpPath))
 
-        # Get list of unique sheets
-        lstSheets = list(df2[df2.dependency_category == "Sheet"]
-                    ["dependency_to"].unique())
-
         # Use tqdm for progress bar if executable, else simple progress
-        nSheet = len(lstSheets)
         iterator = tqdm(lstSheets, total=nSheet) if is_executable else lstSheets
 
         # Create dependency graphs per sheet
-        current_progress = 0
         for sh in iterator:
             visualizeSheetDependencies(df2, sh, gMaster, inpPath, fSVG)
-            #if not is_executable:
-                #time.sleep(1)
-                #current_progress += 1
-                #progress_data['progress'] = int((current_progress / nSheet) * 100)
+            if not is_executable:
+                time.sleep(0.1)
+                current_progress += 1
+                progress_data['progress'] = int((current_progress / nTot) * 100)
+
+    # TEST
+    progress_data['filename'] = 'test'
 
     outSheetDirectory = os.path.join(outFileDirectory, 'Fields')
     outFilePath = os.path.join(outSheetDirectory, inpFileName + '.xlsx')
@@ -408,3 +414,6 @@ def process_twb(filepath, uploadfolder=None, is_executable=True):
         progress_data['filename'] = zip_filename
         # Ensure progress reaches 100 after processing
         progress_data['progress'] = 100
+
+        # Add a small delay to ensure all tasks are completed before sending the final response
+        time.sleep(5)
