@@ -6,7 +6,7 @@ on:
       - 'v*.*.*'  # This pattern matches tags like 'v1.0.3'
 
 jobs:
-  build:
+  build-exe:
     runs-on: windows-latest  # Use latest Windows runner to create Windows executable
     permissions:
       contents: write  # Needed to create and upload releases
@@ -24,9 +24,9 @@ jobs:
           python -m pip install --upgrade pip  # Upgrade pip
           pip install -r requirements.txt  # Install dependencies from requirements.txt
 
-      - name: Build executable with PyInstaller (CI)
+      - name: Build executable with PyInstaller
         run: |
-          pyinstaller --onefile tableau-workbook-extractor.py
+          pyinstaller --onefile -m cli.cli_main
           # Extract version number and add it to the output executable
           $tag = "${env:GITHUB_REF}"
           $version = $tag -replace 'refs/tags/', ''
@@ -35,8 +35,25 @@ jobs:
           # Make exe file name available for the next step as well
           echo "EXE_NAME=$exeName" >> $env:GITHUB_ENV
 
-      - name: Upload release (CD)
+      - name: Upload release
         uses: ncipollo/release-action@v1
         with:
           artifacts: dist/${{env.EXE_NAME}} # Path to the executable to upload
           token: ${{secrets.GITHUB_TOKEN}}  # Use the built-in GITHUB_TOKEN
+  deploy-flask:
+    runs-on: ubuntu-latest  # The job will run on the latest Ubuntu runner
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4  # Check out the code from the repository
+
+    - name: Deploy to Render
+      env:
+        RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}  # API key for Render, stored in GitHub Secrets
+        RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }} # Render app service ID
+      run: |
+        # Authenticate with Render API
+        curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+          -H "Authorization: Bearer $RENDER_API_KEY" \
+          -H "Content-Type: application/json" \
+          -d '{"branch": "main"}'  # Trigger deployment for the main branch

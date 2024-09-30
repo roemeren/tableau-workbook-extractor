@@ -17,32 +17,35 @@ press Enter to exit the program.
 Returns:
     str: The path of the selected file, or None if no file is selected.
 """
-from shared.common import logging
-from shared.logging import stepLog
+#from shared.common import logging
+from shared.logging import setup_logging, stepLog, logger
 from shared.processing import process_twb
 import easygui
 
 def main():
     
+    # Initialize logging for Flask app
+    setup_logging(True, None)
+
     # Ask the user to select a .twb file using easygui
     stepLog("Prompt for input Tableau workbook...")
     inpFilePath = easygui.fileopenbox(
-        title="Select a Tableau Workbook",
+        title = "Select a Tableau Workbook",
         default = "*.twb*"
     )
 
     # Check if a file was selected
     if inpFilePath:
-        logging.info(f"Selected file: {inpFilePath}")
+        logger.info(f"\tSelected file: {inpFilePath}")
         try:
             # Call the process_twb function to process the file
             process_twb(filepath=inpFilePath)
-            logging.info("Processing completed successfully.")
+            logger.info("Processing completed successfully.")
         except Exception as e:
-            logging.error(f"An error occurred during processing: {e}")
+            logger.error(f"An error occurred during processing: {e}")
             input("An error occurred. Press Enter to exit...")
     else:
-        logging.warning("No file selected.")
+        logger.warning("No file selected.")
         input("No file selected. Press Enter to exit...")
 
     return inpFilePath
