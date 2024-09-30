@@ -17,14 +17,11 @@ Usage:
 """
 import warnings
 import shutil
-import time
 from tqdm import tqdm
 from shared.logging import setup_logging, stepLog, logger
 from shared.common import *
 from contextlib import contextmanager
 from tableaudocumentapi import Workbook
-
-stepLog.counter = 1
 
 @contextmanager
 def suppress_stdout():
@@ -65,14 +62,13 @@ def process_twb(filepath, uploadfolder=None, is_executable=True):
         None
     """
 
-    # Initialize logging
-    setup_logging(is_executable, uploadfolder)
+    # Initialize logging for Flask app
+    if not is_executable: setup_logging(is_executable, uploadfolder)
 
     # Ignore future warnings when reading field attributes (not applicable)
     warnings.simplefilter(action='ignore', category=FutureWarning)
 
     # Extract file/directory names from twb file
-    stepLog("Prompt for input Tableau workbook...")
     inpFileName = os.path.splitext(os.path.basename(filepath))[0]
 
     if is_executable:
@@ -139,18 +135,18 @@ def process_twb(filepath, uploadfolder=None, is_executable=True):
     df["d_field"] = df["field_label_orig"].astype(str) + " -> " + \
         df["field_label"].astype(str)
     fldModified = df[df["f_field"]]["d_field"]
-    for fld in fldModified: print("\tRenamed field: {}".format(fld))
+    for fld in fldModified: logger.info("\tRenamed field: {}".format(fld))
 
     # Print out unique source renamings
     df["f_source"] = df["source_label_orig"] != df["source_label"]
     df["d_source"] = df["source_label_orig"].astype(str) + " -> " + \
         df["source_label"].astype(str)
     fldModified = set(df[df["f_source"]]["d_source"])
-    for fld in fldModified: print("\tRenamed source: {}".format(fld))
+    for fld in fldModified: logger.info("\tRenamed source: {}".format(fld))
 
     # Remove duplicate rows based on source field ID
     df, nDupl = removeDuplicatesByRowLength(df, "source_field_id")
-    print("\t{0} duplicate fields removed".format(nDupl))
+    logger.info("\t{0} duplicate fields removed".format(nDupl))
 
     # Filter out duplicate parameter rows and [:Measure Names] field
     lstParam = list(df[df["data_source_name"] == "[Parameters]"]["field_id"])
@@ -160,7 +156,7 @@ def process_twb(filepath, uploadfolder=None, is_executable=True):
     df = df[(df["field_is_param_duplicate"] == 0) & 
         (df["field_id"] != "[:Measure Names]")]
     nDupl2 -= df.shape[0]
-    print("\t{0} duplicate parameters and/or measure names removed".format(nDupl2))
+    logger.info("\t{0} duplicate parameters and/or measure names removed".format(nDupl2))
 
     # Add a randomly generated ID field for each unique field
     baseID = getRandomReplacementBaseID(df, "field_calculation")
@@ -298,66 +294,15 @@ def process_twb(filepath, uploadfolder=None, is_executable=True):
                         "dependency_to", "dependency_level", "dependency_category",
                         "dependency_worksheets_overlap"]
     
-    # Get list of unique sheets
-    lstSheets = list(df2[df2.dependency_category == "Sheet"]
-                ["dependency_to"].unique())
-
-    # Progress bar: calculate total length
-    nField = df.shape[0] if fDepFields else 0
-    nSheet = len(lstSheets) if fDepSheets else 0
-    nTot = nField + nSheet
-    current_progress = 0
-
-    if fDepFields:
-        inpPath = os.path.join(outFileDirectory, 'Graphs')
-
-        stepLog("Creating field dependency graphs per source in {0}..."
-            .format(inpPath))
-
-        # Use tqdm for progress bar if executable, else simple progress
-        iterator = tqdm(df.iterrows(), total=nField) if is_executable else df.iterrows()
-
-        # Create dependency graphs per field
-        
-        for _, row in iterator:
-            # Only generate graph if there are dependencies
-            nDependency = row.n_backward_dependencies + row.n_forward_dependencies
-            if nDependency > 0:
-                visualizeFieldDependencies(df, row.source_field_repl_id, 
-                    row.source_field_label, gMaster, inpPath, fSVG)
-
-            if not is_executable:
-                time.sleep(0.1)
-                current_progress += 1
-                progress_data['progress'] = int((current_progress / nTot) * 100)
-
-    if fDepSheets:
-        # Create output folder if it doesn't exist yet
-        inpPath = os.path.join(outFileDirectory, 'Graphs', 'Sheets')
-        if not os.path.isdir(inpPath): os.makedirs(inpPath)
-
-        stepLog("Creating sheet dependency graphs in {0}...".format(inpPath))
-
-        # Use tqdm for progress bar if executable, else simple progress
-        iterator = tqdm(lstSheets, total=nSheet) if is_executable else lstSheets
-
-        # Create dependency graphs per sheet
-        for sh in iterator:
-            visualizeSheetDependencies(df2, sh, gMaster, inpPath, fSVG)
-            if not is_executable:
-                time.sleep(0.1)
-                current_progress += 1
-                progress_data['progress'] = int((current_progress / nTot) * 100)
-
-    # TEST
-    progress_data['filename'] = 'test'
-
     outSheetDirectory = os.path.join(outFileDirectory, 'Fields')
     outFilePath = os.path.join(outSheetDirectory, inpFileName + '.xlsx')
-    if not os.path.isdir(outSheetDirectory):
-        os.makedirs(outSheetDirectory)
 
     stepLog("Saving table results in " + outFilePath + "...")
+
+    if not os.path.isdir(outSheetDirectory):
+        os.makedirs(outSheetDirectory)
+    df_original = df.copy()
+    df2_original = df2.copy()
 
     # Output 1: field info
     lstClean = ["field_calculation_dependencies", 
@@ -394,11 +339,65 @@ def process_twb(filepath, uploadfolder=None, is_executable=True):
         df.to_excel(writer, sheet_name = "fields", index = False)
         df2.to_excel(writer, sheet_name = "dependencies", index = False)
 
+    # Get list of unique sheets
+    lstSheets = list(df2_original[df2_original.dependency_category == "Sheet"]
+                ["dependency_to"].unique())
+
+    # Progress bar: calculate total length
+    nField = df_original.shape[0] if fDepFields else 0
+    nSheet = len(lstSheets) if fDepSheets else 0
+    nTot = nField + nSheet
+    current_progress = 0
+
+    if fDepFields:
+        inpPath = os.path.join(outFileDirectory, 'Graphs')
+
+        stepLog("Creating field dependency graphs per source in {0}..."
+            .format(inpPath))
+
+        # Use tqdm for progress bar if executable, else simple progress
+        iterator = tqdm(df_original.iterrows(), total=nField) if is_executable else df_original.iterrows()
+
+        # Create dependency graphs per field
+        
+        for _, row in iterator:
+            # Only generate graph if there are dependencies
+            nDependency = row.n_backward_dependencies + row.n_forward_dependencies
+            if nDependency > 0:
+                visualizeFieldDependencies(df_original, row.source_field_repl_id, 
+                    row.source_field_label, gMaster, inpPath, fSVG)
+
+            if not is_executable:
+                current_progress += 1
+                progress_data['progress'] = int((current_progress / nTot) * 100)
+
+    if fDepSheets:
+        # Create output folder if it doesn't exist yet
+        inpPath = os.path.join(outFileDirectory, 'Graphs', 'Sheets')
+        if not os.path.isdir(inpPath): os.makedirs(inpPath)
+
+        stepLog("Creating sheet dependency graphs in {0}...".format(inpPath))
+
+        # Use tqdm for progress bar if executable, else simple progress
+        iterator = tqdm(lstSheets, total=nSheet) if is_executable else lstSheets
+
+        # Create dependency graphs per sheet
+        for sh in iterator:
+            visualizeSheetDependencies(df2_original, sh, gMaster, inpPath, fSVG)
+            if not is_executable:
+                current_progress += 1
+                progress_data['progress'] = int((current_progress / nTot) * 100)
+    
+    zip_filename = 'my_output.zip'
+    # Set the filename for download once processing is complete
+    progress_data['filename'] = zip_filename
+    # Ensure progress reaches 100 after processing
+    progress_data['progress'] = 100
+
     if is_executable: 
         input("Done! Press Enter to exit...")
     else:
         # Zip the output files
-        zip_filename = 'my_output.zip'
         zip_path = os.path.join(uploadfolder, zip_filename)
         zip_folder(folder_path=outFileDirectory, output_zip_path=zip_path)
 
@@ -409,11 +408,3 @@ def process_twb(filepath, uploadfolder=None, is_executable=True):
 
         # Remove temp directory
         shutil.rmtree(outFileDirectory)
-
-        # Set the filename for download once processing is complete
-        progress_data['filename'] = zip_filename
-        # Ensure progress reaches 100 after processing
-        progress_data['progress'] = 100
-
-        # Add a small delay to ensure all tasks are completed before sending the final response
-        time.sleep(5)

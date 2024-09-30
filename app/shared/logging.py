@@ -24,7 +24,7 @@ Dependencies:
 """
 from shared.common import os, sys, logging
 
-logger = logging.getLogger("my_logger")
+logger = logging.getLogger("TWE_LOGGER")
 
 def setup_logging(is_executable, uploadfolder):
     """
@@ -38,6 +38,9 @@ def setup_logging(is_executable, uploadfolder):
     log_directory = os.path.join(uploadfolder or os.path.dirname(__file__), 'temp')
     os.makedirs(log_directory, exist_ok=True)
     log_file = os.path.join(log_directory, 'log_file.log')
+
+    # Prevent the logger from propagating log messages to the root logger
+    logger.propagate = False
 
     # Create a custom logger
     logger.setLevel(logging.DEBUG)
@@ -67,5 +70,10 @@ def stepLog(message, *args, **kwargs):
     Returns:
         Log message containing incremental step count
     """
+    # Initialize the counter if it hasn't been set yet
+    if not hasattr(stepLog, 'counter'):
+        stepLog.counter = 1
+
+    # Print message and increment counter   
     logger.info(" STEP %d: " % stepLog.counter + message, *args, **kwargs)
     stepLog.counter += 1

@@ -21,10 +21,9 @@ Usage:
 Run this module to start the Flask development server.
 """
 
-import os
 from flask import Flask, render_template, request, jsonify
 from shared.processing import process_twb
-from shared.common import progress_data
+from shared.common import os, progress_data
 import threading
 
 app = Flask(__name__)
