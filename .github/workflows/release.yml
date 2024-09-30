@@ -31,7 +31,7 @@ jobs:
           $tag = "${env:GITHUB_REF}"
           $version = $tag -replace 'refs/tags/', ''
           $exeName = "tableau-workbook-extractor-$version.exe"
-          Rename-Item -Path dist\tableau-workbook-extractor.exe -NewName $exeName
+          Rename-Item -Path dist\cli_main.exe -NewName $exeName
           # Make exe file name available for the next step as well
           echo "EXE_NAME=$exeName" >> $env:GITHUB_ENV
 
