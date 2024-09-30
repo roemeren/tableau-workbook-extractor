@@ -26,7 +26,7 @@ jobs:
 
       - name: Build executable with PyInstaller
         run: |
-          pyinstaller --onefile -m app/cli.cli_main
+          pyinstaller --onefile app/cli_main.py
           # Extract version number and add it to the output executable
           $tag = "${env:GITHUB_REF}"
           $version = $tag -replace 'refs/tags/', ''
