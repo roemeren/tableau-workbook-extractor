@@ -9,7 +9,6 @@ Import this module in both `app.py` and `processing.py` to access and modify
 the shared `progress_data`.
 """
 
-import logging
 import os
 import sys
 import numpy as np
@@ -21,6 +20,7 @@ import pydot
 import random
 import string
 import zipfile
+import logging
 
 # Script parameters
 fDepFields = True # create field dependency graphs?
