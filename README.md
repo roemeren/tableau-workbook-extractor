@@ -52,17 +52,17 @@ Graphviz is open source graph visualization software that is used by the tool to
 
 **Some versions may be blocked** by Microsoft Defender Smartscreen:
 
-<img src="images/01-microsoft-defender.png" alt="Microsoft Defender Smartscreen" width="350"/>
+<img src="docs/source/_static/images/01-microsoft-defender.png" alt="Microsoft Defender Smartscreen" width="350"/>
 
 This can be bypassed by **right-clicking** on the file and clicking on **Properties**. Next, the **Unblock** option should be checked after which the executable can be run.
 
-<img src="images/08-unblock-exe.png" alt="Unblock executable" width="350"/>
+<img src="docs/source/_static/images/08-unblock-exe.png" alt="Unblock executable" width="350"/>
 
 An alternative method is to run the exe using the **Command Prompt**: change the directory to the file's download location and then Run the executable with the command `my-executable` or  `my-executable.exe`.
 
 During installation one of the options to **add Graphviz to the PATH variable** should be chosen (by default this is not done):
 
-<img src="images/02-graphviz-installation.png" alt="Graphviz installation PATH variable" width="350"/>
+<img src="docs/source/_static/images/02-graphviz-installation.png" alt="Graphviz installation PATH variable" width="350"/>
 
 This way the installation will be recognized while running the tool.
 
@@ -82,7 +82,7 @@ If the executable is **blocked** again by Microsoft Defender Smartscreen it can 
 
 After initial loading it will prompt the user to **browse to a Tableau workbook** (`.twb` or `.twbx` format):
 
-<img src="images/04-browse-file.png" alt="Browse Tableau workbook" width="500"/>
+<img src="docs/source/_static/images/04-browse-file.png" alt="Browse Tableau workbook" width="500"/>
 
 Next, the **workbook is opened and processed** which includes using the Tableau Document API to extract fields and some cleaning (duplicate removal, cleaning up field names and calculations, etc.). Depending on the number of extracted fields and dependencies this may take a while.
 
@@ -92,18 +92,18 @@ A folder `<workbook name> Files` is created to store all output files:
     - one subfolder per (data source) connection
     - one subfolder for parameters
     - one subfolder for sheets
-    <img src="images/05-output-file.png" alt="Microsoft Defender Smartscreen" width="500"/>
+    <img src="docs/source/_static/images/05-output-file.png" alt="Microsoft Defender Smartscreen" width="500"/>
 - The subfolder `/Fields` contains an Excel file with field information and dependencies in 2 sheets `fields` and `dependencies`.
 
-<img src="images/06-output-file-2.png" alt="Output Excel file" width="600"/>
+<img src="docs/source/_static/images/06-output-file-2.png" alt="Output Excel file" width="600"/>
 
 If everything runs as expected the user is prompted to **press Enter to exit** the program.
 
-<img src="images/07-exit.png" alt="Press enter to exit prompt" width="700"/>
+<img src="docs/source/_static/images/07-exit.png" alt="Press enter to exit prompt" width="700"/>
 
 In case something goes the error is printed out after which the user is also prompted to press Enter to exit.
 
-<img src="images/08-error.png" alt="Error prompt" width="700"/>
+<img src="docs/source/_static/images/08-error.png" alt="Error prompt" width="700"/>
 
 ## How to run the script using Python
 
