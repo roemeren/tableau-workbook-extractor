@@ -13,9 +13,6 @@ is prompted to press Enter to exit the program.
 
 If no file is selected, a warning is logged, and the user is also prompted to 
 press Enter to exit the program.
-
-Returns:
-    str: The path of the selected file, or None if no file is selected.
 """
 #from shared.common import logging
 from shared.logging import setup_logging, stepLog, logger
@@ -23,7 +20,17 @@ from shared.processing import process_twb
 import easygui
 
 def main():
-    
+    """
+    Run the main CLI application to select and process a Tableau workbook.
+
+    This function prompts the user to select a Tableau Workbook file 
+    (.twb or .twbx) and processes it using the `process_twb` function.
+
+    Returns:
+        str: The path of the selected file, or None if no file is 
+        selected.
+    """
+
     # Initialize logging for Flask app
     setup_logging(True, None)
 
