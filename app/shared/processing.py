@@ -26,12 +26,14 @@ from tableaudocumentapi import Workbook
 @contextmanager
 def suppress_stdout():
     """
-    Temporarily suppress console output. 
-    Source: http://thesmithfam.org/blog/2012/10/25/temporarily-suppress-console-output-in-python/
+    Temporarily suppress console output.
 
-    Returns:
-        Suppress console output for following commands e.g. when 
-        opening a workbook
+    Yields:
+        None: Suppresses console output for the following commands 
+        (e.g., when opening a workbook).
+
+    Notes:
+        Source: http://thesmithfam.org/blog/2012/10/25/temporarily-suppress-console-output-in-python/
     """
     with open(os.devnull, "w") as devnull:
         old_stdout = sys.stdout
@@ -43,23 +45,23 @@ def suppress_stdout():
 
 def process_twb(filepath, uploadfolder=None, is_executable=True):
     """
-    Process a Tableau Workbook (TWB/TWBX) file to extract and analyze data sources, fields,
-    and their dependencies.
+    Process a Tableau Workbook (TWB/TWBX) file to extract and analyze data sources,
+    fields, and their dependencies.
 
-    This function reads a TWB file, extracts data sources and field information, 
-    processes field attributes, and computes dependencies among fields and sheets. 
-    It generates visual representations of field dependencies if specified and saves 
+    This function reads a TWB file, extracts data sources and field information,
+    processes field attributes, and computes dependencies among fields and sheets.
+    It generates visual representations of field dependencies if specified and saves
     output files to the specified upload folder.
 
-    Parameters:
+    Args:
         filepath (str): The path to the Tableau workbook (TWB*) file to be processed.
-        uploadfolder (str, optional): The directory where output files will be saved if 
-                                       not running as an executable. Defaults to None.
-        is_executable (bool, optional): Flag indicating if the function is being run 
-                                         as an executable script. Defaults to True.
+        uploadfolder (str, optional): The directory where output files will be saved
+            if not running as an executable. Defaults to None.
+        is_executable (bool, optional): Flag indicating if the function is being run
+            as an executable script. Defaults to True.
 
     Returns:
-        None
+        None: This function does not return a value but generates output files.
     """
 
     # Initialize logging for Flask app
