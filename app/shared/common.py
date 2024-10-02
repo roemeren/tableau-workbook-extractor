@@ -45,20 +45,24 @@ def show_exception_and_exit(exc_type, exc_value, tb):
 
 def getRandomReplacementBaseID(df, c, suffix = ""):
     """
-    Generate a random ID of 10 lower case letters combined with the data frame 
-    index that will serve as a base for a generated field ID field
+    Generate a random ID of 10 lowercase letters combined with the 
+    dataframe index.
 
-    Parameters:
-        df: Input data frame
-        c: Column name that is used to check if none of the generated ID are 
-        accidentally matched in it
-        suffix: optional fixed suffix to add to random ID
+    The generated ID is used as a base for a field identifier. It ensures that 
+    the new ID does not match any values already present in the specified column.
+
+    Args:
+        df (pandas.DataFrame): The input dataframe from which unique values 
+            are checked.
+        c (str): The column name in the dataframe to ensure none of 
+            the generated IDs conflict with existing values.
+        suffix (str, optional): An optional fixed suffix to append to the 
+            randomly generated ID. Defaults to an empty string.
     
     Returns:
-        Random ID consisting of the combination if 10 lower case letters 
-        and the row index. This ID can be used to be replace references
-        to fields in calculations because it is ensured that none of the IDs
-        are accidentally matched
+        str: A random ID consisting of 10 lowercase letters combined with the optional 
+        suffix. The ID is guaranteed not to match any existing values in the 
+        specified column.
     """
     uniqueVals = list(df[c].unique())
     random.seed(10)
@@ -74,13 +78,16 @@ def fieldMappingTable(df, colFrom, colTo):
     Replace all external and internal field references by unique
     source/field IDs
 
-    Parameters:
-        df: Input data frame
-        colFrom: Column name containing original values
-        colTo: Column name containing mapped values
+    Args:
+        df (pandas.DataFrame): The input dataframe containing the 
+            field references.
+        colFrom: The name of the column containing the original values.
+        colTo: The name of the column containing the mapped values.
 
     Returns:
-        Dictionary containing (from: to) mappings
+        dict: A dictionary containing mappings from original values to 
+            mapped values, where each key is an original value and each value 
+            is its corresponding mapped value.
     """
     dfRes = df.copy()
     dfRes = dfRes[[colFrom, colTo]]
@@ -92,14 +99,16 @@ def fieldMappingTable(df, colFrom, colTo):
 
 def sheetMappingTable(df, colFrom):
     """
-    Create dictionary of (sheet name) -> (sheet ID) mappings
+    Create a dictionary mapping sheet names to sheet IDs.
 
-    Parameters:
-        df: Input data frame
-        colFrom: Column name containing sheet lists
+    Args:
+        df (pandas.DataFrame): The input dataframe containing the sheet lists.
+        colFrom (str): The name of the column containing the sheet names.
 
     Returns:
-        Dictionary containing (from: to) mappings
+        dict: A dictionary mapping each unique sheet name to its corresponding
+              sheet ID, where each key is a sheet name and each value is a 
+              generated sheet ID.
     """
     # unique list of sheet names
     lstFrom = list(set([x for l in list(df[colFrom]) for x in l]))
@@ -115,21 +124,22 @@ def fieldCalculationMapping(c, s, d, l):
     Replace all external and internal field references by unique
     source/field IDs
 
-    Parameters:
-        c: Source field calculation string
-        s: Source field source name
-        d: Dictionary of source field -> replacement ID mappings
-        l: List of unique field names
+    Args:
+        c (str): The source field calculation string.
+        s (str): The source field name.
+        d (dict): A dictionary mapping source fields to their replacement 
+                  IDs.
+        l (list): A list of unique field names.
 
     Returns:
-        Calculation string without comments and with all field ID references
-        replaced by unique replacement ID references
+        str: The calculation string without comments and with all field 
+             ID references replaced by their corresponding unique 
+             replacement ID references.
 
     Notes:
-        The function assumes that external fields are 
-        referenced as [source ID].[field ID] and internal 
-        fields [field ID]. If this is not the case the function may return
-        incorrect results.
+        This function assumes that external fields are referenced as 
+        [source ID].[field ID] and internal fields as [field ID]. If this 
+        is not the case, the function may return incorrect results.
     """
     # remove comments (anything that starts with // until end of line)
     res = re.sub(r"\/{2}.*\n", "", c)
@@ -148,32 +158,36 @@ def fieldCalculationMapping(c, s, d, l):
 
 def sheetMapping(s, d):
     """
-    Replace all sheet names by a sequential sheet ID
+    Replace all sheet names with sequential sheet IDs.
 
-    Parameters:
-        s: List of sheet names
-        d: Dictionary of sheet name -> sheet ID mappings
+    Args:
+        s (list): A list of sheet names.
+        d (dict): A dictionary mapping sheet names to their corresponding 
+                  sheet IDs.
 
     Returns:
-        List of mapped sheet names to sheet IDs
+        list: A list of mapped sheet IDs corresponding to the input sheet 
+              names.
     """
     return list(map(d.get, s.copy()))
 
 def processCaptions(i, c):
     """
-    Process captions to the format in which they are used in calculations and 
-    with some invalid characters removed for JSON parsing
+    Process captions into a format suitable for calculations, removing 
+    invalid characters for JSON parsing.
 
-    Parameters:
-        i: Source or field ID value
-        c: Source or field caption value
+    Args:
+        i (str): The source or field ID value.
+        c (str): The source or field caption value.
 
     Returns:
-        lbl: Original field name enclosed with brackets
-        res: Processed caption enclosed in square brackets + any additional
-        right square brackets doubled. Single and double quotes are 
-        replaced by HTML codes resp. &apos and &quot while a backslash (\)
-        is replaced by 2 backslashes (\\)
+        tuple: A tuple containing:
+            - str: The original field name enclosed in brackets.
+            - str: The processed caption enclosed in square brackets, with 
+                   any additional right square brackets doubled. Single and 
+                   double quotes are replaced by HTML codes (&apos; and 
+                   &quot;), while a backslash (\) is replaced by two 
+                   backslashes (\\).
     """
     if c == '': 
         lbl = i
@@ -190,11 +204,15 @@ def processCaptions(i, c):
 
 def processSheetNames(s):
     """
-    Remove invalid characters from sheet names for JSON parsing
-    Parameters:
-        s: input list of sheets
+    Remove invalid characters from sheet names for JSON parsing.
+
+    Args:
+        s (list): A list of input sheet names.
+
     Returns:
-        res: processed list of sheet names without quotes or backslashes
+        list: A processed list of sheet names with single quotes replaced 
+              by &apos;, double quotes replaced by &quot;, and backslashes 
+              replaced by two backslashes (\\\\).
     """
     res = [x.replace("'", "&apos") for x in s]
     res = [x.replace('"', "&quot") for x in res]
@@ -203,29 +221,34 @@ def processSheetNames(s):
 
 def fieldCalculationDependencies(l, x):
     """
-    List direct dependencies in a calculation x based on a list l
+    List direct dependencies in a calculation based on a list of possible 
+    values.
 
-    Parameters:
-        l: List of all possible values that can be matched
-        x: Input calculation string
+    Args:
+        l (list): A list of all possible values that can be matched.
+        x (str): An input calculation string.
 
     Returns:
-        List of values from the list l that were matched in the string x
+        list: A list of values from the list `l` that were matched in the 
+              string `x`.
     """
     return [s for s in l if s in x]
 
 def removeDuplicatesByRowLength(df, x):
     """
-    Remove duplicates from an input frame by retaining per grouping only 
-    the row with the largest concatenated string length
+    Remove duplicates from a DataFrame by retaining the row with the largest 
+    concatenated string length per grouping.
 
-    Parameters:
-        df: input data frame
-        x: grouping column name
+    Args:
+        df (pandas.DataFrame): The input DataFrame.
+        x (str): The name of the column to group by.
 
     Returns:
-        Copy of input data frame with per unique grouping value the row 
-        with the largest concatenated string length + no. duplicates removed
+        tuple: A tuple containing:
+            - pandas.DataFrame: A copy of the input DataFrame with, for each 
+              unique grouping value, the row with the largest concatenated 
+              string length.
+            - int: The number of duplicates removed.
     """
     # initialize result by copying original data frame
     res = df.copy()
@@ -241,29 +264,33 @@ def removeDuplicatesByRowLength(df, x):
 
 def isParamDuplicate(p, s, x):
     """
-    Checks if a field is a parameter duplicate
+    Checks if a field is a parameter duplicate.
 
-    Parameters:
-        p: List of parameter fields
-        s: Source name
-        x: Field name
+    Args:
+        p (list): List of parameter fields.
+        s (str): Source name.
+        x (str): Field name.
 
     Returns:
-        True if the field is a parameter duplicate (and should be removed), 
-        False otherwise
+        bool: True if the field is a parameter duplicate and should be 
+        removed; False otherwise.
     """
     return x in p and s != "[Parameters]"
 
 def fieldCategory(s, c):
     """
-    Returns the category of a source field 
+    Returns the category of a source field.
 
-    Parameters:
-        s: Source field label
-        c: Source field cleaned calculation
+    Args:
+        s (str): Source field label.
+        c (str): Source field cleaned calculation.
 
-    Returns: 
-        Category of the source field: parameter, field, calculated field (LOD)
+    Returns:
+        str: Category of the source field, which can be:
+            - "Parameter"
+            - "Calculated Field (LOD)"
+            - "Calculated Field"
+            - "Field"
     """
     if s.startswith("[Parameters]."): return "Parameter"
     # LOD matching: anything between curly brackets (including line breaks)
@@ -273,16 +300,18 @@ def fieldCategory(s, c):
 
 def backwardDependencies(df, f, level = 0, c = None):
     """
-    Recursively get all backward dependencies of a field
+    Recursively get all backward dependencies of a field.
 
-    Parameters:
-        df: Input data frame
-        f: Source field replacement ID
-        level: Dependency level (0 = root, -1 = level 1 backwards, etc.)
-        c: Originating child source field replacement ID
+    Args:
+        df (pandas.DataFrame): Input data frame.
+        f (str): Source field replacement ID.
+        level (int, optional): Dependency level (0 = root, 
+            -1 = level 1 backwards, etc.). Defaults to 0.
+        c (str, optional): Originating child source field replacement ID. 
+            Defaults to None.
 
-    Returns: 
-        List of all backward dependencies of the input source field
+    Returns:
+        list: List of all backward dependencies of the input source field.
     """
     x = df.loc[df.source_field_repl_id == f]
     depList = list(x.field_calculation_dependencies)
@@ -302,18 +331,19 @@ def backwardDependencies(df, f, level = 0, c = None):
 
 def forwardDependencies(df, f, w, level = 0, p = None, ):
     """
-    Recursively get all forward dependencies of a field
+    Recursively get all forward dependencies of a field.
 
-    Parameters:
-        df: Input data frame
-        f: Source field replacement ID
-        w: List of root source field worksheet ID dependencies
-        rs: Root source field source name
-        level: Dependency level (0 = root, -1 = level 1 backwards, etc.)
-        p: Originating parent source field replacement ID
+    Args:
+        df (pandas.DataFrame): Input data frame.
+        f (str): Source field replacement ID.
+        w (list): List of root source field worksheet ID dependencies.
+        level (int, optional): Dependency level (0 = root, 
+            -1 = level 1 backwards, etc.). Defaults to 0.
+        p (str, optional): Originating parent source field replacement ID. 
+            Defaults to None.
 
-    Returns: 
-        List of all forward dependencies of the input source field
+    Returns:
+        list: List of all forward dependencies of the input source field.
     """
     x = df.loc[df.id == f][["category", "worksheets"]]
     cat, ws = x.head(1).values.flatten()
@@ -346,16 +376,16 @@ def forwardDependencies(df, f, w, level = 0, p = None, ):
 def uniqueDependencies(d, g, f):
     """
     Keep unique dependencies from a list of dependencies with their minimum
-    dependency level
+    dependency level.
 
-    Parameters:
-        d: input list of dependency dictionaries
-        g: grouping list
-        f: aggregation field
+    Args:
+        d (list): Input list of dependency dictionaries.
+        g (list): Grouping list used to determine unique dependencies.
+        f (str): Field name representing the dependency level.
 
     Returns:
-        Dependency dictionaries that only contains unique dependencies with 
-        their minimum dependency level
+        list: Dependency dictionaries that only contain unique dependencies 
+        with their minimum dependency level.
     """
     res = []
     if len(d) > 0:
@@ -366,14 +396,14 @@ def uniqueDependencies(d, g, f):
     return res
 
 def maxDependencyLevel(l):
-    """
-    Return maximum forward or backward dependency level of a given input list
+    """ 
+    Return maximum forward or backward dependency level of a given input list.
 
-    Parameters:
-        l: input list of dependency dictionaries
+    Args:
+        l (list): Input list of dependency dictionaries.
 
-    Returns: 
-        Maximum dependency level for the given dictionary list
+    Returns:
+        int: Maximum dependency level for the given dictionary list.
     """
     res = 0
     # note: values are formatted as text -> max('-1', '-4') = -4
@@ -382,16 +412,18 @@ def maxDependencyLevel(l):
 
 def fieldsFromCategory(l, c, f):
     """
-    Return list of fields of a given category from a list of 
-    dependency dictionaries
+    Return a list of fields of a given category from a list of 
+    dependency dictionaries.
 
-    Parameters:
-        l: input list of dependency dictionaries
-        c: category type
-        f: flag indicating backward (True) or forward (False) dependencies
+    Args:
+        l (list): Input list of dependency dictionaries.
+        c (str): Category type to filter fields.
+        f (bool): Flag indicating backward (True) or forward (False) 
+        dependencies.
 
     Returns: 
-        List of field names corresponding to the category
+        list: List of unique field names corresponding to the specified 
+            category.
     """
     res = []
     if len(l) > 0:
@@ -405,20 +437,21 @@ def fieldsFromCategory(l, c, f):
 
 def addFieldNode(sf, l, cat, shapes, colors, calc):
     """
-    Creates graph node objects for an input source field
+    Creates graph node objects for an input source field.
 
-    Parameters:
-        sf: Input source field replacement ID
-        l: Input source field label
-        cat: Input source field category
-        shapes: List of shapes per source field category
-        colors: List of colors per source field category
-        calc: Input source field calculation expression
+    Args:
+        sf (str): Input source field replacement ID.
+        l (str): Input source field label.
+        cat (str): Input source field category.
+        shapes (dict): List of shapes per source field category.
+        colors (dict): List of colors per source field category.
+        calc (str): Input source field calculation expression.
 
-    Returns: 
-        List of 2 node objects with name equal to the replacement ID, 
-        label equal to the source field label and shape/color/tooltip based on 
-        field type
+    Returns:
+        list: List of 2 node objects with:
+            - name equal to the replacement ID,
+            - label equal to the source field label,
+            - shape/color/tooltip based on field type.
     """
     if calc == "": c = " "
     else: c = calc
@@ -428,16 +461,16 @@ def addFieldNode(sf, l, cat, shapes, colors, calc):
 
 def fieldIDMapping(x, s, d):
     """
-    Replace IDs by labels for an input string or dict list
+    Replace IDs by labels for an input string or dict list.
 
-    Parameters:
-        x: Input string or dict list
-        s: Source name
-        d: Dictionary of (field/sheet) label -> ID mappings
+    Args:
+        x (str or list): Input string or dict list.
+        s (str): Source name.
+        d (dict): Dictionary of (field/sheet) label -> ID mappings.
 
-    Returns: 
-        String or dict list with all field IDs replaced by labels 
-        and references to internal source fields removed
+    Returns:
+        str or list: String or dict list with all field IDs replaced by labels 
+        and references to internal source fields removed.
     """
     # temporarily convert the input to a string
     res = str(x)
@@ -454,19 +487,23 @@ def fieldIDMapping(x, s, d):
 def visualizeFieldDependencies(df, sf, l, g, din, svg = False):
     """
     Creates output PNG/SVG files containing all dependencies for a 
-    given source field
+    given source field.
 
-    Parameters:
-        df: Input data frame containing backward and forward dependencies
-        sf: Input source field replacement ID
-        l: Input source field label
-        g: Master graph containing all source field and field node objects
-        din: Full path to root directory where graphs will be saved
-        svg: Indicator (T/F) whether or not to generate SVG as well
+    Args:
+        df (DataFrame): Input data frame containing backward and forward 
+        dependencies.
+        sf (str): Input source field replacement ID.
+        l (str): Input source field label.
+        g (Graph): Master graph containing all source field and field node 
+        objects.
+        din (str): Full path to root directory where graphs will be saved.
+        svg (bool, optional): Indicator (True/False) whether or not to 
+        generate SVG as well. Defaults to False.
 
-    Returns: 
-        PNG file in "<workbook path> Files\Graphs\<source field name>.png" and 
-        additional SVG file (with extra attributes) if svg == True
+    Returns:
+        None: PNG file is saved in 
+        "<workbook path> Files\Graphs\<source field name>.png" and 
+        additional SVG file (with extra attributes) if svg is True.
     """
     s = l.split(".")[0]
     f = l.split(".")[1]
@@ -537,15 +574,16 @@ def visualizeFieldDependencies(df, sf, l, g, din, svg = False):
 
 def appendFieldsToDicts(l, k, v):
     """
-    Append fixed list of (key, value) to list of dictionaries
+    Append a fixed list of (key, value) to a list of dictionaries.
 
-    Parameters:
-        l: Input dict list
-        k: List of fixed key names
-        v: List of fixed values
+    Args:
+        l (list): Input list of dictionaries to update.
+        k (list): List of fixed key names to append.
+        v (list): List of fixed values to append corresponding to keys.
 
-    Returns: 
-        Updated version of input dict with new (key, value) pairs appended
+    Returns:
+        list: Updated version of input list with new (key, value) pairs 
+        appended to each dictionary.
     """
     if len(l) > 0: 
         for d in l:
@@ -554,19 +592,23 @@ def appendFieldsToDicts(l, k, v):
 
 def visualizeSheetDependencies(df, sh, g, din, svg = False):
     """
-    Creates output PNG/SVG files containing all dependencies for a 
-    given source field
+    Create output PNG/SVG files containing all dependencies for a given 
+    source field.
 
-    Parameters:
-        df: Input data frame containing backward and forward dependencies
-        sh: Input sheet ID
-        g: Master graph containing all source field and field node objects
-        din: Full path to root directory where graphs will be saved
-        svg: Indicator (T/F) whether or not to generate SVG as well
+    Args:
+        df (pandas.DataFrame): Input data frame containing backward and forward 
+        dependencies.
+        sh (str): Input sheet ID for which dependencies are visualized.
+        g (Graph): Master graph containing all source field and field node 
+        objects.
+        din (str): Full path to the root directory where graphs will be saved.
+        svg (bool, optional): Indicator (True/False) to generate SVG as well. 
+        Defaults to False.
 
-    Returns: 
-        PNG file in "<workbook path> Files\Graphs\Sheets\<sheet name>.png" and 
-        additional SVG file (with extra attributes) if svg == True
+    Returns:
+        None: PNG file is saved in 
+        "<workbook path> Files\Graphs\Sheets\<sheet name>.png" and an 
+        additional SVG file (with extra attributes) if svg is True.
     """
     # get field -> sheet edges
     depSheet = df[(df.dependency_category == "Sheet") & 
@@ -637,11 +679,15 @@ def visualizeSheetDependencies(df, sh, g, din, svg = False):
 
 def zip_folder(folder_path, output_zip_path):
     """
-    Zips the contents of a folder, preserving the folder structure.
+    Zip the contents of a folder, preserving the folder structure.
 
-    Parameters:
-        folder_path (str): The path to the folder to zip
-        output_zip_path (str): The path where the output zip file will be created
+    Args:
+        folder_path (str): The path to the folder to zip.
+        output_zip_path (str): The path where the output zip file will be 
+            created.
+
+    Returns:
+        None: The function creates a zip file at the specified output path.
     """
     with zipfile.ZipFile(output_zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
         # Walk through the folder
