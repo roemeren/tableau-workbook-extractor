@@ -22,7 +22,8 @@ Dependencies:
 - sys: For standard I/O.
 - logging: For configuring and writing log messages.
 """
-from shared.common import os, sys, logging
+from shared.common import os, sys
+import logging
 
 logger = logging.getLogger("TWE_LOGGER")
 

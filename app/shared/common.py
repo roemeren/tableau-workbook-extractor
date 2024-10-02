@@ -20,7 +20,6 @@ import pydot
 import random
 import string
 import zipfile
-import logging
 
 # Script parameters
 fDepFields = True # create field dependency graphs?
