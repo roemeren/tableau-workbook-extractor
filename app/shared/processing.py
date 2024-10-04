@@ -316,7 +316,7 @@ def process_twb(filepath, uploadfolder=None, is_executable=True):
 
     colKeep = ["source_label", "field_label", "source_field_label",
         "field_datatype", "field_role", 
-        "field_role", "field_type", "field_aliases", "field_description", 
+        "field_type", "field_aliases", "field_description", 
         "field_hidden", "field_worksheets", "field_category", 
         "field_calculation_cleaned", "source_field_dependencies", 
         "field_backward_dependencies_max_level", 
