@@ -24,7 +24,7 @@ extensions = [
     'sphinx.ext.autodoc',            # Generate documentation from docstrings in your code
     'sphinx.ext.autosummary',        # Create summary tables for modules, classes, and functions automatically
     'sphinx.ext.napoleon',           # Support for Google-style and NumPy-style docstrings
-    'sphinx_multiversion',           # Enable versioned documentation
+    #'sphinx_multiversion',          # Enable versioned documentation (requires pip install sphinx-multiversion)
     #'sphinx.ext.viewcode',          # Add links to view the source code of documented objects
 ]
 
