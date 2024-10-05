@@ -3,7 +3,7 @@ venv/
 env/
 notebooks
 __pycache__
-build
+/build/
 dist
 data
 *.spec
