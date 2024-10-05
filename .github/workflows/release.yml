@@ -59,6 +59,7 @@ jobs:
           -H "Authorization: Bearer $RENDER_API_KEY" \
           -H "Content-Type: application/json" \
           -d '{"branch": "main"}'  # Trigger deployment for the main branch
+  # note: make sure that the gh-pages branch is created beforehand and that docs/build isn't ignored
   build-docs:
     runs-on: ubuntu-latest  # Use Ubuntu for building documentation
     #needs: build-exe  # Ensure the executable build is complete before this step
