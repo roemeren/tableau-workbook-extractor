@@ -1,0 +1,10 @@
+Column Name,Data Type,Description
+source_label,String,Source name
+field_label,String,Field name
+source_field_label,String,Combination of source and field name
+field_category,String,"Values: Field, Calculated Field, Calculated Field (LOD), Parameter"
+dependency_from,String,Source node of a connection in the dependency graph
+dependency_to,String,Target node of a connection in the dependency graph
+dependency_level,String,Direction and level of dependency between the edge and the source field
+dependency_category,String,"Dependency type (values: Field, Calculated Field, Calculated Field (LOD), Parameter, Sheet)"
+dependency_worksheets_overlap,Integer,Number of overlapping sheets between source field and dependency

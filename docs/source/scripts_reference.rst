@@ -1,11 +1,11 @@
 Scripts Reference
 =================
 
-This section contains the auto-generated documentation for the Python scripts in this project.
+This section contains an overview of the Python modules in this project.
 
-.. autosummary::
-   :toctree: generated
-   :recursive:
+.. toctree::
+   :maxdepth: 1
 
    cli_main
    shared.common
+   
