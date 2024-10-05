@@ -83,5 +83,6 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v2
         with:
+          #note: ensure GITHUB_TOKEN has read/write permissions (repo settings)
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/build/html
