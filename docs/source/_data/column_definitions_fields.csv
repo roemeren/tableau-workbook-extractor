@@ -1,0 +1,22 @@
+Column Name,Data Type,Description
+source_label,String,Source name
+field_label,String,Field name
+source_field_label,String,Combination of source and field name
+field_datatype,String,"Values: boolean, integer, real, date, string"
+field_role,String,"Values: dimension, measure"
+field_type,String,"Values: nominal, ordinal, quantitative"
+field_aliases,String,Field aliases
+field_description,String,Field description
+field_hidden,Integer,"Values: 0 (no), 1 (yes)"
+field_worksheets,String,List of sheets where the field is used
+field_category,String,"Values: Field, Calculated Field, Calculated Field (LOD), Parameter"
+field_calculation_cleaned,String,Field cleaned calculation expression
+source_field_dependencies,String,List of data source field (backward) dependencies
+field_backward_dependencies_max_level,Integer,Maximum backwards dependency level of the field (<=  0)
+field_forward_dependencies_max_level,Integer,Maximum backwards dependency level of the field (>=  0)
+n_backward_dependencies,Integer,Number of backward dependency edges
+n_forward_dependencies,Integer,Number of forward dependency edges
+n_backward_dependencies_field,Integer,Number of data source field (backward) dependencies (length of source_field_dependencies list)
+n_backward_dependencies_lod,Integer,Number of backward dependencies that are Level of Detail (LOD) expressions
+n_worksheet_dependencies,Integer,Number of sheet (forward) dependencies (length of field_worksheets)
+flag_unused,Integer,Flag field is unused (1 = yes; 0 = no)
