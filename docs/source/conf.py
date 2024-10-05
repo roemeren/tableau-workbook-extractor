@@ -15,7 +15,7 @@ sys.path.insert(0, (pathlib.Path(__file__).parents[2] / 'app').resolve().as_posi
 project = 'Tableau Workbook Extractor'
 copyright = '2024, Robert Emerencia'
 author = 'Robert Emerencia'
-release = 'v1.1.0' # will be passed dynamically via the GitHub workflow
+release = 'latest' # will be modified dynamically via the GitHub workflow
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
