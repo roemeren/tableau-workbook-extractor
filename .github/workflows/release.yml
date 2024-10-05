@@ -61,41 +61,27 @@ jobs:
           -d '{"branch": "main"}'  # Trigger deployment for the main branch
   # note: make sure that the gh-pages branch is created beforehand and that docs/build isn't ignored
   build-docs:
-    runs-on: ubuntu-latest  # Use Ubuntu for building documentation
-    #needs: build-exe  # Ensure the executable build is complete before this step
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4  # Check out code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip  # Upgrade pip
-          pip install -r app/requirements.txt  # Install dependencies from requirements.txt
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Set version in conf.py
+      - name: Build documentation using Sphinx
         run: |
-          tag=${{env.VERSION}}
-          # If it's a tag, temporarily update the version in conf.py
-          if [ -n "$tag" ]; then
-            echo "Temporarily setting version to tag: $tag"
-            # Use sed to find the version line and update it to the tag
-            sed -i "s/^version = .*/version = '$tag'/" docs/source/conf.py
-          else
-            echo "Using default version 'latest'"
-            # Ensure version is set to 'latest' for non-tag builds (if it isn't already)
-            if ! grep -q "version = 'latest'" docs/source/conf.py; then
-              echo "version = 'latest'" >> docs/source/conf.py  # Append if it doesn't exist
-            fi
-          fi
+          sphinx-build -b html docs/source/ docs/build/html
 
-      - name: Build documentation
-        run: |
-          sphinx-multiversion docs/source docs/build/html  # Build documentation with versioning
-
-      - name: Deploy documentation
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add docs/build/html
-          git commit -m "Update documentation for version ${tag:-latest}"  # Use 'latest' if tag is empty
-          git push origin gh-pages  # Push to gh-pages branch
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/build/html
