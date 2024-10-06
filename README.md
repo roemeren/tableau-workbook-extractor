@@ -49,10 +49,10 @@ For detailed usage instructions and additional information, please refer to
 the [full documentation](https://roemeren.github.io/tableau-workbook-extractor/).
 
 ## Inspiration
-This project was inspired by the [Tableau_Analyzer.py gist](https://gist.github.com/CK4444/054ad072718a9fe9c4314f833523980a.js) 
-by [CK4444](https://gist.github.com/CK4444) and the 
-[accompanying article](https://christian-knoell.medium.com/unravel-the-complexity-of-tableau-workbooks-using-python-and-graphviz-c7e60111461a) 
-by Christian Knoell, which explores using Python and Graphviz to analyze Tableau workbooks.
+This project was inspired by the [Medium article](https://christian-knoell.medium.com/unravel-the-complexity-of-tableau-workbooks-using-python-and-graphviz-c7e60111461a) 
+by Christian Knoell, which explores using Python and Graphviz to analyze Tableau workbooks. The 
+[accompanying gist](https://gist.github.com/CK4444/054ad072718a9fe9c4314f833523980a.js) 
+provides the code related to the concepts discussed in the article.
 
 ## Contributing
 
