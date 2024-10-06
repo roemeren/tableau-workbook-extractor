@@ -5,8 +5,8 @@ Description
 ^^^^^^^^^^^
 
 The Tableau Workbook Extractor is a tool designed to streamline the process 
-of analyzing field dependencies in Tableau workbooks. I
-nstead of manually tracing through complex calculations and dependencies, 
+of analyzing field dependencies in Tableau workbooks. Instead of manually tracing 
+through complex calculations and dependencies, 
 this tool automates the extraction of fields and their relationships, 
 providing a clear, structured overview.
 
