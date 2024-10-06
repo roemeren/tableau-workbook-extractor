@@ -77,10 +77,9 @@ jobs:
           pip install -r app/requirements.txt
 
       - name: Build documentation using Sphinx
-        # note: convenience script for sphinx-build -b html docs/source/ docs/build/html
         run: |
           cd docs
-          make html
+          sphinx-multiversion source build/html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
