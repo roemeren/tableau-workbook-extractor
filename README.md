@@ -7,7 +7,7 @@ To get started with the Tableau Workbook Extractor, you can:
 - **Download the latest Windows executable**: 
 [Download Executable](https://github.com/roemeren/tableau-workbook-extractor/releases/latest) 
 *(Graphviz must be installed and included in your PATH variable.)*
-- **Run the application on Render**: [Access the Deployed Application](https://tableau-workbook-extractor.onrender.com/)* (May take a while to load)*
+- **Run the application on Render**: [Access the Deployed Application](https://tableau-workbook-extractor.onrender.com/) *(May take a while to load)*
 - **View the documentation**: [Documentation](https://roemeren.github.io/tableau-workbook-extractor/main)
 
 ## Description
