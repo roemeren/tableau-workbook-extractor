@@ -1,0 +1,945 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Changelog" href="changelog.html" /><link rel="prev" title="web.flask_app" href="web.flask_app.html" />
+
+    <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
+        <title>shared.common - Tableau Workbook Extractor</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">Tableau Workbook Extractor</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">Tableau Workbook Extractor</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="usage.html">Usage</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Usage</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="output_files.html">Output Files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="example.html">Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="scripts_reference.html">Scripts Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Scripts Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cli_main.html">cli_main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="web.flask_app.html">web.flask_app</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">shared.common</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Roadmap</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/shared.common.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="shared-common">
+<h1>shared.common<a class="headerlink" href="#shared-common" title="Link to this heading">¶</a></h1>
+<p id="module-shared.common">common.py</p>
+<p>This module contains shared variables and utility functions
+used across the Flask application for processing uploaded files.</p>
+<p>Usage:
+Import this module in both <cite>app.py</cite> and <cite>processing.py</cite> to access and modify
+the shared <cite>progress_data</cite>.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.addFieldNode">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">addFieldNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.addFieldNode" title="Link to this definition">¶</a></dt>
+<dd><p>Creates graph node objects for an input source field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sf</strong> (<em>str</em>) – Input source field replacement ID.</p></li>
+<li><p><strong>l</strong> (<em>str</em>) – Input source field label.</p></li>
+<li><p><strong>cat</strong> (<em>str</em>) – Input source field category.</p></li>
+<li><p><strong>shapes</strong> (<em>dict</em>) – List of shapes per source field category.</p></li>
+<li><p><strong>colors</strong> (<em>dict</em>) – List of colors per source field category.</p></li>
+<li><p><strong>calc</strong> (<em>str</em>) – Input source field calculation expression.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>List of 2 node objects with:</dt><dd><ul class="simple">
+<li><p>name equal to the replacement ID,</p></li>
+<li><p>label equal to the source field label,</p></li>
+<li><p>shape/color/tooltip based on field type.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.appendFieldsToDicts">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">appendFieldsToDicts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.appendFieldsToDicts" title="Link to this definition">¶</a></dt>
+<dd><p>Append a fixed list of (key, value) to a list of dictionaries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>l</strong> (<em>list</em>) – Input list of dictionaries to update.</p></li>
+<li><p><strong>k</strong> (<em>list</em>) – List of fixed key names to append.</p></li>
+<li><p><strong>v</strong> (<em>list</em>) – List of fixed values to append corresponding to keys.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updated version of input list with new (key, value) pairs
+appended to each dictionary.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.backwardDependencies">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">backwardDependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.backwardDependencies" title="Link to this definition">¶</a></dt>
+<dd><p>Recursively get all backward dependencies of a field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Input data frame.</p></li>
+<li><p><strong>f</strong> (<em>str</em>) – Source field replacement ID.</p></li>
+<li><p><strong>level</strong> (<em>int</em><em>, </em><em>optional</em>) – Dependency level (0 = root,
+-1 = level 1 backwards, etc.). Defaults to 0.</p></li>
+<li><p><strong>c</strong> (<em>str</em><em>, </em><em>optional</em>) – Originating child source field replacement ID.
+Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of all backward dependencies of the input source field.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.fieldCalculationDependencies">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">fieldCalculationDependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.fieldCalculationDependencies" title="Link to this definition">¶</a></dt>
+<dd><p>List direct dependencies in a calculation based on a list of possible
+values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>l</strong> (<em>list</em>) – A list of all possible values that can be matched.</p></li>
+<li><p><strong>x</strong> (<em>str</em>) – An input calculation string.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of values from the list <cite>l</cite> that were matched in the</dt><dd><p>string <cite>x</cite>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.fieldCalculationMapping">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">fieldCalculationMapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.fieldCalculationMapping" title="Link to this definition">¶</a></dt>
+<dd><p>Replace all external and internal field references by unique
+source/field IDs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>c</strong> (<em>str</em>) – The source field calculation string.</p></li>
+<li><p><strong>s</strong> (<em>str</em>) – The source field name.</p></li>
+<li><p><strong>d</strong> (<em>dict</em>) – A dictionary mapping source fields to their replacement
+IDs.</p></li>
+<li><p><strong>l</strong> (<em>list</em>) – A list of unique field names.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The calculation string without comments and with all field</dt><dd><p>ID references replaced by their corresponding unique
+replacement ID references.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function assumes that external fields are referenced as
+[source ID].[field ID] and internal fields as [field ID]. If this
+is not the case, the function may return incorrect results.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.fieldCategory">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">fieldCategory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.fieldCategory" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the category of a source field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> (<em>str</em>) – Source field label.</p></li>
+<li><p><strong>c</strong> (<em>str</em>) – Source field cleaned calculation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Category of the source field, which can be:</dt><dd><ul class="simple">
+<li><p>”Parameter”</p></li>
+<li><p>”Calculated Field (LOD)”</p></li>
+<li><p>”Calculated Field”</p></li>
+<li><p>”Field”</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.fieldIDMapping">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">fieldIDMapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.fieldIDMapping" title="Link to this definition">¶</a></dt>
+<dd><p>Replace IDs by labels for an input string or dict list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>str</em><em> or </em><em>list</em>) – Input string or dict list.</p></li>
+<li><p><strong>s</strong> (<em>str</em>) – Source name.</p></li>
+<li><p><strong>d</strong> (<em>dict</em>) – Dictionary of (field/sheet) label -&gt; ID mappings.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>String or dict list with all field IDs replaced by labels
+and references to internal source fields removed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str or list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.fieldMappingTable">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">fieldMappingTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colFrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colTo</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.fieldMappingTable" title="Link to this definition">¶</a></dt>
+<dd><p>Replace all external and internal field references by unique
+source/field IDs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – The input dataframe containing the
+field references.</p></li>
+<li><p><strong>colFrom</strong> – The name of the column containing the original values.</p></li>
+<li><p><strong>colTo</strong> – The name of the column containing the mapped values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A dictionary containing mappings from original values to</dt><dd><p>mapped values, where each key is an original value and each value
+is its corresponding mapped value.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.fieldsFromCategory">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">fieldsFromCategory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.fieldsFromCategory" title="Link to this definition">¶</a></dt>
+<dd><p>Return a list of fields of a given category from a list of
+dependency dictionaries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>l</strong> (<em>list</em>) – Input list of dependency dictionaries.</p></li>
+<li><p><strong>c</strong> (<em>str</em>) – Category type to filter fields.</p></li>
+<li><p><strong>f</strong> (<em>bool</em>) – Flag indicating backward (True) or forward (False)</p></li>
+<li><p><strong>dependencies.</strong></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>List of unique field names corresponding to the specified</dt><dd><p>category.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.forwardDependencies">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">forwardDependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.forwardDependencies" title="Link to this definition">¶</a></dt>
+<dd><p>Recursively get all forward dependencies of a field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Input data frame.</p></li>
+<li><p><strong>f</strong> (<em>str</em>) – Source field replacement ID.</p></li>
+<li><p><strong>w</strong> (<em>list</em>) – List of root source field worksheet ID dependencies.</p></li>
+<li><p><strong>level</strong> (<em>int</em><em>, </em><em>optional</em>) – Dependency level (0 = root,
+-1 = level 1 backwards, etc.). Defaults to 0.</p></li>
+<li><p><strong>p</strong> (<em>str</em><em>, </em><em>optional</em>) – Originating parent source field replacement ID.
+Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of all forward dependencies of the input source field.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.getRandomReplacementBaseID">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">getRandomReplacementBaseID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.getRandomReplacementBaseID" title="Link to this definition">¶</a></dt>
+<dd><p>Generate a random ID of 10 lowercase letters combined with the
+dataframe index.</p>
+<p>The generated ID is used as a base for a field identifier. It ensures that
+the new ID does not match any values already present in the specified column.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – The input dataframe from which unique values
+are checked.</p></li>
+<li><p><strong>c</strong> (<em>str</em>) – The column name in the dataframe to ensure none of
+the generated IDs conflict with existing values.</p></li>
+<li><p><strong>suffix</strong> (<em>str</em><em>, </em><em>optional</em>) – An optional fixed suffix to append to the
+randomly generated ID. Defaults to an empty string.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A random ID consisting of 10 lowercase letters combined with the optional
+suffix. The ID is guaranteed not to match any existing values in the
+specified column.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.isParamDuplicate">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">isParamDuplicate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.isParamDuplicate" title="Link to this definition">¶</a></dt>
+<dd><p>Checks if a field is a parameter duplicate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<em>list</em>) – List of parameter fields.</p></li>
+<li><p><strong>s</strong> (<em>str</em>) – Source name.</p></li>
+<li><p><strong>x</strong> (<em>str</em>) – Field name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the field is a parameter duplicate and should be
+removed; False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.maxDependencyLevel">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">maxDependencyLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.maxDependencyLevel" title="Link to this definition">¶</a></dt>
+<dd><p>Return maximum forward or backward dependency level of a given input list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>l</strong> (<em>list</em>) – Input list of dependency dictionaries.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Maximum dependency level for the given dictionary list.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.processCaptions">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">processCaptions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.processCaptions" title="Link to this definition">¶</a></dt>
+<dd><p>Process captions into a format suitable for calculations, removing
+invalid characters for JSON parsing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i</strong> (<em>str</em>) – The source or field ID value.</p></li>
+<li><p><strong>c</strong> (<em>str</em>) – The source or field caption value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A tuple containing:</dt><dd><ul class="simple">
+<li><p>str: The original field name enclosed in brackets.</p></li>
+<li><dl class="simple">
+<dt>str: The processed caption enclosed in square brackets, with</dt><dd><p>any additional right square brackets doubled. Single and
+double quotes are replaced by HTML codes (&amp;apos; and
+&amp;quot;), while a backslash () is replaced by two
+backslashes ().</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.processSheetNames">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">processSheetNames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.processSheetNames" title="Link to this definition">¶</a></dt>
+<dd><p>Remove invalid characters from sheet names for JSON parsing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>s</strong> (<em>list</em>) – A list of input sheet names.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A processed list of sheet names with single quotes replaced</dt><dd><p>by &amp;apos;, double quotes replaced by &amp;quot;, and backslashes
+replaced by two backslashes (\).</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.removeDuplicatesByRowLength">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">removeDuplicatesByRowLength</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.removeDuplicatesByRowLength" title="Link to this definition">¶</a></dt>
+<dd><p>Remove duplicates from a DataFrame by retaining the row with the largest
+concatenated string length per grouping.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – The input DataFrame.</p></li>
+<li><p><strong>x</strong> (<em>str</em>) – The name of the column to group by.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A tuple containing:</dt><dd><ul class="simple">
+<li><p>pandas.DataFrame: A copy of the input DataFrame with, for each
+unique grouping value, the row with the largest concatenated
+string length.</p></li>
+<li><p>int: The number of duplicates removed.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.sheetMapping">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">sheetMapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.sheetMapping" title="Link to this definition">¶</a></dt>
+<dd><p>Replace all sheet names with sequential sheet IDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> (<em>list</em>) – A list of sheet names.</p></li>
+<li><p><strong>d</strong> (<em>dict</em>) – A dictionary mapping sheet names to their corresponding
+sheet IDs.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of mapped sheet IDs corresponding to the input sheet</dt><dd><p>names.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.sheetMappingTable">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">sheetMappingTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colFrom</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.sheetMappingTable" title="Link to this definition">¶</a></dt>
+<dd><p>Create a dictionary mapping sheet names to sheet IDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – The input dataframe containing the sheet lists.</p></li>
+<li><p><strong>colFrom</strong> (<em>str</em>) – The name of the column containing the sheet names.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A dictionary mapping each unique sheet name to its corresponding</dt><dd><p>sheet ID, where each key is a sheet name and each value is a
+generated sheet ID.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.show_exception_and_exit">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">show_exception_and_exit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exc_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tb</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.show_exception_and_exit" title="Link to this definition">¶</a></dt>
+<dd><p>Keeps the application alive when an unhandled exception occurs
+Source: <a class="reference external" href="https://stackoverflow.com/questions/779675/stop-python-from-closing-on-error">https://stackoverflow.com/questions/779675/stop-python-from-closing-on-error</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.uniqueDependencies">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">uniqueDependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.uniqueDependencies" title="Link to this definition">¶</a></dt>
+<dd><p>Keep unique dependencies from a list of dependencies with their minimum
+dependency level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> (<em>list</em>) – Input list of dependency dictionaries.</p></li>
+<li><p><strong>g</strong> (<em>list</em>) – Grouping list used to determine unique dependencies.</p></li>
+<li><p><strong>f</strong> (<em>str</em>) – Field name representing the dependency level.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dependency dictionaries that only contain unique dependencies
+with their minimum dependency level.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.visualizeFieldDependencies">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">visualizeFieldDependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">din</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">svg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.visualizeFieldDependencies" title="Link to this definition">¶</a></dt>
+<dd><p>Creates output PNG/SVG files containing all dependencies for a
+given source field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>DataFrame</em>) – Input data frame containing backward and forward</p></li>
+<li><p><strong>dependencies.</strong></p></li>
+<li><p><strong>sf</strong> (<em>str</em>) – Input source field replacement ID.</p></li>
+<li><p><strong>l</strong> (<em>str</em>) – Input source field label.</p></li>
+<li><p><strong>g</strong> (<em>Graph</em>) – Master graph containing all source field and field node</p></li>
+<li><p><strong>objects.</strong></p></li>
+<li><p><strong>din</strong> (<em>str</em>) – Full path to root directory where graphs will be saved.</p></li>
+<li><p><strong>svg</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicator (True/False) whether or not to</p></li>
+<li><p><strong>False.</strong> (<em>generate SVG as well. Defaults to</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>PNG file is saved in
+“&lt;workbook path&gt; FilesGraphs&lt;source field name&gt;.png” and
+additional SVG file (with extra attributes) if svg is True.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.visualizeSheetDependencies">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">visualizeSheetDependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">din</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">svg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.visualizeSheetDependencies" title="Link to this definition">¶</a></dt>
+<dd><p>Create output PNG/SVG files containing all dependencies for a given
+source field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Input data frame containing backward and forward</p></li>
+<li><p><strong>dependencies.</strong></p></li>
+<li><p><strong>sh</strong> (<em>str</em>) – Input sheet ID for which dependencies are visualized.</p></li>
+<li><p><strong>g</strong> (<em>Graph</em>) – Master graph containing all source field and field node</p></li>
+<li><p><strong>objects.</strong></p></li>
+<li><p><strong>din</strong> (<em>str</em>) – Full path to the root directory where graphs will be saved.</p></li>
+<li><p><strong>svg</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicator (True/False) to generate SVG as well.</p></li>
+<li><p><strong>False.</strong> (<em>Defaults to</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>PNG file is saved in
+“&lt;workbook path&gt; FilesGraphsSheets&lt;sheet name&gt;.png” and an
+additional SVG file (with extra attributes) if svg is True.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.zip_folder">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">zip_folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_zip_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.zip_folder" title="Link to this definition">¶</a></dt>
+<dd><p>Zip the contents of a folder, preserving the folder structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder_path</strong> (<em>str</em>) – The path to the folder to zip.</p></li>
+<li><p><strong>output_zip_path</strong> (<em>str</em>) – The path where the output zip file will be
+created.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The function creates a zip file at the specified output path.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="changelog.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Changelog</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="web.flask_app.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">web.flask_app</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Robert Emerencia
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">shared.common</a><ul>
+<li><a class="reference internal" href="#shared.common.addFieldNode"><code class="docutils literal notranslate"><span class="pre">addFieldNode()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.appendFieldsToDicts"><code class="docutils literal notranslate"><span class="pre">appendFieldsToDicts()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.backwardDependencies"><code class="docutils literal notranslate"><span class="pre">backwardDependencies()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.fieldCalculationDependencies"><code class="docutils literal notranslate"><span class="pre">fieldCalculationDependencies()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.fieldCalculationMapping"><code class="docutils literal notranslate"><span class="pre">fieldCalculationMapping()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.fieldCategory"><code class="docutils literal notranslate"><span class="pre">fieldCategory()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.fieldIDMapping"><code class="docutils literal notranslate"><span class="pre">fieldIDMapping()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.fieldMappingTable"><code class="docutils literal notranslate"><span class="pre">fieldMappingTable()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.fieldsFromCategory"><code class="docutils literal notranslate"><span class="pre">fieldsFromCategory()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.forwardDependencies"><code class="docutils literal notranslate"><span class="pre">forwardDependencies()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.getRandomReplacementBaseID"><code class="docutils literal notranslate"><span class="pre">getRandomReplacementBaseID()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.isParamDuplicate"><code class="docutils literal notranslate"><span class="pre">isParamDuplicate()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.maxDependencyLevel"><code class="docutils literal notranslate"><span class="pre">maxDependencyLevel()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.processCaptions"><code class="docutils literal notranslate"><span class="pre">processCaptions()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.processSheetNames"><code class="docutils literal notranslate"><span class="pre">processSheetNames()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.removeDuplicatesByRowLength"><code class="docutils literal notranslate"><span class="pre">removeDuplicatesByRowLength()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.sheetMapping"><code class="docutils literal notranslate"><span class="pre">sheetMapping()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.sheetMappingTable"><code class="docutils literal notranslate"><span class="pre">sheetMappingTable()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.show_exception_and_exit"><code class="docutils literal notranslate"><span class="pre">show_exception_and_exit()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.uniqueDependencies"><code class="docutils literal notranslate"><span class="pre">uniqueDependencies()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.visualizeFieldDependencies"><code class="docutils literal notranslate"><span class="pre">visualizeFieldDependencies()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.visualizeSheetDependencies"><code class="docutils literal notranslate"><span class="pre">visualizeSheetDependencies()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.zip_folder"><code class="docutils literal notranslate"><span class="pre">zip_folder()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=c6e86fd7"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    </body>
+</html>
