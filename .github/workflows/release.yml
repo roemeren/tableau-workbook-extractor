@@ -77,6 +77,7 @@ jobs:
           pip install -r app/requirements.txt
 
       - name: Build documentation using Sphinx
+        # note: if you run 'cd docs' first it simplifies to 'make html'
         run: |
           sphinx-build -b html docs/source/ docs/build/html
 
