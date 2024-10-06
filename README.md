@@ -46,7 +46,7 @@ Note that Graphviz must be installed on your local machine to run the executable
 ## Documentation
 
 For detailed usage instructions and additional information, please refer to 
-the [full documentation](https://roemeren.github.io/tableau-workbook-extractor/).
+the [full documentation](https://roemeren.github.io/tableau-workbook-extractor/main).
 
 ## Inspiration
 This project was inspired by the [Medium article](https://christian-knoell.medium.com/unravel-the-complexity-of-tableau-workbooks-using-python-and-graphviz-c7e60111461a) 

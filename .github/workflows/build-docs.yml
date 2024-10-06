@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Fetch all history for all branches and tags
-
+          ref: 'main' # Explicitly check out main branch to have main docs build
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
