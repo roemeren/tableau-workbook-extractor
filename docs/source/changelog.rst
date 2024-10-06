@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v1.1.4 (2024-10-06)
+-------------------
+- Changed Flask app output file name
+
 v1.1.3 (2024-10-06)
 -------------------
 - Added multi-version documentation
