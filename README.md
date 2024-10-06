@@ -1,5 +1,17 @@
 # Tableau Workbook Extractor
 
+## Quickstart
+
+To get started with the Tableau Workbook Extractor, you can:
+
+- **Download the latest Windows executable**: 
+[Download Executable](https://github.com/roemeren/tableau-workbook-extractor/releases/latest) 
+*(Graphviz must be installed and included in your PATH variable.)*
+- **Run the application on Render**: [Access the Deployed Application](https://tableau-workbook-extractor.onrender.com/)*(May take a while to load)*
+- **View the documentation**: [Documentation](https://roemeren.github.io/tableau-workbook-extractor/main)
+
+## Description
+
 The **Tableau Workbook Extractor** is your new best friend when it comes to 
 untangling the web of field dependencies in Tableau workbooks. 
 Ever spent way too long manually clicking through field after field, 
