@@ -325,14 +325,18 @@ forward field dependencies by implementing memoization to cache
 previously computed results. This enhancement may significantly
 reduce redundant calculations and improve overall execution time
 for complex Tableau workbooks.</p></li>
-<li><p><strong>Centralization of Configuration Settings</strong>: Centralizing configurations
+<li><p><strong>Centralization of configuration settings</strong>: Centralizing configurations
 such as colors, output file names, and shapes will streamline management
 and improve consistency across the tool.</p></li>
-<li><p><strong>Improve the Quality and Readability of Output Graphs</strong>: Enhance the
+<li><p><strong>Improve the quality and readability of output graphs</strong>: Enhance the
 aesthetics of the output network graphs by refining colors, fonts, and
 node arrangements in the PNG/SVG images for better visual appeal and clarity.</p></li>
 <li><p><strong>Prettify the Flask App</strong>: Improve the user interface and overall design of
 the Flask application to enhance user experience and make it visually appealing.</p></li>
+<li><p><strong>Refactor the main processing routine</strong>: The <code class="docutils literal notranslate"><span class="pre">process_twb</span></code> function in the
+<code class="docutils literal notranslate"><span class="pre">shared\processing.py</span></code> script is quite large. It could be divided into smaller,
+distinct parts to improve readability and make the code easier to
+follow and maintain.</p></li>
 </ul>
 </section>
 </section>

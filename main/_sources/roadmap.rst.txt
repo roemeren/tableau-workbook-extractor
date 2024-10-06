@@ -54,11 +54,15 @@ Enhancements
   previously computed results. This enhancement may significantly 
   reduce redundant calculations and improve overall execution time 
   for complex Tableau workbooks.
-- **Centralization of Configuration Settings**: Centralizing configurations 
+- **Centralization of configuration settings**: Centralizing configurations 
   such as colors, output file names, and shapes will streamline management 
   and improve consistency across the tool.
-- **Improve the Quality and Readability of Output Graphs**: Enhance the 
+- **Improve the quality and readability of output graphs**: Enhance the 
   aesthetics of the output network graphs by refining colors, fonts, and 
   node arrangements in the PNG/SVG images for better visual appeal and clarity.
 - **Prettify the Flask App**: Improve the user interface and overall design of 
   the Flask application to enhance user experience and make it visually appealing.
+- **Refactor the main processing routine**: The ``process_twb`` function in the 
+  ``shared\processing.py`` script is quite large. It could be divided into smaller, 
+  distinct parts to improve readability and make the code easier to 
+  follow and maintain.
