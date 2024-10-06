@@ -2,7 +2,7 @@ Deployment
 ==========
 
 Application Deployment
-======================
+-----------------------
 
 The Tableau Workbook Extractor application is deployed in two ways:
 
@@ -30,7 +30,7 @@ executable file using PyInstaller (see :ref:`Create and Run the Executable File<
 and the creation of a Dockerized Flask app (see :ref:`Running the Dockerized Flask Application<run-docker>`).
 
 Documentation Build Process
-===========================
+----------------------------
 
 The documentation for the Tableau Workbook Extractor is generated and 
 deployed through a 
