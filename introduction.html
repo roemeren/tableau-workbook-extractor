@@ -258,84 +258,79 @@
 <h1>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h1>
 <section id="description">
 <h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
-<p>This tool automatically extracts fields and their dependencies from local
-Tableau workbooks.</p>
-<p>It uses the <a class="reference external" href="https://tableau.github.io/document-api-python">Tableau Document API</a>
-for the extraction of field attributes and the
-<a class="reference external" href="https://graphviz.org">Graphviz</a> software and its <a class="reference external" href="https://pypi.org/project/pydot">pydot</a>
-interface for the visualization of field dependencies.</p>
-<p>It can be run locally as a Windows executable, or via a web interface.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>You do not need to have Tableau installed to use the tool and/or analyze its
-outputs. However, having Tableau installed may help you verify the results
-more effectively.</p>
-</div>
-<p>It consists of the following 3 steps:</p>
-<ol class="arabic simple">
-<li><p>The user selects a local Tableau workbook (in <cite>.twb</cite> or <cite>.twbx</cite> format) to be
-analyzed.</p></li>
-<li><p>The tool processes the workbook and the different fields and their dependencies.</p></li>
-<li><p>Outputs are generated and, depending on how the tool is run, are saved
-locally or offered as a zipped download.</p></li>
-</ol>
-<p>The output has the following structure:</p>
+<p>The Tableau Workbook Extractor is a tool designed to streamline the process
+of analyzing field dependencies in Tableau workbooks. I
+nstead of manually tracing through complex calculations and dependencies,
+this tool automates the extraction of fields and their relationships,
+providing a clear, structured overview.</p>
+<p>It leverages the <a class="reference external" href="https://tableau.github.io/document-api-python">Tableau Document API</a>
+to extract field attributes and uses <a class="reference external" href="https://graphviz.org">Graphviz</a> along
+with <a class="reference external" href="https://pypi.org/project/pydot">Pydot</a> to visualize field dependencies.
+This makes it easy to identify how fields are calculated and how they are
+interrelated across different sheets and calculations.</p>
+<p>The tool can be run locally as a Windows executable or via a web interface.
+Importantly, you don’t need Tableau installed to use the tool or analyze its
+outputs—though having Tableau installed may help verify the results more effectively.</p>
+<p>The workflow is simple:</p>
 <ul class="simple">
-<li><p>The folder <cite>Fields</cite> containing a single Excel file that has 2 sheets
-<cite>fields</cite> and <cite>dependencies</cite>, with resp. the field metadata and the field
-dependencies (on other fields and/or sheets).</p></li>
-<li><p>A folder <cite>Graphs</cite> containing 1 subfolder for each data source inside
-the workbook, as well as a folder <cite>Parameters</cite>. Inside each of these
-subfolders, a set of 1 PNG and 1 SVG file is saved for each field that has
-at least 1 forward or backward dependency to another field or sheet.</p></li>
+<li><p>Select a local Tableau workbook (.twb or .twbx format).</p></li>
+<li><p>Process the workbook to analyze fields and dependencies.</p></li>
+<li><p>Generate outputs—either saving them locally or as a downloadable zip file.</p></li>
+</ul>
+<p>The output includes:</p>
+<ul class="simple">
+<li><p>A <strong>Fields</strong> folder containing an Excel file with two sheets:
+fields (with field metadata) and dependencies (showing the relationships
+between fields and sheets).</p></li>
+<li><p>A <strong>Graphs</strong> folder containing subfolders for each data source and a folder
+for parameters, with PNG and SVG visualizations of field dependencies.</p></li>
 </ul>
 </section>
 <section id="use-cases">
 <h2>Use Cases<a class="headerlink" href="#use-cases" title="Link to this heading">¶</a></h2>
-<p>The tool could be used for the following reasons:</p>
+<p>The Tableau Workbook Extractor can be used for various purposes, such as:</p>
 <ul class="simple">
-<li><p>Get a full overview of <strong>how a field is calculated</strong> (starting from
-data source fields) and how (much) it is used in sheets and/or other calculations</p></li>
-<li><p>Get an overview of <strong>unused fields and calculations</strong>. These could be
-removed from the workbook or data source if needed to improve
-performance or to keep extract sizes as low as possible</p></li>
-<li><p>Get an overview of the <strong>overall complexity</strong> of the
-dashboard and check whether or not it is needed to
-simplify fields by pruning dependencies and fields</p></li>
-<li><p>Automate part of the <strong>documentation</strong> process of a dashboard</p></li>
+<li><p><strong>Understanding field calculations</strong>: Get a comprehensive view of how fields
+are calculated and how they are used across different sheets and calculations.</p></li>
+<li><p><strong>Identifying unused fields</strong>: Find fields that aren’t being used in the
+workbook and consider removing them to improve performance or reduce extract sizes.</p></li>
+<li><p><strong>Assessing workbook complexity</strong>: Gain insight into the overall complexity
+of a workbook and decide whether it can be simplified by reducing dependencies.</p></li>
+<li><p><strong>Automating documentation</strong>: Simplify the process of documenting workbook
+structure and field dependencies.</p></li>
+</ul>
+</section>
+<section id="documentation-overview">
+<h2>Documentation Overview<a class="headerlink" href="#documentation-overview" title="Link to this heading">¶</a></h2>
+<p>For more detailed information about the tool and its features, refer to the following pages in the documentation:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="usage.html"><span class="doc">Usage</span></a>: A guide on the different ways to run the tool,
+including local options such as a pre-created executable or web app,
+as well as running a Python script or setting up the executable or
+the Flask app yourself.</p></li>
+<li><p><a class="reference internal" href="example.html"><span class="doc">Example</span></a>: A practical example to demonstrate the tool’s capabilities.</p></li>
+<li><p><a class="reference internal" href="deployment.html"><span class="doc">Deployment</span></a>: Notes regarding the deployment of the tool.</p></li>
+<li><p><a class="reference internal" href="scripts_reference.html"><span class="doc">Scripts Reference</span></a>: Detailed information on the scripts included with the tool.</p></li>
+<li><p><a class="reference internal" href="changelog.html"><span class="doc">Changelog</span></a>: A log of updates and changes made to the tool over time.</p></li>
+<li><p><a class="reference internal" href="roadmap.html"><span class="doc">Roadmap</span></a>: An overview of possible future features and improvements planned for the tool.</p></li>
 </ul>
 </section>
 <section id="limitations">
 <h2>Limitations<a class="headerlink" href="#limitations" title="Link to this heading">¶</a></h2>
-<p>Below a list of items that <em>cannot</em> be extracted from this tool:</p>
+<p>While this tool is highly effective, there are some limitations,
+many of which are related to the current capabilities of the Tableau Document API:</p>
 <ul class="simple">
-<li><p><strong>Role of a field</strong> in sheets: there is no indication if a field in
-a particular sheet is used as a dimension, measure, filter, tooltip, etc.</p></li>
-<li><p><strong>Direct or indirect dependency</strong> in sheets: there is no indication if
-a field in a particular sheet is used <em>directly</em> in the sheet or <em>indirectly</em>
-through a calculated field that depends on the field</p></li>
-<li><p><strong>Parameter dependencies</strong>: during loading/opening of the workbook some
-parameters may be initialized by a calculated field in the workbook (e.g. most
-recent date). These (backward) dependencies are not captured.</p></li>
-<li><p><strong>Full data source dependencies</strong>: fields from a data source are analyzed
-from the point of view of a particular dashboard. The used data source
-itself may contain calculated fields that depend on hidden fields that are
-not available in the workbook. These ‘hidden dependencies’ from the data
-source therefore will not be captured. This may be overcome by running the
-tool separately for the technical workbook that defines the data source.</p></li>
-<li><p><strong>Dashboard dependencies</strong>: the currently used version of the API
-doesn’t contain links between dashboards and sheets (only a <cite>dashboards</cite>
-workbook property that returns a list of dashboard names). Because of this
-it is not possible to (for example) know which data sources and/or fields
-are used in a specific dashboard.</p></li>
-<li><p><strong>Dashboard actions</strong> processing: dashboard actions depend on fields as well
-as sheets, and have various other properties (source and target fields/sheets,
-action type, etc.) that are currently not exposed in the Document API.</p></li>
-<li><p><strong>Filter</strong> properties: filters in visualizations are related to fields but
-have various other properties (filter expression, filter scope, etc.)</p></li>
+<li><p>It does not identify the <strong>role of a field</strong> within a sheet (e.g., dimension, measure, filter).</p></li>
+<li><p><strong>Indirect dependencies within sheets</strong> are not captured (e.g., if a field is
+used indirectly through another calculation).</p></li>
+<li><p><strong>Parameter dependencies that are set calculated fields</strong> during workbook
+initialization are not tracked.</p></li>
+<li><p><strong>Hidden dependencies</strong> from data sources are not extracted, though this
+can be addressed by running the tool separately on the technical workbook defining the data source.</p></li>
+<li><p><strong>Dashboard dependencies and actions</strong> are not captured due to limitations
+in the API.</p></li>
+<li><p><strong>Filter properties</strong> (such as filter expressions and scopes) are not analyzed.</p></li>
 </ul>
-<p>These items are partially related to the limitations in the current version
-of the Tableau Document API.</p>
 </section>
 </section>
 
@@ -397,6 +392,7 @@ of the Tableau Document API.</p>
 <li><a class="reference internal" href="#">Introduction</a><ul>
 <li><a class="reference internal" href="#description">Description</a></li>
 <li><a class="reference internal" href="#use-cases">Use Cases</a></li>
+<li><a class="reference internal" href="#documentation-overview">Documentation Overview</a></li>
 <li><a class="reference internal" href="#limitations">Limitations</a></li>
 </ul>
 </li>
