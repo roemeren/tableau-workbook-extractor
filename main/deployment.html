@@ -178,7 +178,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -207,8 +207,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="example.html">Example</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Deployment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#application-deployment">Application Deployment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#documentation-build-process">Documentation Build Process</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="scripts_reference.html">Scripts Reference</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Scripts Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="cli_main.html">cli_main</a></li>
 <li class="toctree-l2"><a class="reference internal" href="web.flask_app.html">web.flask_app</a></li>
@@ -261,7 +259,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -269,9 +267,8 @@
         <article role="main" id="furo-main-content">
           <section id="deployment">
 <h1>Deployment<a class="headerlink" href="#deployment" title="Link to this heading">¶</a></h1>
-</section>
 <section id="application-deployment">
-<h1>Application Deployment<a class="headerlink" href="#application-deployment" title="Link to this heading">¶</a></h1>
+<h2>Application Deployment<a class="headerlink" href="#application-deployment" title="Link to this heading">¶</a></h2>
 <p>The Tableau Workbook Extractor application is deployed in two ways:</p>
 <p>1. <strong>As a downloadable executable</strong>: Users can easily download the latest
 executable version of the application from the
@@ -293,7 +290,7 @@ executable file using PyInstaller (see <a class="reference internal" href="usage
 and the creation of a Dockerized Flask app (see <a class="reference internal" href="usage.html#run-docker"><span class="std std-ref">Running the Dockerized Flask Application</span></a>).</p>
 </section>
 <section id="documentation-build-process">
-<h1>Documentation Build Process<a class="headerlink" href="#documentation-build-process" title="Link to this heading">¶</a></h1>
+<h2>Documentation Build Process<a class="headerlink" href="#documentation-build-process" title="Link to this heading">¶</a></h2>
 <p>The documentation for the Tableau Workbook Extractor is generated and
 deployed through a
 <a class="reference external" href="https://github.com/roemeren/tableau-workbook-extractor/blob/main/.github/workflows/build-docs.yml">separate GitHub workflow</a>. (<cite>build-docs.yml</cite>).</p>
@@ -317,6 +314,7 @@ Without these permissions, the documentation deployment will not work.</p></li>
 <p>The published site allows users to switch between tags and the latest version
 (called “main”), ensuring that all documentation is automatically built and
 readily available.</p>
+</section>
 </section>
 
         </article>
@@ -362,8 +360,28 @@ readily available.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Deployment</a><ul>
+<li><a class="reference internal" href="#application-deployment">Application Deployment</a></li>
+<li><a class="reference internal" href="#documentation-build-process">Documentation Build Process</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
