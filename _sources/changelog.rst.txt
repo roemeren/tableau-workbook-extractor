@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.1.2 (2024-10-06)
+-------------------
+- Added web.flask_app documentation to scripts reference
+- Minor changes in README.
+
 v1.1.1 (2024-10-06)
 -------------------
 - Minor bug correction in the output Excel file.

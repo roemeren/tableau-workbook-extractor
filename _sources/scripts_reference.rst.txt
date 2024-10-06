@@ -7,5 +7,6 @@ This section contains an overview of the Python modules in this project.
    :maxdepth: 1
 
    cli_main
+   web.flask_app
    shared.common
    
