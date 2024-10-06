@@ -6,7 +6,7 @@ on:
       - 'v*.*.*'  # This pattern matches tags like 'v1.0.3'
 
 jobs:
-  build-exe:
+  deploy-exe:
     runs-on: windows-latest  # Use latest Windows runner to create Windows executable
     permissions:
       contents: write  # Needed to create and upload releases
