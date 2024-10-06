@@ -332,7 +332,8 @@ and forward dependencies (explanation: see below):</p>
 <a class="reference internal image-reference" href="_images/21-example-graph.png"><img alt="Example Dependency Graph SVG" src="_images/21-example-graph.png" style="width: 100%;" />
 </a>
 <p>The second example is simpler but shows 1 additional node type that represents
-a Level of Detail (LOD) expression (red ellipse):</p>
+a Level of Detail (LOD) expression (red ellipse, SVG tooltip with
+calculation also shown):</p>
 <a class="reference internal image-reference" href="_images/19-example-graph-lod.png"><img alt="Example Dependency Graph SVG" src="_images/19-example-graph-lod.png" style="width: 75%;" />
 </a>
 <p>In general, the output images can be read as follows:</p>
@@ -342,11 +343,11 @@ a Level of Detail (LOD) expression (red ellipse):</p>
 <li><p><strong>Red ellipses</strong> represent calculated fields (at least 1 dependency)
 that contain Level of Detail (LOD) Expressions</p></li>
 <li><p><strong>Purple parallellograms</strong> represent parameters</p></li>
-<li><p><strong>Light blue ellipse</strong> represents the analyzed field (in this case <code class="docutils literal notranslate"><span class="pre">PP</span> <span class="pre">Sales</span></code>)</p></li>
+<li><p><strong>Light blue ellipse</strong> represents the analyzed field (in this case <code class="docutils literal notranslate"><span class="pre">CP</span> <span class="pre">Sales</span></code>)</p></li>
 <li><p>Elements <strong>above</strong> the analyzed field are <strong>backward dependencies</strong>, meaning
 that they are required for the calculation of it</p></li>
 <li><p>Elements <strong>below</strong> the analyzed field are <strong>forward dependencies</strong>, meaning
-that each of these elements directly or indirectly makes use of the <code class="docutils literal notranslate"><span class="pre">PP</span> <span class="pre">Sales</span></code>
+that each of these elements directly or indirectly makes use of the <code class="docutils literal notranslate"><span class="pre">CP</span> <span class="pre">Sales</span></code>
 calculated field.</p></li>
 <li><p>The levels of the graphs represent the <strong>dependency level</strong> of the
 different elements. (NOTE: NOT TRUE, PLEASE REWRITE)
