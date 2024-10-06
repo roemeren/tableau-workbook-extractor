@@ -1,5 +1,5 @@
 """
-app.py
+flask_app.py
 
 Flask web application for uploading and processing CSV files.
 
@@ -14,8 +14,7 @@ Key Features:
 - Progress information is accessible through the `/progress` endpoint.
 
 Configuration:
-- Uploads are saved in the `static/uploads` directory, which is created 
-  if it does not exist.
+- Uploads are saved in the `static/uploads` directory, which is created if it does not exist.
 
 Usage:
 Run this module to start the Flask development server.
@@ -37,6 +36,16 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    """
+    Render the index page and handle file uploads.
+
+    If a file is uploaded, it is saved to the upload folder, and the 
+    processing function is started in a separate thread to maintain 
+    responsiveness of the application.
+
+    Returns:
+        str: The rendered HTML of the index page.
+    """
     if request.method == "POST":
         if 'file' not in request.files:
             return "No file part"
@@ -63,6 +72,15 @@ def index():
 
 @app.route("/progress", methods=["GET"])
 def progress():
+    """
+    Return the current progress of the file processing.
+
+    This function responds with a JSON object containing the current 
+    processing progress and the filename being processed.
+
+    Returns:
+        jsonify: A JSON response containing progress and filename.
+    """
     return jsonify(progress=progress_data['progress'], filename=progress_data['filename'])
 
 def run_processing(filepath):
