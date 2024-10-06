@@ -35,7 +35,7 @@ Documentation Build Process
 The documentation for the Tableau Workbook Extractor is generated and 
 deployed through a 
 `separate GitHub workflow <https://github.com/roemeren/tableau-workbook
--extractor/blob/main/.github/workflows/build-docs.yml>`_. (`build-docs.yml`). 
+-extractor/blob/main/.github/workflows/build-docs.yml>`_.
 
 This workflow is triggered for every tag push (provided that the application 
 has been successfully deployed) to ensure that versioned documentation is 
