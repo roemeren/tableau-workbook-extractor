@@ -4,86 +4,78 @@ Introduction
 Description
 ^^^^^^^^^^^
 
-This tool automatically extracts fields and their dependencies from local 
-Tableau workbooks.
+The Tableau Workbook Extractor is a tool designed to streamline the process 
+of analyzing field dependencies in Tableau workbooks. I
+nstead of manually tracing through complex calculations and dependencies, 
+this tool automates the extraction of fields and their relationships, 
+providing a clear, structured overview.
 
-It uses the `Tableau Document API <https://tableau.github.io/document-api-python>`_ 
-for the extraction of field attributes and the 
-`Graphviz <https://graphviz.org>`_ software and its `pydot <https://pypi.org/project/pydot>`_ 
-interface for the visualization of field dependencies.
+It leverages the `Tableau Document API <https://tableau.github.io/document-api-python>`_ 
+to extract field attributes and uses `Graphviz <https://graphviz.org>`_ along 
+with `Pydot <https://pypi.org/project/pydot>`_ to visualize field dependencies. 
+This makes it easy to identify how fields are calculated and how they are 
+interrelated across different sheets and calculations.
 
-It can be run locally as a Windows executable, or via a web interface.
+The tool can be run locally as a Windows executable or via a web interface. 
+Importantly, you don’t need Tableau installed to use the tool or analyze its 
+outputs—though having Tableau installed may help verify the results more effectively.
 
-.. note::
-   You do not need to have Tableau installed to use the tool and/or analyze its 
-   outputs. However, having Tableau installed may help you verify the results 
-   more effectively.
+The workflow is simple:
 
-It consists of the following 3 steps:
+* Select a local Tableau workbook (.twb or .twbx format).
+* Process the workbook to analyze fields and dependencies.
+* Generate outputs—either saving them locally or as a downloadable zip file.
 
-1. The user selects a local Tableau workbook (in `.twb` or `.twbx` format) to be 
-   analyzed.
-2. The tool processes the workbook and the different fields and their dependencies.
-3. Outputs are generated and, depending on how the tool is run, are saved 
-   locally or offered as a zipped download.
+The output includes:
 
-The output has the following structure:
-
-* The folder `Fields` containing a single Excel file that has 2 sheets 
-  `fields` and `dependencies`, with resp. the field metadata and the field 
-  dependencies (on other fields and/or sheets).
-* A folder `Graphs` containing 1 subfolder for each data source inside 
-  the workbook, as well as a folder `Parameters`. Inside each of these
-  subfolders, a set of 1 PNG and 1 SVG file is saved for each field that has 
-  at least 1 forward or backward dependency to another field or sheet.
+* A **Fields** folder containing an Excel file with two sheets: 
+  fields (with field metadata) and dependencies (showing the relationships 
+  between fields and sheets).
+* A **Graphs** folder containing subfolders for each data source and a folder 
+  for parameters, with PNG and SVG visualizations of field dependencies.
 
 Use Cases
 ^^^^^^^^^
 
-The tool could be used for the following reasons:
+The Tableau Workbook Extractor can be used for various purposes, such as:
 
-- Get a full overview of **how a field is calculated** (starting from 
-  data source fields) and how (much) it is used in sheets and/or other calculations
+* **Understanding field calculations**: Get a comprehensive view of how fields 
+  are calculated and how they are used across different sheets and calculations.
+* **Identifying unused fields**: Find fields that aren’t being used in the 
+  workbook and consider removing them to improve performance or reduce extract sizes.
+* **Assessing workbook complexity**: Gain insight into the overall complexity 
+  of a workbook and decide whether it can be simplified by reducing dependencies.
+* **Automating documentation**: Simplify the process of documenting workbook 
+  structure and field dependencies.
 
-- Get an overview of **unused fields and calculations**. These could be 
-  removed from the workbook or data source if needed to improve 
-  performance or to keep extract sizes as low as possible
+Documentation Overview
+^^^^^^^^^^^^^^^^^^^^^^^
 
-- Get an overview of the **overall complexity** of the 
-  dashboard and check whether or not it is needed to 
-  simplify fields by pruning dependencies and fields
+For more detailed information about the tool and its features, refer to the following pages in the documentation:
 
-- Automate part of the **documentation** process of a dashboard
+* :doc:`usage`: A guide on the different ways to run the tool, 
+  including local options such as a pre-created executable or web app, 
+  as well as running a Python script or setting up the executable or 
+  the Flask app yourself.
+* :doc:`example`: A practical example to demonstrate the tool's capabilities.
+* :doc:`deployment`: Notes regarding the deployment of the tool.
+* :doc:`scripts_reference`: Detailed information on the scripts included with the tool.
+* :doc:`changelog`: A log of updates and changes made to the tool over time.
+* :doc:`roadmap`: An overview of possible future features and improvements planned for the tool.
 
 Limitations
 ^^^^^^^^^^^
 
-Below a list of items that *cannot* be extracted from this tool:
+While this tool is highly effective, there are some limitations, 
+many of which are related to the current capabilities of the Tableau Document API:
 
-- **Role of a field** in sheets: there is no indication if a field in 
-  a particular sheet is used as a dimension, measure, filter, tooltip, etc.
-- **Direct or indirect dependency** in sheets: there is no indication if 
-  a field in a particular sheet is used *directly* in the sheet or *indirectly* 
-  through a calculated field that depends on the field
-- **Parameter dependencies**: during loading/opening of the workbook some 
-  parameters may be initialized by a calculated field in the workbook (e.g. most 
-  recent date). These (backward) dependencies are not captured.
-- **Full data source dependencies**: fields from a data source are analyzed 
-  from the point of view of a particular dashboard. The used data source 
-  itself may contain calculated fields that depend on hidden fields that are 
-  not available in the workbook. These 'hidden dependencies' from the data 
-  source therefore will not be captured. This may be overcome by running the 
-  tool separately for the technical workbook that defines the data source.
-- **Dashboard dependencies**: the currently used version of the API 
-  doesn't contain links between dashboards and sheets (only a `dashboards` 
-  workbook property that returns a list of dashboard names). Because of this 
-  it is not possible to (for example) know which data sources and/or fields 
-  are used in a specific dashboard.
-- **Dashboard actions** processing: dashboard actions depend on fields as well 
-  as sheets, and have various other properties (source and target fields/sheets, 
-  action type, etc.) that are currently not exposed in the Document API.
-- **Filter** properties: filters in visualizations are related to fields but 
-  have various other properties (filter expression, filter scope, etc.)
-
-These items are partially related to the limitations in the current version 
-of the Tableau Document API.
+* It does not identify the **role of a field** within a sheet (e.g., dimension, measure, filter).
+* **Indirect dependencies within sheets** are not captured (e.g., if a field is 
+  used indirectly through another calculation).
+* **Parameter dependencies that are set calculated fields** during workbook 
+  initialization are not tracked.
+* **Hidden dependencies** from data sources are not extracted, though this 
+  can be addressed by running the tool separately on the technical workbook defining the data source.
+* **Dashboard dependencies and actions** are not captured due to limitations 
+  in the API.
+* **Filter properties** (such as filter expressions and scopes) are not analyzed.

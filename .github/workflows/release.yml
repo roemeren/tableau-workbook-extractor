@@ -77,9 +77,10 @@ jobs:
           pip install -r app/requirements.txt
 
       - name: Build documentation using Sphinx
-        # note: if you run 'cd docs' first it simplifies to 'make html'
+        # note: convenience script for sphinx-build -b html docs/source/ docs/build/html
         run: |
-          sphinx-build -b html docs/source/ docs/build/html
+          cd docs
+          make html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
