@@ -4,6 +4,7 @@ Changelog
 v1.1.3 (2024-10-06)
 -------------------
 - Added multi-version documentation
+- Split application deployment from documentation building workflows
 - Changed main documentation link in README
 
 v1.1.2 (2024-10-06)
