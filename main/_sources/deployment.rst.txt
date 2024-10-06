@@ -48,8 +48,8 @@ documentation.
 To ensure that the documentation is built and published correctly, 
 please note the following requirements:
 
-- An orphan `gh-pages` branch must be available, containing an empty 
-  `.nojekyll` file. This file prevents GitHub Pages from processing 
+- An orphan ``gh-pages`` branch must be available, containing an empty 
+  ``.nojekyll`` file. This file prevents GitHub Pages from processing 
   the site with Jekyll.
   
 - In the GitHub repository settings (Actions permissions), ensure that the 
