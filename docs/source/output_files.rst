@@ -66,7 +66,8 @@ and forward dependencies (explanation: see below):
     :width: 100%
 
 The second example is simpler but shows 1 additional node type that represents
-a Level of Detail (LOD) expression (red ellipse):
+a Level of Detail (LOD) expression (red ellipse, SVG tooltip with 
+calculation also shown):
 
 .. image:: _static/images/19-example-graph-lod.png
     :alt: Example Dependency Graph SVG
@@ -79,11 +80,11 @@ In general, the output images can be read as follows:
 * **Red ellipses** represent calculated fields (at least 1 dependency) 
   that contain Level of Detail (LOD) Expressions
 * **Purple parallellograms** represent parameters
-* **Light blue ellipse** represents the analyzed field (in this case ``PP Sales``)
+* **Light blue ellipse** represents the analyzed field (in this case ``CP Sales``)
 * Elements **above** the analyzed field are **backward dependencies**, meaning 
   that they are required for the calculation of it
 * Elements **below** the analyzed field are **forward dependencies**, meaning 
-  that each of these elements directly or indirectly makes use of the ``PP Sales``
+  that each of these elements directly or indirectly makes use of the ``CP Sales``
   calculated field.
 * The levels of the graphs represent the **dependency level** of the 
   different elements. (NOTE: NOT TRUE, PLEASE REWRITE)
