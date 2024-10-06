@@ -61,7 +61,7 @@ For more detailed information about the tool and its features, refer to the foll
 * :doc:`deployment`: Notes regarding the deployment of the tool.
 * :doc:`scripts_reference`: Detailed information on the scripts included with the tool.
 * :doc:`changelog`: A log of updates and changes made to the tool over time.
-* :doc:`roadmap`: An overview of possible future features and improvements planned for the tool.
+* :doc:`roadmap`: An overview of possible future features and improvements for the tool.
 
 Limitations
 ^^^^^^^^^^^

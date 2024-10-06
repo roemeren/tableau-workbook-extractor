@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Usage" href="usage.html" /><link rel="prev" title="Tableau Workbook Extractor" href="index.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Example" href="example.html" /><link rel="prev" title="Usage" href="usage.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
-        <title>Introduction - Tableau Workbook Extractor latest documentation</title>
+        <title>Output Files - Tableau Workbook Extractor</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
@@ -166,7 +166,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">Tableau Workbook Extractor latest documentation</div></a>
+      <a href="index.html"><div class="brand">Tableau Workbook Extractor</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -190,7 +190,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">Tableau Workbook Extractor latest documentation</span>
+  <span class="sidebar-brand-text">Tableau Workbook Extractor</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -200,9 +200,9 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
 <ul class="current">
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Introduction</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="usage.html">Usage</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Usage</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="output_files.html">Output Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="usage.html">Usage</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Usage</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Output Files</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="example.html">Example</a></li>
@@ -218,6 +218,13 @@
 </ul>
 
 </div>
+
+  <div style="padding-left: 1em;">  <!-- Adjust the padding as needed -->
+    <h6 style="font-family: 'Segoe UI', sans-serif; color: #74777E; font-size: 0.75em; font-weight: bold;">VERSIONS</h6>
+    <ul>
+        <li><a href="output_files.html" style="font-family: 'Georgia', sans-serif;">v1.1.3</a></li>
+    </ul>
+  </div>
 </div>
 
       </div>
@@ -235,7 +242,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/introduction.rst.txt" title="View this page">
+  <a class="muted-link" href="_sources/output_files.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -255,83 +262,260 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="introduction">
-<h1>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h1>
-<section id="description">
-<h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
-<p>The Tableau Workbook Extractor is a tool designed to streamline the process
-of analyzing field dependencies in Tableau workbooks. I
-nstead of manually tracing through complex calculations and dependencies,
-this tool automates the extraction of fields and their relationships,
-providing a clear, structured overview.</p>
-<p>It leverages the <a class="reference external" href="https://tableau.github.io/document-api-python">Tableau Document API</a>
-to extract field attributes and uses <a class="reference external" href="https://graphviz.org">Graphviz</a> along
-with <a class="reference external" href="https://pypi.org/project/pydot">Pydot</a> to visualize field dependencies.
-This makes it easy to identify how fields are calculated and how they are
-interrelated across different sheets and calculations.</p>
-<p>The tool can be run locally as a Windows executable or via a web interface.
-Importantly, you don’t need Tableau installed to use the tool or analyze its
-outputs—though having Tableau installed may help verify the results more effectively.</p>
-<p>The workflow is simple:</p>
+          <section id="output-files">
+<h1>Output Files<a class="headerlink" href="#output-files" title="Link to this heading">¶</a></h1>
+<section id="output-folder-structure">
+<h2>Output Folder Structure<a class="headerlink" href="#output-folder-structure" title="Link to this heading">¶</a></h2>
+<p>The output files are structured as follows:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;Root Folder&gt;/
+├── Fields/
+│   └── &lt;Workbook Name&gt;.xlsx
+├── Graphs/
+│   ├── &lt;Data Source Name 1&gt;
+│   │   ├── &lt;Field Name 1&gt;.png
+│   │   ├── &lt;Field Name 1&gt;.svg
+│   │   ├── &lt;Field Name 2&gt;.png
+│   │   ├── &lt;Field Name 2&gt;.svg
+│   │   └── ...
+│   ├── &lt;Data Source Name 2&gt;
+│   │   ├── &lt;Field Name 1&gt;.png
+│   │   ├── &lt;Field Name 1&gt;.svg
+│   │   ├── &lt;Field Name 2&gt;.png
+│   │   ├── &lt;Field Name 2&gt;.svg
+│   │   └── ...
+│   ├── Parameters
+│   │   ├── &lt;Parameter Name 1&gt;.png
+│   │   ├── &lt;Parameter Name 1&gt;.svg
+│   │   ├── &lt;Parameter Name 2&gt;.png
+│   │   ├── &lt;Parameter Name 2&gt;.svg
+│   │   └── ...
+│   └── Sheets
+│   │   ├── &lt;Sheet Name 1&gt;.png
+│   │   ├── &lt;Sheet Name 1&gt;.svg
+│   │   ├── &lt;Sheet Name 2&gt;.png
+│   │   ├── &lt;Sheet Name 2&gt;.svg
+│   │   └── ...
+└── log_file.log (Optional, only for Flask app)
+</pre></div>
+</div>
+<p>Clarifications w.r.t. this folder structure:</p>
 <ul class="simple">
-<li><p>Select a local Tableau workbook (.twb or .twbx format).</p></li>
-<li><p>Process the workbook to analyze fields and dependencies.</p></li>
-<li><p>Generate outputs—either saving them locally or as a downloadable zip file.</p></li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">&lt;Root</span> <span class="pre">Folder&gt;</span></code> depends on how the tool is run (for more details check <a class="reference internal" href="usage.html"><span class="doc">Usage</span></a>)</dt><dd><ul>
+<li><p>Executable: &lt;Workbook Folder&gt; Files</p></li>
+<li><p>Flask: &lt;Browser Default Download Folder&gt;</p></li>
 </ul>
-<p>The output includes:</p>
-<ul class="simple">
-<li><p>A <strong>Fields</strong> folder containing an Excel file with two sheets:
-fields (with field metadata) and dependencies (showing the relationships
-between fields and sheets).</p></li>
-<li><p>A <strong>Graphs</strong> folder containing subfolders for each data source and a folder
-for parameters, with PNG and SVG visualizations of field dependencies.</p></li>
-</ul>
-</section>
-<section id="use-cases">
-<h2>Use Cases<a class="headerlink" href="#use-cases" title="Link to this heading">¶</a></h2>
-<p>The Tableau Workbook Extractor can be used for various purposes, such as:</p>
-<ul class="simple">
-<li><p><strong>Understanding field calculations</strong>: Get a comprehensive view of how fields
-are calculated and how they are used across different sheets and calculations.</p></li>
-<li><p><strong>Identifying unused fields</strong>: Find fields that aren’t being used in the
-workbook and consider removing them to improve performance or reduce extract sizes.</p></li>
-<li><p><strong>Assessing workbook complexity</strong>: Gain insight into the overall complexity
-of a workbook and decide whether it can be simplified by reducing dependencies.</p></li>
-<li><p><strong>Automating documentation</strong>: Simplify the process of documenting workbook
-structure and field dependencies.</p></li>
-</ul>
-</section>
-<section id="documentation-overview">
-<h2>Documentation Overview<a class="headerlink" href="#documentation-overview" title="Link to this heading">¶</a></h2>
-<p>For more detailed information about the tool and its features, refer to the following pages in the documentation:</p>
-<ul class="simple">
-<li><p><a class="reference internal" href="usage.html"><span class="doc">Usage</span></a>: A guide on the different ways to run the tool,
-including local options such as a pre-created executable or web app,
-as well as running a Python script or setting up the executable or
-the Flask app yourself.</p></li>
-<li><p><a class="reference internal" href="example.html"><span class="doc">Example</span></a>: A practical example to demonstrate the tool’s capabilities.</p></li>
-<li><p><a class="reference internal" href="deployment.html"><span class="doc">Deployment</span></a>: Notes regarding the deployment of the tool.</p></li>
-<li><p><a class="reference internal" href="scripts_reference.html"><span class="doc">Scripts Reference</span></a>: Detailed information on the scripts included with the tool.</p></li>
-<li><p><a class="reference internal" href="changelog.html"><span class="doc">Changelog</span></a>: A log of updates and changes made to the tool over time.</p></li>
-<li><p><a class="reference internal" href="roadmap.html"><span class="doc">Roadmap</span></a>: An overview of possible future features and improvements planned for the tool.</p></li>
+</dd>
+</dl>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;Workbook</span> <span class="pre">Name&gt;</span></code>: name of the selected workbook</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;Data</span> <span class="pre">Source</span> <span class="pre">Name</span> <span class="pre">1&gt;</span></code>: name of the first data source used in the workbook</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;Field</span> <span class="pre">Name</span> <span class="pre">1&gt;</span></code>: name of the first (calculated) field from the parent data
+source used in the workbook</p></li>
+<li><p>For parameter and sheet dependency graphs 2 separate subfolders <code class="docutils literal notranslate"><span class="pre">Parameters</span></code>
+and <code class="docutils literal notranslate"><span class="pre">Sheets</span></code> are used</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">log_file.log</span></code> is generated only when the tool is run via the Flask app.
+In other cases, the output is displayed directly in the command line instead
+of being written to a log file.</p></li>
 </ul>
 </section>
-<section id="limitations">
-<h2>Limitations<a class="headerlink" href="#limitations" title="Link to this heading">¶</a></h2>
-<p>While this tool is highly effective, there are some limitations,
-many of which are related to the current capabilities of the Tableau Document API:</p>
+<section id="dependency-graphs">
+<h2>Dependency Graphs<a class="headerlink" href="#dependency-graphs" title="Link to this heading">¶</a></h2>
+<p>The images below show some examples of output dependency graphs.</p>
+<p>The first example is a more complex example of a field with both backward
+and forward dependencies (explanation: see below):</p>
+<a class="reference internal image-reference" href="_images/15-example-svg.png"><img alt="Example Dependency Graph SVG" src="_images/15-example-svg.png" style="width: 100%;" />
+</a>
+<p>The second example is simpler but shows 1 additional node type that represents
+a Level of Detail (LOD) expression (red ellipse):</p>
+<a class="reference internal image-reference" href="_images/19-example-graph-lod.png"><img alt="Example Dependency Graph SVG" src="_images/19-example-graph-lod.png" style="width: 75%;" />
+</a>
+<p>In general, the output images can be read as follows:</p>
 <ul class="simple">
-<li><p>It does not identify the <strong>role of a field</strong> within a sheet (e.g., dimension, measure, filter).</p></li>
-<li><p><strong>Indirect dependencies within sheets</strong> are not captured (e.g., if a field is
-used indirectly through another calculation).</p></li>
-<li><p><strong>Parameter dependencies that are set calculated fields</strong> during workbook
-initialization are not tracked.</p></li>
-<li><p><strong>Hidden dependencies</strong> from data sources are not extracted, though this
-can be addressed by running the tool separately on the technical workbook defining the data source.</p></li>
-<li><p><strong>Dashboard dependencies and actions</strong> are not captured due to limitations
-in the API.</p></li>
-<li><p><strong>Filter properties</strong> (such as filter expressions and scopes) are not analyzed.</p></li>
+<li><p><strong>Green rectangles</strong> represent data source fields (no dependencies)</p></li>
+<li><p><strong>Orange ellipses</strong> represent calculated fields (at least 1 dependency)</p></li>
+<li><p><strong>Red ellipses</strong> represent calculated fields (at least 1 dependency)
+that contain Level of Detail (LOD) Expressions</p></li>
+<li><p><strong>Purple parallellograms</strong> represent parameters</p></li>
+<li><p><strong>Light blue ellipse</strong> represents the analyzed field (in this case <code class="docutils literal notranslate"><span class="pre">PP</span> <span class="pre">Sales</span></code>)</p></li>
+<li><p>Elements <strong>above</strong> the analyzed field are <strong>backward dependencies</strong>, meaning
+that they are required for the calculation of it</p></li>
+<li><p>Elements <strong>below</strong> the analyzed field are <strong>forward dependencies</strong>, meaning
+that each of these elements directly or indirectly makes use of the <code class="docutils literal notranslate"><span class="pre">PP</span> <span class="pre">Sales</span></code>
+calculated field.</p></li>
+<li><p>The levels of the graphs represent the <strong>dependency level</strong> of the
+different elements. (NOTE: NOT TRUE, PLEASE REWRITE)
+* Backward dependencies are numbered -1 (for direct backward dependencies), -2, etc.
+* Forward dependencies are numbered 1 (for direct forward dependencies), 2, etc.</p></li>
 </ul>
+<p>Field dependency graphs are exported as PNG and SVG files. The advantage of the
+SVG files compared to the PNG files is the ability to show the field calculations
+in the node tooltips, which is not possible for the PNG file.</p>
+</section>
+<section id="field-metadata">
+<h2>Field Metadata<a class="headerlink" href="#field-metadata" title="Link to this heading">¶</a></h2>
+<p>The output file <code class="docutils literal notranslate"><span class="pre">Fields\&lt;Workbook</span> <span class="pre">Name&gt;.xlsx</span></code> contains 2 sheets <code class="docutils literal notranslate"><span class="pre">fields</span></code> and
+<code class="docutils literal notranslate"><span class="pre">dependencies</span></code>. Below their column descriptions are described in detail.</p>
+<section id="column-definitions-for-fields-sheet">
+<h3>Column definitions for “fields” sheet<a class="headerlink" href="#column-definitions-for-fields-sheet" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 20.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Column Name</p></th>
+<th class="head"><p>Data Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>source_label</p></td>
+<td><p>String</p></td>
+<td><p>Source name</p></td>
+</tr>
+<tr class="row-odd"><td><p>field_label</p></td>
+<td><p>String</p></td>
+<td><p>Field name</p></td>
+</tr>
+<tr class="row-even"><td><p>source_field_label</p></td>
+<td><p>String</p></td>
+<td><p>Combination of source and field name</p></td>
+</tr>
+<tr class="row-odd"><td><p>field_datatype</p></td>
+<td><p>String</p></td>
+<td><p>Values: boolean, integer, real, date, string</p></td>
+</tr>
+<tr class="row-even"><td><p>field_role</p></td>
+<td><p>String</p></td>
+<td><p>Values: dimension, measure</p></td>
+</tr>
+<tr class="row-odd"><td><p>field_type</p></td>
+<td><p>String</p></td>
+<td><p>Values: nominal, ordinal, quantitative</p></td>
+</tr>
+<tr class="row-even"><td><p>field_aliases</p></td>
+<td><p>String</p></td>
+<td><p>Field aliases</p></td>
+</tr>
+<tr class="row-odd"><td><p>field_description</p></td>
+<td><p>String</p></td>
+<td><p>Field description</p></td>
+</tr>
+<tr class="row-even"><td><p>field_hidden</p></td>
+<td><p>Integer</p></td>
+<td><p>Values: 0 (no), 1 (yes)</p></td>
+</tr>
+<tr class="row-odd"><td><p>field_worksheets</p></td>
+<td><p>String</p></td>
+<td><p>List of sheets where the field is used</p></td>
+</tr>
+<tr class="row-even"><td><p>field_category</p></td>
+<td><p>String</p></td>
+<td><p>Values: Field, Calculated Field, Calculated Field (LOD), Parameter</p></td>
+</tr>
+<tr class="row-odd"><td><p>field_calculation_cleaned</p></td>
+<td><p>String</p></td>
+<td><p>Field cleaned calculation expression</p></td>
+</tr>
+<tr class="row-even"><td><p>source_field_dependencies</p></td>
+<td><p>String</p></td>
+<td><p>List of data source field (backward) dependencies</p></td>
+</tr>
+<tr class="row-odd"><td><p>field_backward_dependencies_max_level</p></td>
+<td><p>Integer</p></td>
+<td><p>Maximum backwards dependency level of the field (&lt;=  0)</p></td>
+</tr>
+<tr class="row-even"><td><p>field_forward_dependencies_max_level</p></td>
+<td><p>Integer</p></td>
+<td><p>Maximum backwards dependency level of the field (&gt;=  0)</p></td>
+</tr>
+<tr class="row-odd"><td><p>n_backward_dependencies</p></td>
+<td><p>Integer</p></td>
+<td><p>Number of backward dependency edges</p></td>
+</tr>
+<tr class="row-even"><td><p>n_forward_dependencies</p></td>
+<td><p>Integer</p></td>
+<td><p>Number of forward dependency edges</p></td>
+</tr>
+<tr class="row-odd"><td><p>n_backward_dependencies_field</p></td>
+<td><p>Integer</p></td>
+<td><p>Number of data source field (backward) dependencies (length of source_field_dependencies list)</p></td>
+</tr>
+<tr class="row-even"><td><p>n_backward_dependencies_lod</p></td>
+<td><p>Integer</p></td>
+<td><p>Number of backward dependencies that are Level of Detail (LOD) expressions</p></td>
+</tr>
+<tr class="row-odd"><td><p>n_worksheet_dependencies</p></td>
+<td><p>Integer</p></td>
+<td><p>Number of sheet (forward) dependencies (length of field_worksheets)</p></td>
+</tr>
+<tr class="row-even"><td><p>flag_unused</p></td>
+<td><p>Integer</p></td>
+<td><p>Flag field is unused (1 = yes; 0 = no)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="column-definitions-for-dependencies-sheet">
+<h3>Column definitions for “dependencies” sheet<a class="headerlink" href="#column-definitions-for-dependencies-sheet" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 20.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Column Name</p></th>
+<th class="head"><p>Data Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>source_label</p></td>
+<td><p>String</p></td>
+<td><p>Source name</p></td>
+</tr>
+<tr class="row-odd"><td><p>field_label</p></td>
+<td><p>String</p></td>
+<td><p>Field name</p></td>
+</tr>
+<tr class="row-even"><td><p>source_field_label</p></td>
+<td><p>String</p></td>
+<td><p>Combination of source and field name</p></td>
+</tr>
+<tr class="row-odd"><td><p>field_category</p></td>
+<td><p>String</p></td>
+<td><p>Values: Field, Calculated Field, Calculated Field (LOD), Parameter</p></td>
+</tr>
+<tr class="row-even"><td><p>dependency_from</p></td>
+<td><p>String</p></td>
+<td><p>Source node of a connection in the dependency graph</p></td>
+</tr>
+<tr class="row-odd"><td><p>dependency_to</p></td>
+<td><p>String</p></td>
+<td><p>Target node of a connection in the dependency graph</p></td>
+</tr>
+<tr class="row-even"><td><p>dependency_level</p></td>
+<td><p>String</p></td>
+<td><p>Direction and level of dependency between the edge and the source field</p></td>
+</tr>
+<tr class="row-odd"><td><p>dependency_category</p></td>
+<td><p>String</p></td>
+<td><p>Dependency type (values: Field, Calculated Field, Calculated Field (LOD), Parameter, Sheet)</p></td>
+</tr>
+<tr class="row-even"><td><p>dependency_worksheets_overlap</p></td>
+<td><p>Integer</p></td>
+<td><p>Number of overlapping sheets between source field and dependency</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 </section>
 </section>
 
@@ -340,23 +524,23 @@ in the API.</p></li>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="usage.html">
+          <a class="next-page" href="example.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Usage</div>
+                <div class="title">Example</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="index.html">
+          <a class="prev-page" href="usage.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Home</div>
+                <div class="title">Usage</div>
                 
               </div>
             </a>
@@ -390,11 +574,14 @@ in the API.</p></li>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Introduction</a><ul>
-<li><a class="reference internal" href="#description">Description</a></li>
-<li><a class="reference internal" href="#use-cases">Use Cases</a></li>
-<li><a class="reference internal" href="#documentation-overview">Documentation Overview</a></li>
-<li><a class="reference internal" href="#limitations">Limitations</a></li>
+<li><a class="reference internal" href="#">Output Files</a><ul>
+<li><a class="reference internal" href="#output-folder-structure">Output Folder Structure</a></li>
+<li><a class="reference internal" href="#dependency-graphs">Dependency Graphs</a></li>
+<li><a class="reference internal" href="#field-metadata">Field Metadata</a><ul>
+<li><a class="reference internal" href="#column-definitions-for-fields-sheet">Column definitions for “fields” sheet</a></li>
+<li><a class="reference internal" href="#column-definitions-for-dependencies-sheet">Column definitions for “dependencies” sheet</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

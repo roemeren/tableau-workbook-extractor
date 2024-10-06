@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Scripts Reference" href="scripts_reference.html" /><link rel="prev" title="Example" href="example.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="cli_main" href="cli_main.html" /><link rel="prev" title="Deployment" href="deployment.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
-        <title>Deployment - Tableau Workbook Extractor latest documentation</title>
+        <title>Scripts Reference - Tableau Workbook Extractor</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
@@ -166,7 +166,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">Tableau Workbook Extractor latest documentation</div></a>
+      <a href="index.html"><div class="brand">Tableau Workbook Extractor</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -190,7 +190,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">Tableau Workbook Extractor latest documentation</span>
+  <span class="sidebar-brand-text">Tableau Workbook Extractor</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -206,8 +206,8 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="example.html">Example</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Deployment</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="scripts_reference.html">Scripts Reference</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Scripts Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a></li>
+<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Scripts Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Scripts Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="cli_main.html">cli_main</a></li>
 <li class="toctree-l2"><a class="reference internal" href="web.flask_app.html">web.flask_app</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shared.common.html">shared.common</a></li>
@@ -218,6 +218,13 @@
 </ul>
 
 </div>
+
+  <div style="padding-left: 1em;">  <!-- Adjust the padding as needed -->
+    <h6 style="font-family: 'Segoe UI', sans-serif; color: #74777E; font-size: 0.75em; font-weight: bold;">VERSIONS</h6>
+    <ul>
+        <li><a href="scripts_reference.html" style="font-family: 'Georgia', sans-serif;">v1.1.3</a></li>
+    </ul>
+  </div>
 </div>
 
       </div>
@@ -235,7 +242,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/deployment.rst.txt" title="View this page">
+  <a class="muted-link" href="_sources/scripts_reference.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -255,27 +262,16 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="deployment">
-<h1>Deployment<a class="headerlink" href="#deployment" title="Link to this heading">¶</a></h1>
-<p>The Tableau Workbook Extractor application is deployed in two ways:</p>
-<p>1. <strong>As a downloadable executable</strong>: Users can easily download the latest
-executable version of the application from the
-<a class="reference external" href="https://github.com/roemeren/tableau-workbook-extractor/releases/latest">releases page</a>.
-Please note that in order to run the downloaded executable file,
-Graphviz must be installed on your local machine.
-<a class="reference internal" href="usage.html#install-graphviz"><span class="std std-ref">Graphviz must be installed</span></a>.</p>
-<p>2. <strong>As a deployed Flask application on Render</strong>: This option allows users to
-run the application in a cloud environment without the need for local setup.
-The deployed application can be accessed <a class="reference external" href="https://tableau-workbook-extractor.onrender.com/">on this link</a>.</p>
-<p>Both deployment methods are automated through a <strong>GitHub workflow</strong> that is
-triggered each time a new version tag is pushed to the repository.
-This ensures that the latest updates are consistently available to users.</p>
-<p>You can view the GitHub workflow file responsible for these deployments
-<a class="reference external" href="https://github.com/roemeren/tableau-workbook-extractor/blob/main/.github/workflows/release.yml">here</a>.</p>
-<p>These workflows are automated versions of some use cases explained in
-the <a class="reference internal" href="usage.html"><span class="doc">Usage</span></a> page, specifically the creation of an
-executable file using PyInstaller (see <a class="reference internal" href="usage.html#create-run-exe"><span class="std std-ref">Create and Run the Executable File</span></a>)
-and the creation of a Dockerized Flask app (see <a class="reference internal" href="usage.html#run-docker"><span class="std std-ref">Running the Dockerized Flask Application</span></a>).</p>
+          <section id="scripts-reference">
+<h1>Scripts Reference<a class="headerlink" href="#scripts-reference" title="Link to this heading">¶</a></h1>
+<p>This section contains an overview of the Python modules in this project.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cli_main.html">cli_main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="web.flask_app.html">web.flask_app</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shared.common.html">shared.common</a></li>
+</ul>
+</div>
 </section>
 
         </article>
@@ -283,23 +279,23 @@ and the creation of a Dockerized Flask app (see <a class="reference internal" hr
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="scripts_reference.html">
+          <a class="next-page" href="cli_main.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Scripts Reference</div>
+                <div class="title">cli_main</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="example.html">
+          <a class="prev-page" href="deployment.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Example</div>
+                <div class="title">Deployment</div>
                 
               </div>
             </a>

@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Roadmap" href="roadmap.html" /><link rel="prev" title="shared.common" href="shared.common.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="Changelog" href="changelog.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
-        <title>Changelog - Tableau Workbook Extractor latest documentation</title>
+        <title>Roadmap - Tableau Workbook Extractor</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
@@ -166,7 +166,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">Tableau Workbook Extractor latest documentation</div></a>
+      <a href="index.html"><div class="brand">Tableau Workbook Extractor</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -190,7 +190,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">Tableau Workbook Extractor latest documentation</span>
+  <span class="sidebar-brand-text">Tableau Workbook Extractor</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -213,11 +213,18 @@
 <li class="toctree-l2"><a class="reference internal" href="shared.common.html">shared.common</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Changelog</a></li>
-<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Roadmap</a></li>
 </ul>
 
 </div>
+
+  <div style="padding-left: 1em;">  <!-- Adjust the padding as needed -->
+    <h6 style="font-family: 'Segoe UI', sans-serif; color: #74777E; font-size: 0.75em; font-weight: bold;">VERSIONS</h6>
+    <ul>
+        <li><a href="roadmap.html" style="font-family: 'Georgia', sans-serif;">v1.1.3</a></li>
+    </ul>
+  </div>
 </div>
 
       </div>
@@ -235,7 +242,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/changelog.rst.txt" title="View this page">
+  <a class="muted-link" href="_sources/roadmap.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -255,28 +262,71 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="changelog">
-<h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
-<section id="v1-1-2-2024-10-06">
-<h2>v1.1.2 (2024-10-06)<a class="headerlink" href="#v1-1-2-2024-10-06" title="Link to this heading">¶</a></h2>
+          <section id="roadmap">
+<h1>Roadmap<a class="headerlink" href="#roadmap" title="Link to this heading">¶</a></h1>
+<p>This document outlines some possible new features and enhancements for
+the application, as well as known issues that are being tracked.</p>
+<section id="new-features">
+<h2>New Features<a class="headerlink" href="#new-features" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Added web.flask_app documentation to scripts reference</p></li>
-<li><p>Minor changes in README.</p></li>
+<li><p><strong>Simplify the extraction of unique dependencies</strong>: Currently, there is no
+efficient method to quickly extract unique forward and backward dependencies,
+along with their minimum dependency levels, for a given field, parameter, or
+sheet, as demonstrated on the <a class="reference internal" href="example.html"><span class="doc">Example</span></a> page. By expanding the output
+Excel file to include additional precalculated columns,
+we can streamline this process and make it more user-friendly.</p></li>
+<li><p><strong>Batch processing</strong>: implement functionality to process
+multiple Tableau workbooks at once</p></li>
+<li><p><strong>Remove multi-line comments from cleaned calculations</strong>: Currently,
+multi-line comments are not removed from the cleaned calculated field
+expressions in the output Excel file. The goal is to eliminate all single-
+and multi-line comments from the original calculation expressions.</p></li>
+<li><p><strong>Provide Linux and macOS executables</strong>: Develop and distribute executables
+for the tool compatible with Linux and macOS, expanding accessibility
+for users on different operating systems.</p></li>
 </ul>
 </section>
-<section id="v1-1-1-2024-10-06">
-<h2>v1.1.1 (2024-10-06)<a class="headerlink" href="#v1-1-1-2024-10-06" title="Link to this heading">¶</a></h2>
+<section id="known-issues">
+<h2>Known Issues<a class="headerlink" href="#known-issues" title="Link to this heading">¶</a></h2>
+<p>Some of these issues stem from limitations within the tool.
+Others are related to the current version of the <code class="docutils literal notranslate"><span class="pre">tableaudocumentapi</span></code> Python
+package, which at the moment doesn’t appear to be actively developed.
+The lack of new releases may be related to emerging alternatives, such as the
+official Tableau Metadata API and other third-party solutions for managing
+Tableau workbooks.</p>
 <ul class="simple">
-<li><p>Minor bug correction in the output Excel file.</p></li>
-<li><p>Replaced detailed information in <cite>README.md</cite> with Sphinx documentation.</p></li>
-<li><p>Reduced the amount of information in <cite>README.md</cite> for improved clarity.</p></li>
+<li><p><strong>Incomplete Processing of Tableau Workbooks</strong>: Some Tableau workbooks
+generate errors during analysis, and further investigation is needed to
+identify the causes and implement necessary bug fixes.</p></li>
+<li><p><strong>Not all dependencies are captured</strong>: Some fields may be used solely to
+initialize parameter values when the workbook is opened, while data source
+fields may depend on fields hidden in the data source and not visible in the
+dashboard; additionally, fields and parameters may be utilized in dashboard
+actions.</p></li>
+<li><p><strong>Not all field captions are captured</strong>: Field captions may be missing,
+resulting in the use of their internal ID in the outputs,
+which may relate to hidden fields and dependencies.</p></li>
+<li><p><strong>Not all extracted fields are assigned to the correct data source</strong>: Some
+(copies of) fields may be linked to a data source to which they do not belong.</p></li>
 </ul>
 </section>
-<section id="v1-1-0-2024-09-30">
-<h2>v1.1.0 (2024-09-30)<a class="headerlink" href="#v1-1-0-2024-09-30" title="Link to this heading">¶</a></h2>
+<section id="enhancements">
+<h2>Enhancements<a class="headerlink" href="#enhancements" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Initial release of the tool with support for local execution and deployment
-in a Dockerized environment.</p></li>
+<li><p><strong>Optimization of recursive dependency analysis functions</strong>: Enhance the
+performance of the recursive functions that analyze backward and
+forward field dependencies by implementing memoization to cache
+previously computed results. This enhancement may significantly
+reduce redundant calculations and improve overall execution time
+for complex Tableau workbooks.</p></li>
+<li><p><strong>Centralization of Configuration Settings</strong>: Centralizing configurations
+such as colors, output file names, and shapes will streamline management
+and improve consistency across the tool.</p></li>
+<li><p><strong>Improve the Quality and Readability of Output Graphs</strong>: Enhance the
+aesthetics of the output network graphs by refining colors, fonts, and
+node arrangements in the PNG/SVG images for better visual appeal and clarity.</p></li>
+<li><p><strong>Prettify the Flask App</strong>: Improve the user interface and overall design of
+the Flask application to enhance user experience and make it visually appealing.</p></li>
 </ul>
 </section>
 </section>
@@ -286,23 +336,15 @@ in a Dockerized environment.</p></li>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="roadmap.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">Roadmap</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="shared.common.html">
+          
+          <a class="prev-page" href="changelog.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">shared.common</div>
+                <div class="title">Changelog</div>
                 
               </div>
             </a>
@@ -336,10 +378,10 @@ in a Dockerized environment.</p></li>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Changelog</a><ul>
-<li><a class="reference internal" href="#v1-1-2-2024-10-06">v1.1.2 (2024-10-06)</a></li>
-<li><a class="reference internal" href="#v1-1-1-2024-10-06">v1.1.1 (2024-10-06)</a></li>
-<li><a class="reference internal" href="#v1-1-0-2024-09-30">v1.1.0 (2024-09-30)</a></li>
+<li><a class="reference internal" href="#">Roadmap</a><ul>
+<li><a class="reference internal" href="#new-features">New Features</a></li>
+<li><a class="reference internal" href="#known-issues">Known Issues</a></li>
+<li><a class="reference internal" href="#enhancements">Enhancements</a></li>
 </ul>
 </li>
 </ul>
