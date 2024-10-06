@@ -1,0 +1,10 @@
+{% if versions %}
+  <div style="padding-left: 1em;">  <!-- Adjust the padding as needed -->
+    <h6 style="font-family: 'Segoe UI', sans-serif; color: #74777E; font-size: 0.75em; font-weight: bold;">{{ _('Versions') | upper }}</h6>
+    <ul>
+      {%- for item in versions | reverse %}
+        <li><a href="{{ item.url }}" style="font-family: 'Georgia', sans-serif;">{{ item.name }}</a></li>
+      {%- endfor %}
+    </ul>
+  </div>
+{% endif %}

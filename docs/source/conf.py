@@ -8,6 +8,7 @@
 
 import sys
 import pathlib
+from sphinx.application import Sphinx
 
 # Add the app directory to the system path
 sys.path.insert(0, (pathlib.Path(__file__).parents[2] / 'app').resolve().as_posix())
@@ -24,7 +25,7 @@ extensions = [
     'sphinx.ext.autodoc',            # Generate documentation from docstrings in your code
     'sphinx.ext.autosummary',        # Create summary tables for modules, classes, and functions automatically
     'sphinx.ext.napoleon',           # Support for Google-style and NumPy-style docstrings
-    #'sphinx_multiversion',          # Enable versioned documentation (requires pip install sphinx-multiversion)
+    'sphinx_multiversion',           # Enable versioned documentation (requires pip install sphinx-multiversion)
     #'sphinx.ext.viewcode',          # Add links to view the source code of documented objects
 ]
 
@@ -37,3 +38,23 @@ exclude_patterns = []
 # html_theme = 'alabaster' # default theme
 html_theme = 'furo' # reauires pip install furo
 html_static_path = ['_static']
+# versioned title not possible? (see https://github.com/sphinx-contrib/multiversion/issues/61)
+#  -> override default html_title (<project> <release> documentation) with fixed one
+html_title = f"{project}"
+
+# extend default sidebar with version selector
+# sources: sphinx-multiversion quickstart + https://pradyunsg.me/furo/customisation/sidebar/)
+html_sidebars = {
+    "**": [
+        # default sidebar
+        "sidebar/brand.html",
+        "sidebar/search.html",
+        "sidebar/scroll-start.html",
+        "sidebar/navigation.html",
+        "sidebar/ethical-ads.html",
+        # custom extension saved in docs/source/_templates
+        "versioning.html",
+        "sidebar/scroll-end.html",
+        "sidebar/variant-selector.html",
+    ]
+}
