@@ -59,8 +59,3 @@ jobs:
           -H "Authorization: Bearer $RENDER_API_KEY" \
           -H "Content-Type: application/json" \
           -d '{"branch": "main"}'  # Trigger deployment for the main branch
-# Trigger build-docs workflow
-  build-docs:
-    uses: ./.github/workflows/build-docs.yml
-    with:
-      tags: ${{ github.ref }}  # Pass the tag reference

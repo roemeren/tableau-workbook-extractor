@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main  # Trigger this workflow on pushes to the main branch
+    tags:
+      - 'v*.*.*'  # This pattern matches tags like 'v1.0.3'
 
   # note: make sure that the gh-pages branch is created beforehand and that docs/build isn't ignored
 jobs:
