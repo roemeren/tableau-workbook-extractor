@@ -390,7 +390,7 @@ def process_twb(filepath, uploadfolder=None, is_executable=True):
                 current_progress += 1
                 progress_data['progress'] = int((current_progress / nTot) * 100)
     
-    zip_filename = 'tableau-workbook-extractor-output.zip'
+    zip_filename = inpFileName + ' Files.zip'
     # Set the filename for download once processing is complete
     progress_data['filename'] = zip_filename
     # Ensure progress reaches 100 after processing

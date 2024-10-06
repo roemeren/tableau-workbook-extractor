@@ -41,8 +41,8 @@ The output files are structured as follows:
 Clarifications w.r.t. this folder structure:
 
 * ``<Root Folder>`` depends on how the tool is run (for more details check :doc:`usage`)
-   * Executable: <Workbook Folder> Files
-   * Flask: <Browser Default Download Folder>
+   * Executable: <Workbook Folder>/<Workbook Name> Files
+   * Flask: <Workbook Name> Files.zip (saved in browser default download folder)
 * ``<Workbook Name>``: name of the selected workbook
 * ``<Data Source Name 1>``: name of the first data source used in the workbook
 * ``<Field Name 1>``: name of the first (calculated) field from the parent data 
