@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.1.3 (2024-10-06)
+-------------------
+- Added multi-version documentation
+- Changed main documentation link in README
+
 v1.1.2 (2024-10-06)
 -------------------
 - Added web.flask_app documentation to scripts reference
