@@ -25,11 +25,12 @@ New Features
 Known Issues
 -------------
  
-Some of these issues stem from limitations within our tool. 
-Others are related to the current version of the tableaudocumentapi Python 
-package, which is no longer actively developed. The lack of new releases may 
-be related to emerging alternatives, such as the official Tableau Metadata API 
-and other third-party solutions for managing Tableau workbooks.
+Some of these issues stem from limitations within the tool. 
+Others are related to the current version of the ``tableaudocumentapi`` Python 
+package, which at the moment doesn't appear to be actively developed. 
+The lack of new releases may be related to emerging alternatives, such as the 
+official Tableau Metadata API and other third-party solutions for managing 
+Tableau workbooks.
 
 - **Incomplete Processing of Tableau Workbooks**: Some Tableau workbooks 
   generate errors during analysis, and further investigation is needed to 
@@ -59,3 +60,5 @@ Enhancements
 - **Improve the Quality and Readability of Output Graphs**: Enhance the 
   aesthetics of the output network graphs by refining colors, fonts, and 
   node arrangements in the PNG/SVG images for better visual appeal and clarity.
+- **Prettify the Flask App**: Improve the user interface and overall design of 
+  the Flask application to enhance user experience and make it visually appealing.
