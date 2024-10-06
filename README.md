@@ -40,7 +40,7 @@ Note that Graphviz must be installed on your local machine to run the executable
 
 ### Sample Output Excel Table: Tabular Representation of Dependency Graph
 
-![Sample Output Excel Table](docs/source/_static/images/20-example-excel-dependencies.png)
+![Sample Output Excel Table](docs/source/_static/images/21-example-graph.png)
 *Figure 2: Sample output Excel table containing tabular representation of nodes and edges.*
 
 ## Documentation

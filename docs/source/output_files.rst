@@ -61,7 +61,7 @@ The images below show some examples of output dependency graphs.
 The first example is a more complex example of a field with both backward 
 and forward dependencies (explanation: see below):
 
-.. image:: _static/images/15-example-svg.png
+.. image:: _static/images/21-example-graph.png
     :alt: Example Dependency Graph SVG
     :width: 100%
 
