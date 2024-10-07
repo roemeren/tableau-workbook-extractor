@@ -6,6 +6,7 @@ the application, as well as known issues that are being tracked.
 
 New Features
 ------------
+
 - **Simplify the extraction of unique dependencies**: Currently, there is no 
   efficient method to quickly extract unique forward and backward dependencies, 
   along with their minimum dependency levels, for a given field, parameter, or 
@@ -21,10 +22,14 @@ New Features
 - **Provide Linux and macOS executables**: Develop and distribute executables 
   for the tool compatible with Linux and macOS, expanding accessibility 
   for users on different operating systems.
+- **Flask App: Improve Error Handling**: Enhance the user experience by 
+  implementing robust error handling in the Flask app. Users should receive 
+  clear feedback when selecting incorrect files or when processing errors 
+  occur, ensuring a smoother interaction with the application.
 
 Known Issues
 -------------
- 
+
 Some of these issues stem from limitations within the tool. 
 Others are related to the current version of the ``tableaudocumentapi`` Python 
 package, which at the moment doesn't appear to be actively developed. 
@@ -48,6 +53,7 @@ Tableau workbooks.
 
 Enhancements
 ------------
+
 - **Optimization of recursive dependency analysis functions**: Enhance the 
   performance of the recursive functions that analyze backward and 
   forward field dependencies by implementing memoization to cache 
