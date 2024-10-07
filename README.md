@@ -44,7 +44,7 @@ Workflow steps:
 3. **Obtain Output**: The output files will be saved automatically on your local machine.
 
 ![Workflow Executable](docs/source/_static/images/22-usage-cli.png)
-*Figure 1: Workflow of the Tableau Workbook Extractor Windows executable.*
+*Workflow of the Tableau Workbook Extractor Windows executable.*
 
 ### Access the Web App
 
