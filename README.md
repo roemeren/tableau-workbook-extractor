@@ -58,7 +58,7 @@ the Tableau workbook file you want to analyze.
 workbook. The tool will extract field dependencies and generate the output.
 3. **Obtain Output**: Download and unpack the generated ZIP file containing the output files.
 
-![Workflow Web App](docs/source/_static/images/22-usage-cli.png)
+![Workflow Web App](docs/source/_static/images/23-usage-flask.png)
 *Workflow of the Tableau Workbook Extractor web app.*
 
 ## Screenshots
