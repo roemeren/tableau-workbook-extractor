@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.1.6 (2024-10-07)
+-------------------
+- Modified build-docs workflow permissions
+- Fixed indendation errors in docstrings
+
 v1.1.5 (2024-10-07)
 -------------------
 - Changed Flask app title
