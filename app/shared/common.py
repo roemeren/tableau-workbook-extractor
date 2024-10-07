@@ -5,6 +5,7 @@ This module contains shared variables and utility functions
 used across the Flask application for processing uploaded files.
 
 Usage:
+
 Import this module in both `app.py` and `processing.py` to access and modify 
 the shared `progress_data`.
 """

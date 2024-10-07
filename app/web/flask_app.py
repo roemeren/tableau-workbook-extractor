@@ -8,15 +8,18 @@ in the background. The progress of the processing is tracked and can be
 queried via a dedicated endpoint.
 
 Key Features:
+
 The application allows users to upload Tableau workbooks via a web form and 
 processes these workbooks in the background using the `process_twb` function. 
 It also includes progress tracking for ongoing processing tasks, enabling 
 users to access progress information through the `/progress` endpoint.
 
 Configuration:
+
 Uploads are saved in the `static/uploads` directory, which is created if it does not exist.
 
 Usage:
+
 Run this module to start the Flask development server.
 """
 

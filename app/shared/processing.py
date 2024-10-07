@@ -5,12 +5,14 @@ This module provides functions to process Tableau Workbook (TWB/TWBX) files, ext
 and analyzing data sources, fields, and their dependencies. It includes context managers 
 for suppressing console output and functionality for visualizing field dependencies.
 
-Key Functionalities: 
+Key Functionalities:
+
 This application processes Tableau workbooks to extract data sources and fields,
 generates visual representations of field dependencies, and manages 
 output file organization and logging.
 
-Usage: 
+Usage:
+
 The `process_twb` function serves as the main entry point, taking a 
 file path and optional parameters for output handling and execution context.
 """
