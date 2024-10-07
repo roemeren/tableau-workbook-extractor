@@ -15,16 +15,27 @@ Graphviz must be installed on your local machine.
 
 2. **As a deployed Flask application on Render**: This option allows users to 
 run the application in a cloud environment without the need for local setup. 
-The deployed application can be accessed `on this link <https://tableau-workbook-extractor.onrender.com/>`_.
+The deployed application can be accessed `on this link <https://tableau-workbook-extractor.onrender.com/>`_. 
 
 Both deployment methods are automated through a **GitHub workflow** that is 
 triggered each time a new version tag is pushed to the repository. 
 This ensures that the latest updates are consistently available to users.
 
+For the Render Flask app deployment to work, the following steps 
+are required:
+
+1. **Create a web app on Render**: First, create the Flask web app on the 
+  Render platform. After creating the app, you will receive a Service ID.
+2. **Generate an API key**: On Render, generate an API key to allow programmatic 
+  access to your app.
+3. **Add these secrets to GitHub**: Add the Render Service ID and API key 
+  respectively as secrets ``RENDER_SERVICE_ID`` and ``RENDER_API_KEY`` to 
+  the GitHub repository for use in the workflow file.
+
 You can view the GitHub workflow file responsible for these deployments 
 `here <https://github.com/roemeren/tableau-workbook-extractor/blob/main/.github/workflows/release.yml>`_.
 
-These workflows are automated versions of some use cases explained in 
+These workflows are automated versions of some of the use cases explained in 
 the :doc:`usage` page, specifically the creation of an 
 executable file using PyInstaller (see :ref:`Create and Run the Executable File<create-run-exe>`) 
 and the creation of a Dockerized Flask app (see :ref:`Running the Dockerized Flask Application<run-docker>`).
@@ -52,8 +63,8 @@ please note the following requirements:
   ``.nojekyll`` file. This file prevents GitHub Pages from processing 
   the site with Jekyll.
   
-- In the GitHub repository settings (Actions permissions), ensure that the 
-  GITHUB_TOKEN has proper **read** and **write** privileges. 
+- In the GitHub repository settings (Actions permissions), ensure that 
+  ``GITHUB_TOKEN`` has proper **read** and **write** privileges. 
   Without these permissions, the documentation deployment will not work.
 
 The published site allows users to switch between tags and the latest version 

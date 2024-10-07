@@ -286,9 +286,30 @@ The deployed application can be accessed <a class="reference external" href="htt
 <p>Both deployment methods are automated through a <strong>GitHub workflow</strong> that is
 triggered each time a new version tag is pushed to the repository.
 This ensures that the latest updates are consistently available to users.</p>
+<p>For the Render Flask app deployment to work, the following steps
+are required:</p>
+<ol class="arabic simple">
+<li><p><strong>Create a web app on Render</strong>: First, create the Flask web app on the</p></li>
+</ol>
+<blockquote>
+<div><p>Render platform. After creating the app, you will receive a Service ID.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p><strong>Generate an API key</strong>: On Render, generate an API key to allow programmatic</p></li>
+</ol>
+<blockquote>
+<div><p>access to your app.</p>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p><strong>Add these secrets to GitHub</strong>: Add the Render Service ID and API key</p></li>
+</ol>
+<blockquote>
+<div><p>respectively as secrets <code class="docutils literal notranslate"><span class="pre">RENDER_SERVICE_ID</span></code> and <code class="docutils literal notranslate"><span class="pre">RENDER_API_KEY</span></code> to
+the GitHub repository for use in the workflow file.</p>
+</div></blockquote>
 <p>You can view the GitHub workflow file responsible for these deployments
 <a class="reference external" href="https://github.com/roemeren/tableau-workbook-extractor/blob/main/.github/workflows/release.yml">here</a>.</p>
-<p>These workflows are automated versions of some use cases explained in
+<p>These workflows are automated versions of some of the use cases explained in
 the <a class="reference internal" href="usage.html"><span class="doc">Usage</span></a> page, specifically the creation of an
 executable file using PyInstaller (see <a class="reference internal" href="usage.html#create-run-exe"><span class="std std-ref">Create and Run the Executable File</span></a>)
 and the creation of a Dockerized Flask app (see <a class="reference internal" href="usage.html#run-docker"><span class="std std-ref">Running the Dockerized Flask Application</span></a>).</p>
@@ -311,8 +332,8 @@ please note the following requirements:</p>
 <li><p>An orphan <code class="docutils literal notranslate"><span class="pre">gh-pages</span></code> branch must be available, containing an empty
 <code class="docutils literal notranslate"><span class="pre">.nojekyll</span></code> file. This file prevents GitHub Pages from processing
 the site with Jekyll.</p></li>
-<li><p>In the GitHub repository settings (Actions permissions), ensure that the
-GITHUB_TOKEN has proper <strong>read</strong> and <strong>write</strong> privileges.
+<li><p>In the GitHub repository settings (Actions permissions), ensure that
+<code class="docutils literal notranslate"><span class="pre">GITHUB_TOKEN</span></code> has proper <strong>read</strong> and <strong>write</strong> privileges.
 Without these permissions, the documentation deployment will not work.</p></li>
 </ul>
 <p>The published site allows users to switch between tags and the latest version
