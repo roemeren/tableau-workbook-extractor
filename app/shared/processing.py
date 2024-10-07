@@ -12,8 +12,8 @@ Key functionalities:
 
 Usage:
 - The `process_twb` function serves as the main entry point, 
-  taking a file path and optional parameters for output handling 
-  and execution context.
+taking a file path and optional parameters for output handling 
+and execution context.
 """
 import warnings
 import shutil
