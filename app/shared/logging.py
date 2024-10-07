@@ -14,7 +14,10 @@ def setup_logging(is_executable, uploadfolder):
     Set up conditional logging based on type
 
     Args:
-        is_executable: True if Flask app is run, False otherwise 
+        is_executable: True if Flask app is run, False otherwise
+        uploadfolder (str): The directory where log files should be saved. 
+                    If not provided, logs will be saved in a 'temp' 
+                    directory adjacent to this module.
     """
 
     # Set up logging for Flask app
