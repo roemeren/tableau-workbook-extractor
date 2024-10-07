@@ -36,7 +36,7 @@ exclude_patterns = []
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 # html_theme = 'alabaster' # default theme
-html_theme = 'furo' # reauires pip install furo
+html_theme = 'furo' # requires pip install furo
 html_static_path = ['_static']
 # versioned title not possible? (see https://github.com/sphinx-contrib/multiversion/issues/61)
 #  -> override default html_title (<project> <release> documentation) with fixed one
