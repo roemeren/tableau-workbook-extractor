@@ -25,12 +25,14 @@ For the Render Flask app deployment to work, the following steps
 are required:
 
 1. **Create a web app on Render**: First, create the Flask web app on the 
-  Render platform. After creating the app, you will receive a Service ID.
+Render platform. After creating the app, you will receive a Service ID.
+
 2. **Generate an API key**: On Render, generate an API key to allow programmatic 
-  access to your app.
+access to your app.
+
 3. **Add these secrets to GitHub**: Add the Render Service ID and API key 
-  respectively as secrets ``RENDER_SERVICE_ID`` and ``RENDER_API_KEY`` to 
-  the GitHub repository for use in the workflow file.
+respectively as secrets ``RENDER_SERVICE_ID`` and ``RENDER_API_KEY`` to 
+the GitHub repository for use in the workflow file.
 
 You can view the GitHub workflow file responsible for these deployments 
 `here <https://github.com/roemeren/tableau-workbook-extractor/blob/main/.github/workflows/release.yml>`_.
@@ -56,16 +58,10 @@ release. This setup ensures that users always have access to the most
 current information while still preserving the integrity of versioned 
 documentation.
 
-To ensure that the documentation is built and published correctly, 
-please note the following requirements:
-
-- An orphan ``gh-pages`` branch must be available, containing an empty 
-  ``.nojekyll`` file. This file prevents GitHub Pages from processing 
-  the site with Jekyll.
-  
-- In the GitHub repository settings (Actions permissions), ensure that 
-  ``GITHUB_TOKEN`` has proper **read** and **write** privileges. 
-  Without these permissions, the documentation deployment will not work.
+To ensure that the documentation is built and published correctly, an orphan 
+``gh-pages`` branch must be available, containing an empty 
+``.nojekyll`` file. This file prevents GitHub Pages from processing 
+the site with Jekyll.
 
 The published site allows users to switch between tags and the latest version 
 (called ``main``), ensuring that all documentation is automatically built and 

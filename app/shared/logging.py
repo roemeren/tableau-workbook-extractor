@@ -3,24 +3,6 @@ logging.py
 
 This module sets up logging for different environments based on whether
 the application is executed as a standalone program or as a Flask app. 
-
-It provides two main functions: 
-1. `setup_logging(is_executable, uploadfolder)`: Configures logging settings 
-    based on the execution context.
-2. `stepLog(message, *args, **kwargs)`: Logs messages with an incremental
-   step counter to track progress in the main script.
-
-Functions:
-- setup_logging(is_executable):
-    Set up conditional logging based on the execution type.
-
-- stepLog(message, *args, **kwargs):
-    Log a message that includes an incremental step counter in a main script.
-
-Dependencies:
-- os: For path manipulation.
-- sys: For standard I/O.
-- logging: For configuring and writing log messages.
 """
 from shared.common import os, sys
 import logging
