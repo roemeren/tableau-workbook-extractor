@@ -4,7 +4,7 @@ Changelog
 v1.1.6 (2024-10-07)
 -------------------
 - Modified build-docs workflow permissions
-- Fixed indendation errors in docstrings
+- Fixed indendation errors in module docstrings
 
 v1.1.5 (2024-10-07)
 -------------------
