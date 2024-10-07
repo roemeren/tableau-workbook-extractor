@@ -289,25 +289,13 @@ triggered each time a new version tag is pushed to the repository.
 This ensures that the latest updates are consistently available to users.</p>
 <p>For the Render Flask app deployment to work, the following steps
 are required:</p>
-<ol class="arabic simple">
-<li><p><strong>Create a web app on Render</strong>: First, create the Flask web app on the</p></li>
-</ol>
-<blockquote>
-<div><p>Render platform. After creating the app, you will receive a Service ID.</p>
-</div></blockquote>
-<ol class="arabic simple" start="2">
-<li><p><strong>Generate an API key</strong>: On Render, generate an API key to allow programmatic</p></li>
-</ol>
-<blockquote>
-<div><p>access to your app.</p>
-</div></blockquote>
-<ol class="arabic simple" start="3">
-<li><p><strong>Add these secrets to GitHub</strong>: Add the Render Service ID and API key</p></li>
-</ol>
-<blockquote>
-<div><p>respectively as secrets <code class="docutils literal notranslate"><span class="pre">RENDER_SERVICE_ID</span></code> and <code class="docutils literal notranslate"><span class="pre">RENDER_API_KEY</span></code> to
+<p>1. <strong>Create a web app on Render</strong>: First, create the Flask web app on the
+Render platform. After creating the app, you will receive a Service ID.</p>
+<p>2. <strong>Generate an API key</strong>: On Render, generate an API key to allow programmatic
+access to your app.</p>
+<p>3. <strong>Add these secrets to GitHub</strong>: Add the Render Service ID and API key
+respectively as secrets <code class="docutils literal notranslate"><span class="pre">RENDER_SERVICE_ID</span></code> and <code class="docutils literal notranslate"><span class="pre">RENDER_API_KEY</span></code> to
 the GitHub repository for use in the workflow file.</p>
-</div></blockquote>
 <p>You can view the GitHub workflow file responsible for these deployments
 <a class="reference external" href="https://github.com/roemeren/tableau-workbook-extractor/blob/main/.github/workflows/release.yml">here</a>.</p>
 <p>These workflows are automated versions of some of the use cases explained in
@@ -327,16 +315,10 @@ branch, allowing for documentation updates without the need to publish a new
 release. This setup ensures that users always have access to the most
 current information while still preserving the integrity of versioned
 documentation.</p>
-<p>To ensure that the documentation is built and published correctly,
-please note the following requirements:</p>
-<ul class="simple">
-<li><p>An orphan <code class="docutils literal notranslate"><span class="pre">gh-pages</span></code> branch must be available, containing an empty
+<p>To ensure that the documentation is built and published correctly, an orphan
+<code class="docutils literal notranslate"><span class="pre">gh-pages</span></code> branch must be available, containing an empty
 <code class="docutils literal notranslate"><span class="pre">.nojekyll</span></code> file. This file prevents GitHub Pages from processing
-the site with Jekyll.</p></li>
-<li><p>In the GitHub repository settings (Actions permissions), ensure that
-<code class="docutils literal notranslate"><span class="pre">GITHUB_TOKEN</span></code> has proper <strong>read</strong> and <strong>write</strong> privileges.
-Without these permissions, the documentation deployment will not work.</p></li>
-</ul>
+the site with Jekyll.</p>
 <p>The published site allows users to switch between tags and the latest version
 (called <code class="docutils literal notranslate"><span class="pre">main</span></code>), ensuring that all documentation is automatically built and
 readily available.</p>

@@ -277,15 +277,15 @@
 <p>This application allows users to upload CSV files, which are then processed
 in the background. The progress of the processing is tracked and can be
 queried via a dedicated endpoint.</p>
-<p>Key Features:
-- Tableau workbook upload via a web form.
-- Background processing of Tableau workbook using the <cite>process_twb</cite> function.
-- Progress tracking for ongoing processing tasks.
-- Progress information is accessible through the <cite>/progress</cite> endpoint.</p>
-<p>Configuration:
-- Uploads are saved in the <cite>static/uploads</cite> directory, which is created if it does not exist.</p>
-<p>Usage:
-Run this module to start the Flask development server.</p>
+<p>Key Features:</p>
+<p>The application allows users to upload Tableau workbooks via a web form and
+processes these workbooks in the background using the <cite>process_twb</cite> function.
+It also includes progress tracking for ongoing processing tasks, enabling
+users to access progress information through the <cite>/progress</cite> endpoint.</p>
+<p>Configuration:</p>
+<p>Uploads are saved in the <cite>static/uploads</cite> directory, which is created if it does not exist.</p>
+<p>Usage:</p>
+<p>Run this module to start the Flask development server.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="web.flask_app.index">
 <span class="sig-prename descclassname"><span class="pre">web.flask_app.</span></span><span class="sig-name descname"><span class="pre">index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#web.flask_app.index" title="Link to this definition">¶</a></dt>

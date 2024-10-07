@@ -275,38 +275,18 @@
 <p id="module-shared.logging">logging.py</p>
 <p>This module sets up logging for different environments based on whether
 the application is executed as a standalone program or as a Flask app.</p>
-<p>It provides two main functions:
-1. <cite>setup_logging(is_executable, uploadfolder)</cite>: Configures logging settings</p>
-<blockquote>
-<div><p>based on the execution context.</p>
-</div></blockquote>
-<ol class="arabic simple" start="2">
-<li><p><cite>stepLog(message, *args, **kwargs)</cite>: Logs messages with an incremental
-step counter to track progress in the main script.</p></li>
-</ol>
-<p>Functions:
-- setup_logging(is_executable):</p>
-<blockquote>
-<div><p>Set up conditional logging based on the execution type.</p>
-</div></blockquote>
-<ul class="simple">
-<li><dl class="simple">
-<dt>stepLog(message, <a href="#id1"><span class="problematic" id="id2">*</span></a>args, <a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs):</dt><dd><p>Log a message that includes an incremental step counter in a main script.</p>
-</dd>
-</dl>
-</li>
-</ul>
-<p>Dependencies:
-- os: For path manipulation.
-- sys: For standard I/O.
-- logging: For configuring and writing log messages.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="shared.logging.setup_logging">
 <span class="sig-prename descclassname"><span class="pre">shared.logging.</span></span><span class="sig-name descname"><span class="pre">setup_logging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_executable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uploadfolder</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.logging.setup_logging" title="Link to this definition">¶</a></dt>
 <dd><p>Set up conditional logging based on type</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>is_executable</strong> – True if Flask app is run, False otherwise</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>is_executable</strong> – True if Flask app is run, False otherwise</p></li>
+<li><p><strong>uploadfolder</strong> (<em>str</em>) – The directory where log files should be saved.
+If not provided, logs will be saved in a ‘temp’
+directory adjacent to this module.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
