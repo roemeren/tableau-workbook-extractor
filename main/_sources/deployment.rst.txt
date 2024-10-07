@@ -68,5 +68,5 @@ please note the following requirements:
   Without these permissions, the documentation deployment will not work.
 
 The published site allows users to switch between tags and the latest version 
-(called "main"), ensuring that all documentation is automatically built and 
+(called ``main``), ensuring that all documentation is automatically built and 
 readily available.
