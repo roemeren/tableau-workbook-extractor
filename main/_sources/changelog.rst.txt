@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.1.7 (2024-10-08)
+-------------------
+- Minor simplification in build-docs workflow
+- Use separate production environment for Render deployment
+
 v1.1.6 (2024-10-07)
 -------------------
 - Modified build-docs workflow permissions
