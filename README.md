@@ -30,9 +30,9 @@ straight to the insights.
 
 ## Usage
 
-You can use the tool in two ways.
+You can use the tool in two main ways.
 
-### Download and Run Windows Executable
+### Option 1: Download and Run Windows Executable
 
 Download the latest executable from the [GitHub Releases page](https://github.com/roemeren/tableau-workbook-extractor/releases/latest). 
 Note that Graphviz must be installed on your local machine to run the executable.
@@ -46,7 +46,7 @@ Workflow steps:
 ![Workflow Executable](docs/source/_static/images/22-usage-cli.png)
 *Workflow of the Tableau Workbook Extractor Windows executable.*
 
-### Access the Web App
+### Option 2: Access the Web App
 
 Access the deployed Flask application hosted on [Render](https://tableau-workbook-extractor.onrender.com/). Note that it may take a while to load.
 
@@ -60,6 +60,12 @@ workbook. The tool will extract field dependencies and generate the output.
 
 ![Workflow Web App](docs/source/_static/images/23-usage-flask.png)
 *Workflow of the Tableau Workbook Extractor web app.*
+
+### More Ways to Use the Tool
+
+For advanced users or developers, additional ways to run the tool locally or 
+customize the workflow are available. You can find detailed instructions in the 
+[documentation](https://roemeren.github.io/tableau-workbook-extractor/main/usage.html).
 
 ## Screenshots
 
