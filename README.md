@@ -32,7 +32,7 @@ straight to the insights.
 
 You can use the tool in two main ways.
 
-### Option 1: Download and Run Windows Executable
+### Option 1: Download and Run the Windows Executable
 
 Download the latest executable from the [GitHub Releases page](https://github.com/roemeren/tableau-workbook-extractor/releases/latest). 
 Note that Graphviz must be installed on your local machine to run the executable.
