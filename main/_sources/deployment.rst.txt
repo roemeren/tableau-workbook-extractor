@@ -34,6 +34,16 @@ access to your app.
 respectively as secrets ``RENDER_SERVICE_ID`` and ``RENDER_API_KEY`` to 
 the GitHub repository for use in the workflow file.
 
+4. **(Optional) Use a dedicated environment for production**: A separate 
+"production" environment has been created within the GitHub repository settings, 
+moving the Render API key and Service ID to this environment 
+(instead of storing them as repository secrets). This change enhances 
+security and manageability, especially when maintaining multiple environments, 
+such as development and staging. By isolating production credentials, 
+each environment can be configured independently and more securely, 
+facilitating better management and control during development and 
+testing phases..
+
 You can view the GitHub workflow file responsible for these deployments 
 `here <https://github.com/roemeren/tableau-workbook-extractor/blob/main/.github/workflows/release.yml>`_.
 

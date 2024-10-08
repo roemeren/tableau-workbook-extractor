@@ -297,6 +297,15 @@ access to your app.</p>
 <p>3. <strong>Add these secrets to GitHub</strong>: Add the Render Service ID and API key
 respectively as secrets <code class="docutils literal notranslate"><span class="pre">RENDER_SERVICE_ID</span></code> and <code class="docutils literal notranslate"><span class="pre">RENDER_API_KEY</span></code> to
 the GitHub repository for use in the workflow file.</p>
+<p>4. <strong>(Optional) Use a dedicated environment for production</strong>: A separate
+“production” environment has been created within the GitHub repository settings,
+moving the Render API key and Service ID to this environment
+(instead of storing them as repository secrets). This change enhances
+security and manageability, especially when maintaining multiple environments,
+such as development and staging. By isolating production credentials,
+each environment can be configured independently and more securely,
+facilitating better management and control during development and
+testing phases..</p>
 <p>You can view the GitHub workflow file responsible for these deployments
 <a class="reference external" href="https://github.com/roemeren/tableau-workbook-extractor/blob/main/.github/workflows/release.yml">here</a>.</p>
 <p>These workflows are automated versions of some of the use cases explained in
