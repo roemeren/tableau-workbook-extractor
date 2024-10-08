@@ -45,17 +45,18 @@ jobs:
   deploy-flask:
     runs-on: ubuntu-latest  # The job will run on the latest Ubuntu runner
 
+    environment: 
+      name: production  # Contains environment-specific config and secrets
+      url: https://tableau-workbook-extractor.onrender.com  # Link to the deployed app 
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4  # Check out the code from the repository
 
     - name: Deploy to Render
-      env:
-        RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}  # API key for Render, stored in GitHub Secrets
-        RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }} # Render app service ID
       run: |
         # Authenticate with Render API
         curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
-          -H "Authorization: Bearer $RENDER_API_KEY" \
+          -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
           -H "Content-Type: application/json" \
           -d '{"branch": "main"}'  # Trigger deployment for the main branch

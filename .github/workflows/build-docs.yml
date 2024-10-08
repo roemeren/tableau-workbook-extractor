@@ -33,8 +33,7 @@ jobs:
 
       - name: Build documentation using Sphinx
         run: |
-          cd docs
-          sphinx-multiversion source build/html
+          sphinx-multiversion docs/source docs/build/html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
