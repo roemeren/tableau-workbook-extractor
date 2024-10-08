@@ -1,0 +1,705 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Output Files" href="output_files.html" /><link rel="prev" title="Introduction" href="introduction.html" />
+
+    <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
+        <title>Usage - Tableau Workbook Extractor</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">Tableau Workbook Extractor</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">Tableau Workbook Extractor</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Usage</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Usage</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="output_files.html">Output Files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="example.html">Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="scripts_reference.html">Scripts Reference</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Scripts Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli_main.html">cli_main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="web.flask_app.html">web.flask_app</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shared.common.html">shared.common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shared.logging.html">shared.logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shared.processing.html">shared.processing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Roadmap</a></li>
+</ul>
+
+</div>
+
+  <div style="padding-left: 1em;">  <!-- Adjust the padding as needed -->
+    <h6 style="font-family: 'Segoe UI', sans-serif; color: #74777E; font-size: 0.75em; font-weight: bold;">VERSIONS</h6>
+    <ul>
+        <li><a href="../main/usage.html" style="font-family: 'Georgia', sans-serif;">main</a></li>
+        <li><a href="usage.html" style="font-family: 'Georgia', sans-serif;">v1.1.7</a></li>
+        <li><a href="../v1.1.6/usage.html" style="font-family: 'Georgia', sans-serif;">v1.1.6</a></li>
+        <li><a href="../v1.1.5/usage.html" style="font-family: 'Georgia', sans-serif;">v1.1.5</a></li>
+        <li><a href="../v1.1.4/usage.html" style="font-family: 'Georgia', sans-serif;">v1.1.4</a></li>
+        <li><a href="../v1.1.3/usage.html" style="font-family: 'Georgia', sans-serif;">v1.1.3</a></li>
+        <li><a href="../v1.1.2/usage.html" style="font-family: 'Georgia', sans-serif;">v1.1.2</a></li>
+        <li><a href="../v1.1.1/usage.html" style="font-family: 'Georgia', sans-serif;">v1.1.1</a></li>
+    </ul>
+  </div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/usage.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h1>
+<p>This tool can be run in a variety of ways, depending on your needs.</p>
+<p>The first two options—<a class="reference internal" href="#download-run-exe"><span class="std std-ref">downloading and running the prebuilt executable</span></a>,
+or <a class="reference internal" href="#run-render"><span class="std std-ref">using the deployed Flask app on Render</span></a>—are the easiest
+and most user-friendly choices, designed for general end users.</p>
+<p>The remaining four options—running the <a class="reference internal" href="#run-python"><span class="std std-ref">Python script</span></a> or
+<a class="reference internal" href="#run-flask"><span class="std std-ref">Flask app</span></a> locally,
+<a class="reference internal" href="#create-run-exe"><span class="std std-ref">creating a custom executable with PyInstaller</span></a>, or
+using a <a class="reference internal" href="#run-docker"><span class="std std-ref">dockerized version of the Flask app</span></a>—are
+more suited for developers or advanced users who need to test, debug,
+or customize the tool in a local environment.</p>
+<div class="toctree-wrapper compound">
+</div>
+<section id="option-1-downloading-the-executable-file">
+<h2>Option 1: Downloading the Executable File<a class="headerlink" href="#option-1-downloading-the-executable-file" title="Link to this heading">¶</a></h2>
+<section id="prerequisite-1-install-graphviz">
+<span id="download-run-exe"></span><h3>Prerequisite 1: Install Graphviz<a class="headerlink" href="#prerequisite-1-install-graphviz" title="Link to this heading">¶</a></h3>
+<p id="install-graphviz">To install Graphviz on Windows, download the latest installer from the
+official <a class="reference external" href="https://graphviz.org/download/">Graphviz download page</a> and run it,
+following the on-screen instructions.</p>
+<p>During installation, make sure that the  <strong>add Graphviz to the PATH variable</strong>
+is checked (this is unchecked by default). This way it can be accessed from
+the command line.</p>
+<a class="reference internal image-reference" href="_images/02-graphviz-installation.png"><img alt="Graphviz Installation PATH Variable" src="_images/02-graphviz-installation.png" style="width: 350px;" />
+</a>
+<p>To verify the installation, open a Command Prompt and type <code class="docutils literal notranslate"><span class="pre">dot</span> <span class="pre">-V</span></code>
+to check the version.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Some versions may be blocked</strong> by Microsoft Defender Smartscreen:</p>
+<a class="reference internal image-reference" href="_images/01-microsoft-defender.png"><img alt="Microsoft Defender Smartscreen" src="_images/01-microsoft-defender.png" style="width: 350px;" />
+</a>
+<p>This can be bypassed by <strong>right-clicking</strong> on the file and clicking on <strong>Properties</strong>.
+Next, the <strong>Unblock</strong> option should be checked after which the executable can be run.</p>
+<a class="reference internal image-reference" href="_images/08-unblock-exe.png"><img alt="Unblock Blocked Executable" src="_images/08-unblock-exe.png" style="width: 350px;" />
+</a>
+<p>An alternative method is to run the exe using the <strong>Command Prompt</strong>:
+change the directory to the file’s download location and then Run the
+executable with the command <code class="docutils literal notranslate"><span class="pre">my-executable</span></code> or  <code class="docutils literal notranslate"><span class="pre">my-executable.exe</span></code>.</p>
+</div>
+</section>
+<section id="step-1-download-and-run-the-executable-file">
+<h3>Step 1: Download and Run the Executable File<a class="headerlink" href="#step-1-download-and-run-the-executable-file" title="Link to this heading">¶</a></h3>
+<p>Download the executable version of the Python script <code class="docutils literal notranslate"><span class="pre">cli_main.py</span></code>
+from the <a class="reference external" href="https://github.com/roemeren/tableau-workbook-extractor/releases">GitHub Releases page</a>:</p>
+<a class="reference internal image-reference" href="_images/03-releases.png"><img alt="Download Release Executable" src="_images/03-releases.png" style="width: 350px;" />
+</a>
+<p>Double-clicking on the executable will launch the tool which consists of the
+following steps:</p>
+<p>First, the user needs to browse to a local Tableau workbook (<code class="docutils literal notranslate"><span class="pre">.twb</span></code> or <code class="docutils literal notranslate"><span class="pre">.twbx</span></code> file):</p>
+<a class="reference internal image-reference" href="_images/04-browse-file.png"><img alt="Browse Tableau Workbook easygui" src="_images/04-browse-file.png" style="width: 700px;" />
+</a>
+<p>Once the file is selected it will be processed, and progress can be tracked
+through printed log lines and/or progress bars.</p>
+<p>If everything runs as expected the user is prompted to <code class="docutils literal notranslate"><span class="pre">press</span> <span class="pre">Enter</span> <span class="pre">to</span> <span class="pre">exit</span></code> the program:</p>
+<a class="reference internal image-reference" href="_images/07-exit.png"><img alt="Command Prompt Exit Message Success" src="_images/07-exit.png" style="width: 700px;" />
+</a>
+<p>In case something goes the error is printed out after which the user is also
+prompted to press Enter to exit.</p>
+<a class="reference internal image-reference" href="_images/08-error.png"><img alt="Command Prompt Exit Message Error" src="_images/08-error.png" style="width: 700px;" />
+</a>
+<p>Upon completion, the output files will be stored in a newly created folder
+named <code class="docutils literal notranslate"><span class="pre">&lt;my</span> <span class="pre">workbook&gt;</span> <span class="pre">Files</span></code> within the same directory as the selected workbook:</p>
+<a class="reference internal image-reference" href="_images/05-output-file.png"><img alt="Local Output File Storage" src="_images/05-output-file.png" style="width: 500px;" />
+</a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The main <strong>advantage</strong> of the executable is that it is fast and
+straightforward, allowing users to run the tool without the need to
+clone the repository or set up a Python environment first.</p>
+<p>The main <strong>drawback</strong> is that Graphviz must be installed separately
+and configured correctly for the executable to function properly.</p>
+</div>
+</section>
+</section>
+<section id="option-2-accessing-the-application-on-render">
+<h2>Option 2: Accessing the Application on Render<a class="headerlink" href="#option-2-accessing-the-application-on-render" title="Link to this heading">¶</a></h2>
+<p id="run-render">A <a class="reference external" href="https://flask.palletsprojects.com/">Flask</a> app version of the tool has
+been dockerized and deployed as a
+web application using <a class="reference external" href="https://render.com/">Render</a>, accessible at
+<a class="reference external" href="https://tableau-workbook-extractor.onrender.com/">https://tableau-workbook-extractor.onrender.com/</a>.</p>
+<p>Running the Flask application is an alternative way to use the
+tool, offering similar functionality to running an executable:</p>
+<a class="reference internal image-reference" href="_images/09-flask-init.png"><img alt="Flask Output Download Button" src="_images/09-flask-init.png" style="width: 350px;" />
+</a>
+<ul class="simple">
+<li><p>First, the user needs to upload a local Tableau workbook
+(<code class="docutils literal notranslate"><span class="pre">.twb</span></code> or <code class="docutils literal notranslate"><span class="pre">.twbx</span></code> file) using a browse button in the Flask app</p></li>
+<li><p>Once the file is selected a button can be clicked to execute the processing.
+Progress is tracked and checked through the web interface and an output log
+file instead of printed logs on the command line.</p></li>
+<li><p>Upon completion, the generated output are zipped which can be downloaded
+by the user (see image below).</p></li>
+</ul>
+<a class="reference internal image-reference" href="_images/10-flask-done.png"><img alt="Flask Output Download Button" src="_images/10-flask-done.png" style="width: 350px;" />
+</a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The main <strong>advantage</strong> of this web app compared to running the executable is that
+it eliminates the need for users to install Graphviz separately, as Docker
+is used to package and deploy the entire application along with all its
+dependencies, including the Python version and required packages.</p>
+<p>The main <strong>drawback</strong> is that the app is hosted on the free tier of Render,
+which can result in longer loading times as the Docker container
+needs to be started up first.</p>
+</div>
+</section>
+<section id="option-3-executing-the-python-script-in-the-command-line">
+<h2>Option 3: Executing the Python Script in the Command Line<a class="headerlink" href="#option-3-executing-the-python-script-in-the-command-line" title="Link to this heading">¶</a></h2>
+<p id="run-python">This section explains how to run the Python script <code class="docutils literal notranslate"><span class="pre">cli_main.py</span></code> directly on
+your local machine, bypassing the need for the executable.
+Running the script locally provides more flexibility, allowing you to
+customize the code, use virtual environments, or troubleshoot in real-time.</p>
+<p>However, to ensure the tool runs properly, you will need to install both Git
+and Graphviz.</p>
+<section id="prerequisite-1-install-git">
+<h3>Prerequisite 1: Install Git<a class="headerlink" href="#prerequisite-1-install-git" title="Link to this heading">¶</a></h3>
+<p id="install-git">To install Git on Windows, download the installer
+from the official <a class="reference external" href="https://git-scm.com/">Git for Windows site</a>
+and follow the setup wizard to complete the installation.</p>
+<dl class="simple">
+<dt>After installation, open Git Bash and verify the installation by typing</dt><dd><p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">--version</span></code>, allowing you to clone repositories from GitHub and
+other sources.</p>
+</dd>
+</dl>
+</section>
+<section id="prerequisite-2-install-graphviz">
+<h3>Prerequisite 2: Install Graphviz<a class="headerlink" href="#prerequisite-2-install-graphviz" title="Link to this heading">¶</a></h3>
+<p>For instructions on how to install Graphviz, see <a class="reference internal" href="#install-graphviz"><span class="std std-ref">Install Graphviz</span></a></p>
+</section>
+<section id="step-1-clone-the-repository">
+<h3>Step 1: Clone the Repository<a class="headerlink" href="#step-1-clone-the-repository" title="Link to this heading">¶</a></h3>
+<p id="clone-repo">You need to clone a Git repository to create a local copy of the project on your computer.</p>
+<p>To do this, open a new PowerShell terminal and set the working directory
+to the directory where you’ll clone the <code class="docutils literal notranslate"><span class="pre">tableau-workbook-extractor</span></code>
+git repository. For example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>C:<span class="se">\U</span>sers<span class="se">\j</span>doe<span class="se">\D</span>ocuments<span class="se">\R</span>epositories<span class="se">\</span>
+</pre></div>
+</div>
+<p>The repository can then be cloned (using HTTPS) by running this command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/roemeren/tableau-workbook-extractor.git
+</pre></div>
+</div>
+</section>
+<section id="step-2-create-an-environment">
+<h3>Step 2: Create an Environment<a class="headerlink" href="#step-2-create-an-environment" title="Link to this heading">¶</a></h3>
+<p id="create-env">Creating a virtual environment ensures that the project dependencies are
+isolated from other projects on your system, preventing conflicts.</p>
+<p>Installing dependencies from a <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file guarantees that
+you have all the necessary packages and their correct versions needed
+for the project to run properly.</p>
+<p>To do this, set the working directory to the cloned repository from the
+previous step, for example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>tableau-workbook-extractor
+</pre></div>
+</div>
+<p>Next, run the following commands to create and activate the virtual environment:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+<span class="gp">$ </span>.venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate.bat
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If using PowerShell, the commands are slightly different. It may also be
+needed to temporarily override PowerShell’s Execution Policy to allow
+scripts to run in the current session:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+<span class="gp">$ </span>Set-ExecutionPolicy<span class="w"> </span>-Scope<span class="w"> </span>Process<span class="w"> </span>-ExecutionPolicy<span class="w"> </span>Bypass
+<span class="gp">$ </span>.venv<span class="se">\S</span>cripts<span class="se">\A</span>ctivate.ps1
+</pre></div>
+</div>
+</div>
+<p>Finally, the dependencies from the provided <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file (located
+inside the <code class="docutils literal notranslate"><span class="pre">app</span></code> subfolder) can be installed using <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>app/requirements.txt
+</pre></div>
+</div>
+</section>
+<section id="step-3-execute-the-python-script">
+<h3>Step 3: Execute the Python Script<a class="headerlink" href="#step-3-execute-the-python-script" title="Link to this heading">¶</a></h3>
+<p>To run the application, set the working directory to the repo’s <code class="docutils literal notranslate"><span class="pre">app</span></code>
+subfolder. For example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>C:<span class="se">\U</span>sers<span class="se">\j</span>doe<span class="se">\D</span>ocuments<span class="se">\R</span>epositories<span class="se">\t</span>ableau-workbook-extractor<span class="se">\a</span>pp
+</pre></div>
+</div>
+<p>In case you are already inside the repo’s root directory it suffice to run
+the command <code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">app</span></code>.</p>
+<p>Inside this folder the main script <code class="docutils literal notranslate"><span class="pre">cli_main.py</span></code> will prompt the user
+to browse to a local <code class="docutils literal notranslate"><span class="pre">.twb</span></code> or <code class="docutils literal notranslate"><span class="pre">.twbx</span></code> file, after which the processing
+progress is displayed through printed log lines and progress bars for certain steps.</p>
+<p>To execute the script:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>cli_main.py
+</pre></div>
+</div>
+</section>
+</section>
+<section id="option-4-create-and-run-the-executable-file">
+<h2>Option 4: Create and Run the Executable File<a class="headerlink" href="#option-4-create-and-run-the-executable-file" title="Link to this heading">¶</a></h2>
+<p id="create-run-exe">Creating an executable with <code class="docutils literal notranslate"><span class="pre">PyInstaller</span></code> allows you to package your Python
+tool into a standalone application that can be run without requiring a
+Python environment or external dependencies on the user’s machine.</p>
+<p>This option is useful if you want to customize the build, add specific
+configurations, or distribute the tool internally without relying on
+downloading pre-built releases from GitHub.</p>
+<p>The general workflow involves first setting up a Python environment with
+all the necessary dependencies, including <code class="docutils literal notranslate"><span class="pre">PyInstaller</span></code> (already included in
+the repo’s <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file). Next, you run PyInstaller to
+package the tool into an executable, which can be run, shared or distributed
+without requiring a separate Python installation.</p>
+<section id="prerequisites-install-git-and-graphviz">
+<h3>Prerequisites: Install Git and Graphviz<a class="headerlink" href="#prerequisites-install-git-and-graphviz" title="Link to this heading">¶</a></h3>
+<p>For instructions on how to install Git and Graphviz, see resp.
+<a class="reference internal" href="#install-git"><span class="std std-ref">Install Git</span></a> and <a class="reference internal" href="#install-graphviz"><span class="std std-ref">Install Graphviz</span></a>.</p>
+</section>
+<section id="step-1-clone-the-repository-and-create-an-environment">
+<h3>Step 1: Clone the Repository and Create an Environment<a class="headerlink" href="#step-1-clone-the-repository-and-create-an-environment" title="Link to this heading">¶</a></h3>
+<p>For instructions on how to clone the repository and create the Python
+environment, see resp.
+<a class="reference internal" href="#clone-repo"><span class="std std-ref">Clone the Repo</span></a> and <a class="reference internal" href="#create-env"><span class="std std-ref">Create an Environment</span></a>.</p>
+</section>
+<section id="step-2-create-the-executable-file">
+<h3>Step 2: Create the Executable File<a class="headerlink" href="#step-2-create-the-executable-file" title="Link to this heading">¶</a></h3>
+<p>To create the executable file, set the working directory to the repo’s root
+folder. For example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>C:<span class="se">\U</span>sers<span class="se">\j</span>doe<span class="se">\D</span>ocuments<span class="se">\R</span>epositories<span class="se">\t</span>ableau-workbook-extractor
+</pre></div>
+</div>
+<p>The following command will create the executable based on the application’s
+<code class="docutils literal notranslate"><span class="pre">cli_main.py</span></code> script inside the repo’s subfolder <code class="docutils literal notranslate"><span class="pre">dist</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pyinstaller<span class="w"> </span>--onefile<span class="w"> </span>app/cli_main.py
+</pre></div>
+</div>
+<p>The resulting <code class="docutils literal notranslate"><span class="pre">dist\cli_main.exe</span></code> executable can be moved if needed and run by
+double-clicking it, allowing you to browse to a file and view progress and
+logs directly in the command line window.</p>
+</section>
+</section>
+<section id="option-5-running-the-flask-application">
+<h2>Option 5: Running the Flask Application<a class="headerlink" href="#option-5-running-the-flask-application" title="Link to this heading">¶</a></h2>
+<p id="run-flask">In this section, you’ll find instructions on how to run the Flask app version
+of the tool locally on your machine.</p>
+<p>This provides the same functionality as the web version, allowing you to
+upload Tableau workbooks, process them, and download the results—without
+relying on an external deployment like Render.</p>
+<section id="id1">
+<h3>Prerequisites: Install Git and Graphviz<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<p>For instructions on how to install Git Graphviz, see resp.
+<a class="reference internal" href="#install-git"><span class="std std-ref">Install Git</span></a> and <a class="reference internal" href="#install-graphviz"><span class="std std-ref">Install Graphviz</span></a>.</p>
+</section>
+<section id="id2">
+<h3>Step 1: Clone the Repository and Create an Environment<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<p>See resp. <a class="reference internal" href="#clone-repo"><span class="std std-ref">Clone the Repository</span></a> and
+<a class="reference internal" href="#create-env"><span class="std std-ref">Create an environment</span></a>.</p>
+</section>
+<section id="step-2-run-the-app">
+<h3>Step 2: Run the App<a class="headerlink" href="#step-2-run-the-app" title="Link to this heading">¶</a></h3>
+<p id="flask-local">To run the application, set the working directory to the repo’s <code class="docutils literal notranslate"><span class="pre">app</span></code>
+subfolder. For example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>C:<span class="se">\U</span>sers<span class="se">\j</span>doe<span class="se">\D</span>ocuments<span class="se">\R</span>epositories<span class="se">\t</span>ableau-workbook-extractor<span class="se">\a</span>pp
+</pre></div>
+</div>
+<p>In case you are already inside the repo’s root directory it suffice to run
+the command <code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">app</span></code>.</p>
+<p>Inside this folder the main script <code class="docutils literal notranslate"><span class="pre">web\flask_app.py</span></code> will start the
+application that will typically be available on <code class="docutils literal notranslate"><span class="pre">localhost:5000</span></code> (to be
+verified in the Command Prompt, check for example for
+<code class="docutils literal notranslate"><span class="pre">Running</span> <span class="pre">on</span> <span class="pre">http://127.0.0.1:5000</span></code>).</p>
+<p>To execute the script (run as a module to ):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>-m<span class="w"> </span>web.flask_app
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To maintain proper relative imports, like <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">shared.common</span></code>
+(referring to the <code class="docutils literal notranslate"><span class="pre">shared\common.py</span></code> script inside the <code class="docutils literal notranslate"><span class="pre">app</span></code> folder),
+the Flask app needs to be run as a module from the root directory as
+shown in the code block above, not as a script</p>
+</div>
+</section>
+</section>
+<section id="option-6-running-the-dockerized-flask-application">
+<h2>Option 6: Running the Dockerized Flask Application<a class="headerlink" href="#option-6-running-the-dockerized-flask-application" title="Link to this heading">¶</a></h2>
+<p id="run-docker">This section explains how to run a dockerized version of the Flask app locally,
+providing an alternative to using the deployed version on Render.
+Running the tool locally in Docker ensures that all dependencies,
+including Graphviz, are preconfigured and removes the wait time associated
+with the free-tier deployment on Render.</p>
+<p>To proceed, you’ll need to install Docker Desktop locally. Docker offers free
+plans, but check their website for the most up-to-date details on pricing and
+availability.</p>
+<section id="prerequisite-install-docker">
+<h3>Prerequisite: Install Docker<a class="headerlink" href="#prerequisite-install-docker" title="Link to this heading">¶</a></h3>
+<p>To install Docker on Windows, visit the official
+<a class="reference external" href="https://www.docker.com/products/docker-desktop/">Docker Desktop for Windows</a>
+page and follow the instructions for downloading and setting it up.</p>
+</section>
+<section id="step-1-build-the-image">
+<h3>Step 1: Build the Image<a class="headerlink" href="#step-1-build-the-image" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">app</span></code> folder of the repository has a file <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code> that contains
+the instructions on how to build the image, including all of its
+dependencies and exposed ports (in this case 5000).</p>
+<p>Set the working directory to the repo’s <code class="docutils literal notranslate"><span class="pre">app</span></code> subfolder. For example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>C:<span class="se">\U</span>sers<span class="se">\j</span>doe<span class="se">\D</span>ocuments<span class="se">\R</span>epositories<span class="se">\t</span>ableau-workbook-extractor<span class="se">\a</span>pp
+</pre></div>
+</div>
+<p>In case you are already inside the repo’s root directory it suffice to run
+the command <code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">app</span></code>.</p>
+<p>Next, build the Docker image (named <code class="docutils literal notranslate"><span class="pre">tableau-workbook-extractor</span></code>)
+by running the following command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>tableau-workbook-extractor<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
+<section id="step-2-run-the-container">
+<h3>Step 2: Run the Container<a class="headerlink" href="#step-2-run-the-container" title="Link to this heading">¶</a></h3>
+<p>Now that the image has been built, you can run an instance of it as a container.</p>
+<p>This can be done by running this command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>docker<span class="w"> </span>run<span class="w"> </span>-p<span class="w"> </span><span class="m">5000</span>:5000<span class="w"> </span>tableau-workbook-extractor
+</pre></div>
+</div>
+<p>Similar to <a class="reference internal" href="#flask-local"><span class="std std-ref">running the Flask app locally</span></a>,
+the application will be accessible in your browser at <code class="docutils literal notranslate"><span class="pre">http://localhost:5000</span></code>.</p>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="output_files.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Output Files</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="introduction.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Introduction</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Robert Emerencia
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Usage</a><ul>
+<li><a class="reference internal" href="#option-1-downloading-the-executable-file">Option 1: Downloading the Executable File</a><ul>
+<li><a class="reference internal" href="#prerequisite-1-install-graphviz">Prerequisite 1: Install Graphviz</a></li>
+<li><a class="reference internal" href="#step-1-download-and-run-the-executable-file">Step 1: Download and Run the Executable File</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#option-2-accessing-the-application-on-render">Option 2: Accessing the Application on Render</a></li>
+<li><a class="reference internal" href="#option-3-executing-the-python-script-in-the-command-line">Option 3: Executing the Python Script in the Command Line</a><ul>
+<li><a class="reference internal" href="#prerequisite-1-install-git">Prerequisite 1: Install Git</a></li>
+<li><a class="reference internal" href="#prerequisite-2-install-graphviz">Prerequisite 2: Install Graphviz</a></li>
+<li><a class="reference internal" href="#step-1-clone-the-repository">Step 1: Clone the Repository</a></li>
+<li><a class="reference internal" href="#step-2-create-an-environment">Step 2: Create an Environment</a></li>
+<li><a class="reference internal" href="#step-3-execute-the-python-script">Step 3: Execute the Python Script</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#option-4-create-and-run-the-executable-file">Option 4: Create and Run the Executable File</a><ul>
+<li><a class="reference internal" href="#prerequisites-install-git-and-graphviz">Prerequisites: Install Git and Graphviz</a></li>
+<li><a class="reference internal" href="#step-1-clone-the-repository-and-create-an-environment">Step 1: Clone the Repository and Create an Environment</a></li>
+<li><a class="reference internal" href="#step-2-create-the-executable-file">Step 2: Create the Executable File</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#option-5-running-the-flask-application">Option 5: Running the Flask Application</a><ul>
+<li><a class="reference internal" href="#id1">Prerequisites: Install Git and Graphviz</a></li>
+<li><a class="reference internal" href="#id2">Step 1: Clone the Repository and Create an Environment</a></li>
+<li><a class="reference internal" href="#step-2-run-the-app">Step 2: Run the App</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#option-6-running-the-dockerized-flask-application">Option 6: Running the Dockerized Flask Application</a><ul>
+<li><a class="reference internal" href="#prerequisite-install-docker">Prerequisite: Install Docker</a></li>
+<li><a class="reference internal" href="#step-1-build-the-image">Step 1: Build the Image</a></li>
+<li><a class="reference internal" href="#step-2-run-the-container">Step 2: Run the Container</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=c6e86fd7"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    </body>
+</html>
