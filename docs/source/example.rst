@@ -17,7 +17,7 @@ will be used to extract fields and their dependencies from the
 Instructions
 ------------
 
-Step 1: Download the Exmaple Tableau Workbook
+Step 1: Download the Example Tableau Workbook
 """"""""""""""""""""""""""""""""""""""""""""""
 
 Download a local copy of the 

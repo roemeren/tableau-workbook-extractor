@@ -22,7 +22,7 @@ New Features
 - **Provide Linux and macOS executables**: Develop and distribute executables 
   for the tool compatible with Linux and macOS, expanding accessibility 
   for users on different operating systems.
-- **Flask App: Improve Error Handling**: Enhance the user experience by 
+- **Improve Flask app error handling**: Enhance the user experience by 
   implementing robust error handling in the Flask app. Users should receive 
   clear feedback when selecting incorrect files or when processing errors 
   occur, ensuring a smoother interaction with the application.
@@ -37,7 +37,7 @@ The lack of new releases may be related to emerging alternatives, such as the
 official Tableau Metadata API and other third-party solutions for managing 
 Tableau workbooks.
 
-- **Incomplete Processing of Tableau Workbooks**: Some Tableau workbooks 
+- **Incomplete processing of Tableau workbooks**: Some Tableau workbooks 
   generate errors during analysis, and further investigation is needed to 
   identify the causes and implement necessary bug fixes.
 - **Not all dependencies are captured**: Some fields may be used solely to 
@@ -66,7 +66,7 @@ Enhancements
 - **Improve the quality and readability of output graphs**: Enhance the 
   aesthetics of the output network graphs by refining colors, fonts, and 
   node arrangements in the PNG/SVG images for better visual appeal and clarity.
-- **Prettify the Flask App**: Improve the user interface and overall design of 
+- **Prettify the Flask app**: Improve the user interface and overall design of 
   the Flask application to enhance user experience and make it visually appealing.
 - **Refactor the main processing routine**: The ``process_twb`` function in the 
   ``shared\processing.py`` script is quite large. It could be divided into smaller, 
