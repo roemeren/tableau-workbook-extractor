@@ -1,5 +1,12 @@
 # Tableau Workbook Extractor
 
+![Docs Build Status](https://github.com/roemeren/tableau-workbook-extractor/workflows/Build%20Documentation/badge.svg)
+![App Deployment Status](https://github.com/roemeren/tableau-workbook-extractor/workflows/Deploy%20Application/badge.svg)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/roemeren/tableau-workbook-extractor)
+![Last Commit](https://img.shields.io/github/last-commit/roemeren/tableau-workbook-extractor)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+
+
 ## Quickstart
 
 To get started with the Tableau Workbook Extractor, you can:
