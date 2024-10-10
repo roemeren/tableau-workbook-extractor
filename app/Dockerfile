@@ -16,5 +16,5 @@ RUN apt-get update && apt-get install -y graphviz
 # Expose the port the app runs on
 EXPOSE 5000
 
-# Run app.py when the container launches (use gunicorn for non-dev environment)
-CMD ["python", "-m", "web.flask_app"]
+# Run flask_app.py when the container launches
+CMD ["gunicorn", "web.flask_app:app", "--bind", "0.0.0.0:5000"]

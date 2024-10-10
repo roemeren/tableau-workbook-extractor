@@ -105,4 +105,5 @@ def run_processing(filepath):
                 is_executable=False)
 
 if __name__ == "__main__":
+    # Debug mode for development, 0.0.0.0 to allow external access (Docker)
     app.run(debug=True, host='0.0.0.0')
