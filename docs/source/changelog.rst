@@ -1,6 +1,14 @@
 Changelog
 =========
 
+v1.1.8 (2024-10-10)
+-------------------
+Switch from Flask development server to Gunicorn
+
+- Updated Dockerfile to use Gunicorn as the web server.
+- Changed the ``CMD`` instruction inside Dockerfile to run Gunicorn and 
+  bind to ``0.0.0.0:5000``.
+
 v1.1.7 (2024-10-08)
 -------------------
 - Minor simplification in build-docs workflow
