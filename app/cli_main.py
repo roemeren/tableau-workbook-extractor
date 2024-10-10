@@ -14,7 +14,7 @@ is prompted to press Enter to exit the program.
 If no file is selected, a warning is logged, and the user is also prompted to 
 press Enter to exit the program.
 """
-#from shared.common import logging
+
 from shared.logging import setup_logging, stepLog, logger
 from shared.processing import process_twb
 import easygui
