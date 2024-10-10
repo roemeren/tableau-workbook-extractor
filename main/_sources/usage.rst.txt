@@ -425,7 +425,7 @@ In case you are already inside the repo's root directory it suffice to run
 the command ``cd app``.
 
 Next, build the Docker image (named ``tableau-workbook-extractor``) 
-by running the following command:
+by running the following command (make sure that Docker Desktop is running):
 
 .. code-block:: console
 
