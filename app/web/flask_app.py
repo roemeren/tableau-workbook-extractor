@@ -37,6 +37,9 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# Global flag controlling PNG generation
+generate_png = False  # default state
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     """
@@ -49,6 +52,8 @@ def index():
     Returns:
         str: The rendered HTML of the index page.
     """
+    global generate_png
+
     if request.method == "POST":
         if 'file' not in request.files:
             return "No file part"
@@ -57,6 +62,9 @@ def index():
         
         if file.filename == '':
             return "No selected file"
+        
+        # Read checkbox state
+        generate_png = bool(request.form.get("generate_png"))
 
         if file and file.filename.endswith(('.twb', '.twbx')):
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
@@ -68,10 +76,12 @@ def index():
 
             # Start a new thread to run the processing function in the background
             # This allows the Flask app to remain responsive
-            thread = threading.Thread(target=run_processing, args=(filepath,))
+            thread = threading.Thread(
+                target=run_processing, args=(filepath, generate_png)
+            )
             thread.start()
 
-    return render_template("index.html")
+    return render_template("index.html", generate_png=generate_png)
 
 @app.route("/progress", methods=["GET"])
 def progress():
@@ -86,7 +96,7 @@ def progress():
     """
     return jsonify(progress=progress_data['progress'], filename=progress_data['filename'])
 
-def run_processing(filepath):
+def run_processing(filepath, generate_png):
     """
     Processes a Tableau workbook file in the background.
 
@@ -97,13 +107,18 @@ def run_processing(filepath):
 
     Args:
         filepath (str): The path to the Tableau workbook file to be processed.
+        generate_png (bool): Flag indicating whether or not PNG files are generated
 
     Returns:
         None
     """
-    process_twb(filepath=filepath, uploadfolder=app.config['UPLOAD_FOLDER'], 
-                is_executable=False)
+    process_twb(
+        filepath=filepath, 
+        uploadfolder=app.config['UPLOAD_FOLDER'], 
+        is_executable=False,
+        fPNG=generate_png
+    )
 
 if __name__ == "__main__":
     # Debug mode for development, 0.0.0.0 to allow external access (Docker)
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=False, host='0.0.0.0')
