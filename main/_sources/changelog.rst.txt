@@ -1,6 +1,19 @@
 Changelog
 =========
 
+v1.2.1 (2025-10-15)
+-------------------
+Add PNG generation toggle and optimize dependency resolution
+
+- Optional PNG Generation: added a checkbox in the Flask app to 
+  let users choose whether to generate PNG files alongside SVGs. By default, 
+  only SVGs are created for faster processing.
+- Memoization for Dependency Resolution: replaced the previous naive recursive 
+  logic in both forward and backward 
+  dependency functions with a memoized implementation. This significantly 
+  reduces redundant calculations and improves performance (~3× faster).
+
+
 v1.1.8 (2024-10-10)
 -------------------
 Switch from Flask development server to Gunicorn
