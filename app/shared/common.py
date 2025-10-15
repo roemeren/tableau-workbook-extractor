@@ -592,6 +592,33 @@ def fieldIDMapping(x, s, d):
         res = [json.loads(idx.replace("'", '"')) for idx in [res]][0]
     return res
 
+def deduplicate_graph(G: pydot.Dot) -> pydot.Dot:
+    """Return a new graph with duplicate nodes and edges removed."""
+    clean = pydot.Dot(graph_type=G.get_type())
+
+    # Preserve graph-level attributes (optional)
+    for k, v in G.get_attributes().items():
+        clean.set(k, v)
+
+    # Unique nodes by name
+    seen_nodes = set()
+    for node in G.get_nodes():
+        name = node.get_name()
+        if name not in seen_nodes:
+            seen_nodes.add(name)
+            clean.add_node(node)
+
+    # Unique edges by (src, dst)
+    seen_edges = set()
+    for edge in G.get_edges():
+        src = edge.get_source()
+        dst = edge.get_destination()
+        if (src, dst) not in seen_edges:
+            seen_edges.add((src, dst))
+            clean.add_edge(edge)
+
+    return clean
+
 def visualizeFieldDependencies(df, sf, l, g, din, svg = False):
     """
     Creates output PNG/SVG files containing all dependencies for a 
@@ -675,7 +702,14 @@ def visualizeFieldDependencies(df, sf, l, g, din, svg = False):
         "workbook name and/or field/parameter names. \n" + 
         "Output graph path: {4}")
             .format(s, f, len(outFile), MAXPATHSIZE, outFile))
+    
+    # deduplicate before saving
+    G = deduplicate_graph(G)
+
+    # save svg and raw dot
     G.write_svg(outFile, encoding = "utf-8")
+    outFile = os.path.join(dout, f"{fout}.dot")
+    G.write_raw(outFile, encoding="utf-8")
     if svg:
         outFile = os.path.join(dout, f"{fout}.png")
         G.write_png(outFile, encoding = "utf-8")
@@ -788,7 +822,13 @@ def visualizeSheetDependencies(df, sh, g, din, png=False):
         "workbook name and/or field/parameter names. \n" + 
         "Output graph path: {3}")
             .format(l, len(outFile), MAXPATHSIZE, outFile))
+    
+    # deduplicate before saving
+    G = deduplicate_graph(G)
+
     G.write_svg(outFile, encoding = "utf-8")
+    outFile = os.path.join(din, f"{fout}.dot")
+    G.write_raw(outFile, encoding="utf-8")
     if png:
         outFile = os.path.join(din, f"{fout}.png")
         G.write_png(outFile, encoding = "utf-8")
