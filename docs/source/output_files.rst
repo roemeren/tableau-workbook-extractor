@@ -91,9 +91,12 @@ In general, the output images can be read as follows:
   * Backward dependencies are numbered -1 (for direct backward dependencies), -2, etc.
   * Forward dependencies are numbered 1 (for direct forward dependencies), 2, etc.
 
-Field dependency graphs are exported as PNG and SVG files. The advantage of the 
-SVG files compared to the PNG files is the ability to show the field calculations 
+Field dependency graphs are exported as PNG and SVG files. The advantage of the
+SVG files compared to the PNG files is the ability to show the field calculations
 in the node tooltips, which is not possible for the PNG file.
+
+⚙️ Note: PNG file generation is optional and can be enabled or disabled
+from the Flask web application before starting the processing.
 
 Field Metadata
 ---------------
