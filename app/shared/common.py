@@ -26,7 +26,6 @@ from functools import lru_cache
 # Script parameters
 fDepFields = True # create field dependency graphs?
 fDepSheets = True # create sheet dependency graphs?
-fPNG = True # create PNG versions of dependency graphs next to SVG?
 
 # Keep track of progress and filename
 progress_data = {'progress': 0, 'filename': None}

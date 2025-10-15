@@ -44,7 +44,7 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
-def process_twb(filepath, uploadfolder=None, is_executable=True):
+def process_twb(filepath, uploadfolder=None, is_executable=True, fPNG=True):
     """
     Process a Tableau Workbook (TWB/TWBX) file to extract and analyze data sources,
     fields, and their dependencies.
@@ -60,6 +60,8 @@ def process_twb(filepath, uploadfolder=None, is_executable=True):
             if not running as an executable. Defaults to None.
         is_executable (bool, optional): Flag indicating if the function is being run
             as an executable script. Defaults to True.
+        fPNG (bool, optional): Flag indicating if the function also has to 
+            generate PNG images next to SVG images
 
     Returns:
         None: This function does not return a value but generates output files.
