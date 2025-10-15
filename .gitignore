@@ -8,6 +8,7 @@ dist
 data
 *.spec
 data/
-app/web/static
+app/web/static/
+app/assets/
 *.pyc
 docs/source/generated/
