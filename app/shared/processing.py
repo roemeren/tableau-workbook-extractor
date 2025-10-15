@@ -371,7 +371,7 @@ def process_twb(filepath, uploadfolder=None, is_executable=True):
             nDependency = row.n_backward_dependencies + row.n_forward_dependencies
             if nDependency > 0:
                 visualizeFieldDependencies(df_original, row.source_field_repl_id, 
-                    row.source_field_label, gMaster, inpPath, fSVG)
+                    row.source_field_label, gMaster, inpPath, fPNG)
 
             if not is_executable:
                 current_progress += 1
@@ -389,7 +389,7 @@ def process_twb(filepath, uploadfolder=None, is_executable=True):
 
         # Create dependency graphs per sheet
         for sh in iterator:
-            visualizeSheetDependencies(df2_original, sh, gMaster, inpPath, fSVG)
+            visualizeSheetDependencies(df2_original, sh, gMaster, inpPath, fPNG)
             if not is_executable:
                 current_progress += 1
                 progress_data['progress'] = int((current_progress / nTot) * 100)

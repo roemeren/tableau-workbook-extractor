@@ -26,7 +26,7 @@ from functools import lru_cache
 # Script parameters
 fDepFields = True # create field dependency graphs?
 fDepSheets = True # create sheet dependency graphs?
-fSVG = True # create SVG versions of dependency graphs next to PNG?
+fPNG = True # create PNG versions of dependency graphs next to SVG?
 
 # Keep track of progress and filename
 progress_data = {'progress': 0, 'filename': None}
@@ -606,13 +606,13 @@ def visualizeFieldDependencies(df, sf, l, g, din, svg = False):
         g (Graph): Master graph containing all source field and field node 
         objects.
         din (str): Full path to root directory where graphs will be saved.
-        svg (bool, optional): Indicator (True/False) whether or not to 
-        generate SVG as well. Defaults to False.
+        png (bool, optional): Indicator (True/False) whether or not to 
+        generate PNG as well. Defaults to False.
 
     Returns:
-        None: PNG file is saved in 
+        None: SVG file is saved in 
         "<workbook path> Files\Graphs\<source field name>.png" and 
-        additional SVG file (with extra attributes) if svg is True.
+        additional PNG file (with extra attributes) if png is True.
     """
     s = l.split(".")[0]
     f = l.split(".")[1]
@@ -668,7 +668,7 @@ def visualizeFieldDependencies(df, sf, l, g, din, svg = False):
     
     # write output files with forced UTF-8 encoding to avoid errors
     # see https://github.com/pydot/pydot/issues/142
-    outFile = os.path.join(dout, f"{fout}.png")
+    outFile = os.path.join(dout, f"{fout}.svg")
     if len(outFile) > MAXPATHSIZE:
         raise Exception(("Output graph path size for source {0} and " + 
         "field {1} ({2}) exceeds the path size " +
@@ -676,10 +676,10 @@ def visualizeFieldDependencies(df, sf, l, g, din, svg = False):
         "workbook name and/or field/parameter names. \n" + 
         "Output graph path: {4}")
             .format(s, f, len(outFile), MAXPATHSIZE, outFile))
-    G.write_png(outFile, encoding = "utf-8")
+    G.write_svg(outFile, encoding = "utf-8")
     if svg:
-        outFile = os.path.join(dout, f"{fout}.svg")
-        G.write_svg(outFile, encoding = "utf-8")
+        outFile = os.path.join(dout, f"{fout}.png")
+        G.write_png(outFile, encoding = "utf-8")
 
 def appendFieldsToDicts(l, k, v):
     """
@@ -699,7 +699,7 @@ def appendFieldsToDicts(l, k, v):
             for i in range(len(k)): d[k[i]] = v[i]
     return l
 
-def visualizeSheetDependencies(df, sh, g, din, svg = False):
+def visualizeSheetDependencies(df, sh, g, din, png=False):
     """
     Create output PNG/SVG files containing all dependencies for a given 
     source field.
@@ -711,13 +711,13 @@ def visualizeSheetDependencies(df, sh, g, din, svg = False):
         g (Graph): Master graph containing all source field and field node 
         objects.
         din (str): Full path to the root directory where graphs will be saved.
-        svg (bool, optional): Indicator (True/False) to generate SVG as well. 
+        png (bool, optional): Indicator (True/False) to generate PNG as well. 
         Defaults to False.
 
     Returns:
         None: PNG file is saved in 
-        "<workbook path> Files\Graphs\Sheets\<sheet name>.png" and an 
-        additional SVG file (with extra attributes) if svg is True.
+        "<workbook path> Files\Graphs\Sheets\<sheet name>.svg" and an 
+        additional PNG file (with extra attributes) if png is True.
     """
     # --- get field -> sheet edges (only level == "0") ---
     depSheet = df[
@@ -762,7 +762,7 @@ def visualizeSheetDependencies(df, sh, g, din, svg = False):
     G.add_node(root)
     
     # add (parent -> child) edges to graph
-    for index, row in depSheet.iterrows():
+    for _, row in depSheet.iterrows():
         parent = '"' + row.dependency_from + '"'
         child = '"' + row.dependency_to + '"'
         nodeParent = MGCopy.get_node(parent)[0]
@@ -781,7 +781,7 @@ def visualizeSheetDependencies(df, sh, g, din, svg = False):
     # see https://github.com/pydot/pydot/issues/142
     specialChar = "[^A-Za-z0-9]+"
     fout = re.sub(specialChar, '', l)
-    outFile = os.path.join(din, f"{fout}.png")
+    outFile = os.path.join(din, f"{fout}.svg")
     if len(outFile) > MAXPATHSIZE:
         raise Exception(("Output graph path size for sheet {0} " + 
         "({1}) exceeds the path size " +
@@ -789,10 +789,10 @@ def visualizeSheetDependencies(df, sh, g, din, svg = False):
         "workbook name and/or field/parameter names. \n" + 
         "Output graph path: {3}")
             .format(l, len(outFile), MAXPATHSIZE, outFile))
-    G.write_png(outFile, encoding = "utf-8")
-    if svg:
-        outFile = os.path.join(din, f"{fout}.svg")
-        G.write_svg(outFile, encoding = "utf-8")
+    G.write_svg(outFile, encoding = "utf-8")
+    if png:
+        outFile = os.path.join(din, f"{fout}.png")
+        G.write_png(outFile, encoding = "utf-8")
 
 def zip_folder(folder_path, output_zip_path):
     """
