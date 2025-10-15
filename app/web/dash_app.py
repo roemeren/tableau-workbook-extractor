@@ -1,46 +1,26 @@
-"""
-Interactive Graphviz Viewer (Dash + dash_interactive_graphviz)
---------------------------------------------------------------
-
-Displays .dot files (Graphviz source) stored under `assets/folder_name/Graphs/`
-in an interactive Dash web app.
-
-Features:
-- Dropdowns to select subfolder and .dot file
-- Engine selector (dot / neato / etc.)
-- Interactive, zoomable, pannable Graphviz rendering
-- Click any node to inspect its attributes (fillcolor, label, shape, style, tooltip)
-- Tooltip text displayed with preserved line breaks
-- Stores parsed attributes in dcc.Store for later use
-"""
-
 import os
 import re
-from dash import Dash, dcc, html, Output, Input, State, no_update
+from dash import Dash, html, dcc, Output, Input, State, no_update
+import dash_bootstrap_components as dbc
 import dash_interactive_graphviz
 
 # -------------------------------------------------------------------
 # CONFIGURATION
 # -------------------------------------------------------------------
-# Relative to your Dash assets folder. Structure:
-# assets/
-#   folder_name/
-#     Graphs/
-#       SubfolderA/
-#         file1.dot
-#         file2.dot
-#       SubfolderB/
-#         ...
-BASE_DIR = "folder_name/Graphs"
+BASE_DIR = "folder_name/Graphs"  # relative to assets/
+ASSETS_PATH = os.path.join("assets", BASE_DIR)
 
 # -------------------------------------------------------------------
 # HELPER FUNCTIONS
 # -------------------------------------------------------------------
 def list_subfolders(base_dir):
     """Return all subfolders inside assets/<base_dir>."""
+    folder_path = os.path.join("assets", base_dir)
+    if not os.path.exists(folder_path):
+        return []
     return [
-        f for f in os.listdir(os.path.join("assets", base_dir))
-        if os.path.isdir(os.path.join("assets", base_dir, f))
+        f for f in os.listdir(folder_path)
+        if os.path.isdir(os.path.join(folder_path, f))
     ]
 
 def list_dot_files(subfolder):
@@ -55,7 +35,7 @@ def list_dot_files(subfolder):
     ]
 
 def read_dot_file(subfolder, filename):
-    """Read and return the raw DOT text for a given subfolder/file."""
+    """Return the raw DOT source for the given folder + file."""
     path = os.path.join("assets", BASE_DIR, subfolder, f"{filename}.dot")
     if not os.path.exists(path):
         return ""
@@ -63,133 +43,162 @@ def read_dot_file(subfolder, filename):
         return f.read()
 
 # -------------------------------------------------------------------
-# DASH APP SETUP
+# APP INITIALIZATION
 # -------------------------------------------------------------------
-app = Dash(__name__)
+app = Dash(__name__, external_stylesheets=[dbc.themes.ZEPHYR])
+app.title = "Graphviz Viewer (Bootstrap)"
 
-app.layout = html.Div(
+# -------------------------------------------------------------------
+# LAYOUT COMPONENTS
+# -------------------------------------------------------------------
+
+# ---- Left Panel ---------------------------------------------------
+left_panel = dbc.Col(
     [
-        # ==============================================================
-        # Top controls: folder / file / engine
-        # ==============================================================
+        html.H5("Actions", className="mb-3 text-center"),
+
+        # Upload button
+        dbc.Button("Upload", id="btn-upload", color="primary", className="w-100 mb-2"),
+
+        # Process button
+        dbc.Button("Process", id="btn-process", color="secondary", className="w-100 mb-3"),
+
+        # Progress bar + message
         html.Div(
             [
-                html.H3("Interactive Graphviz Viewer", style={"marginBottom": "5px"}),
+                dbc.Progress(id="progress-bar", value=0, striped=True, animated=True, style={"height": "20px"}),
+                html.Div(id="progress-message", className="text-muted small mt-2", children="No process running."),
+            ],
+            className="mb-3",
+        ),
 
-                # Dropdown row (Folder, File, Engine)
-                html.Div(
+        # Download button
+        dbc.Button("Download Results", id="btn-download", color="success", className="w-100 mb-2"),
+    ],
+    width=3,
+    className="p-3 bg-light border-end vh-100",
+)
+
+# ---- Right Panel --------------------------------------------------
+right_panel = dbc.Col(
+    [
+        # Header row
+        dbc.Row(
+            dbc.Col(
+                html.H3("Interactive Graphviz Viewer", className="my-3 text-center"),
+                width=12,
+            ),
+        ),
+
+        # Control row (folder/file/engine)
+        dbc.Row(
+            [
+                dbc.Col(
                     [
-                        # Folder selection
-                        html.Div(
-                            [
-                                html.Label("Folder"),
-                                dcc.Dropdown(
-                                    id="folder-dropdown",
-                                    options=[{"label": f, "value": f} for f in list_subfolders(BASE_DIR)],
-                                    placeholder="Select a folder",
-                                    clearable=False,
-                                    style={"width": "250px"},
-                                ),
-                            ],
-                            style={"marginRight": "15px"},
-                        ),
-                        # File selection
-                        html.Div(
-                            [
-                                html.Label(".dot File"),
-                                dcc.Dropdown(
-                                    id="file-dropdown",
-                                    placeholder="Select a file",
-                                    style={"width": "250px"},
-                                ),
-                            ],
-                            style={"marginRight": "15px"},
-                        ),
-                        # Graphviz layout engine
-                        html.Div(
-                            [
-                                html.Label("Engine"),
-                                dcc.Dropdown(
-                                    id="engine",
-                                    value="dot",
-                                    options=[
-                                        {"label": e, "value": e}
-                                        for e in [
-                                            "dot", "neato", "fdp", "sfdp",
-                                            "twopi", "circo", "osage", "patchwork"
-                                        ]
-                                    ],
-                                    clearable=False,
-                                    style={"width": "150px"},
-                                ),
-                            ]
+                        html.Label("Folder", className="fw-bold"),
+                        dcc.Dropdown(
+                            id="folder-dropdown",
+                            options=[{"label": f, "value": f} for f in list_subfolders(BASE_DIR)],
+                            placeholder="Select folder",
+                            clearable=False,
                         ),
                     ],
-                    style={"display": "flex", "alignItems": "flex-end"},
+                    width=4,
+                ),
+                dbc.Col(
+                    [
+                        html.Label(".dot File", className="fw-bold"),
+                        dcc.Dropdown(
+                            id="file-dropdown",
+                            placeholder="Select file",
+                        ),
+                    ],
+                    width=4,
+                ),
+                dbc.Col(
+                    [
+                        html.Label("Engine", className="fw-bold"),
+                        dcc.Dropdown(
+                            id="engine",
+                            value="dot",
+                            options=[
+                                {"label": e, "value": e}
+                                for e in ["dot", "neato", "fdp", "sfdp", "twopi", "circo", "osage", "patchwork"]
+                            ],
+                            clearable=False,
+                        ),
+                    ],
+                    width=4,
                 ),
             ],
-            style={
-                "padding": "10px 20px",
-                "backgroundColor": "#f8f9fa",
-                "borderBottom": "1px solid #ccc",
-            },
+            className="g-3 mb-3 px-2",
         ),
 
-        # ==============================================================
-        # Graphviz display area
-        # ==============================================================
-        html.Div(
-            dash_interactive_graphviz.DashInteractiveGraphviz(id="gv"),
-            style={
-                "flexGrow": 1,
-                "position": "relative",
-                "height": "76vh",  # big viewport for graph
-                "borderBottom": "1px solid #ddd",
-                "backgroundColor": "white",
-            },
-        ),
-
-        # ==============================================================
-        # Bottom panel: selection info + raw .dot text
-        # ==============================================================
-        dcc.Store(id="selected-store"),  # holds selected node data for later use
-        html.Div(
+        # Visualization + Node Info side by side
+        dbc.Row(
             [
-                html.Div(
-                    id="selected-element",
-                    style={"marginBottom": "8px", "fontWeight": "bold"},
+                # Graph container
+                dbc.Col(
+                    [
+                        dbc.Card(
+                            dbc.CardBody(
+                                [
+                                    html.H5("Network Visualization", className="card-title"),
+                                    dash_interactive_graphviz.DashInteractiveGraphviz(
+                                        id="gv",
+                                        style={"height": "70vh", "width": "99%"},
+                                    ),
+                                ]
+                            ),
+                            className="shadow-sm",
+                        )
+                    ],
+                    width=8,
                 ),
-                dcc.Textarea(
-                    id="dot-source",
-                    style={
-                        "width": "100%",
-                        "height": "14vh",
-                        "fontFamily": "monospace",
-                        "fontSize": "12px",
-                        "whiteSpace": "pre",
-                        "overflowY": "scroll",
-                    },
-                    readOnly=True,
+
+                # Node info panel
+                dbc.Col(
+                    [
+                        dcc.Store(id="selected-store"),
+                        dbc.Card(
+                            dbc.CardBody(
+                                [
+                                    html.H5("Node Info", className="card-title"),
+                                    html.Div(id="selected-element", className="small"),
+                                ]
+                            ),
+                            className="shadow-sm",
+                        ),
+                    ],
+                    width=4,
                 ),
             ],
-            style={"padding": "8px 15px", "backgroundColor": "#f9f9f9"},
+            className="g-3 px-2",
         ),
     ],
-    style={"display": "flex", "flexDirection": "column", "height": "100vh"},
+    width=9,
+    className="p-0",
+)
+
+# ---- Full page layout ---------------------------------------------
+app.layout = dbc.Container(
+    dbc.Row([left_panel, right_panel]),
+    fluid=True,
+    className="gx-0",  # remove default Bootstrap gutter spacing
 )
 
 # -------------------------------------------------------------------
 # CALLBACKS
 # -------------------------------------------------------------------
 
-# -- (1) When folder changes: update available files -----------------
+# (1) Folder -> update file dropdown
 @app.callback(
     Output("file-dropdown", "options"),
     Output("file-dropdown", "value"),
     Input("folder-dropdown", "value"),
 )
 def update_file_dropdown(selected_folder):
-    """List .dot files in the selected subfolder and auto-select the first one."""
+    """Update .dot file list based on selected folder."""
     if not selected_folder:
         return [], None
     files = list_dot_files(selected_folder)
@@ -197,10 +206,8 @@ def update_file_dropdown(selected_folder):
         return [], None
     return [{"label": f, "value": f} for f in files], files[0]
 
-
-# -- (2) When file or engine changes: update the graph viewer --------
+# (2) File or engine change -> render graph
 @app.callback(
-    Output("dot-source", "value"),
     Output("gv", "dot_source"),
     Output("gv", "engine"),
     Input("file-dropdown", "value"),
@@ -208,25 +215,28 @@ def update_file_dropdown(selected_folder):
     State("folder-dropdown", "value"),
 )
 def update_graph(selected_file, engine, selected_folder):
-    """
-    Load the selected .dot file, display its raw content in the textarea,
-    and render it in the interactive Graphviz viewer.
-    """
+    """Load and render the selected .dot file."""
     if not selected_file or not selected_folder:
-        return "", no_update, no_update
+        return no_update, no_update
 
-    dot_text = read_dot_file(selected_folder, selected_file)
-    return dot_text, dot_text, engine
+    path = os.path.join("assets", BASE_DIR, selected_folder, f"{selected_file}.dot")
+    if not os.path.exists(path):
+        return no_update, no_update
 
+    with open(path, "r", encoding="utf-8") as f:
+        dot_text = f.read()
 
-# -- (3) When a node is clicked: parse and display its attributes ----
+    return dot_text, engine
+
+# (3) When a node is clicked: parse and display its attributes
 @app.callback(
     Output("selected-store", "data"),
     Output("selected-element", "children"),
     Input("gv", "selected"),
-    State("dot-source", "value"),
+    State("file-dropdown", "value"),
+    State("folder-dropdown", "value"),
 )
-def show_selected_attributes(selected, dot_source):
+def show_selected_attributes(selected, selected_file, selected_folder):
     """
     When a user clicks on a node, extract its attributes from the raw DOT source.
 
@@ -234,19 +244,23 @@ def show_selected_attributes(selected, dot_source):
         - selected-store.data: a dict {"name": node_name, "attributes": {...}}
         - selected-element.children: human-readable HTML summary
     """
-    # Graceful defaults when nothing selected yet
-    if not selected or not dot_source:
+    # Handle missing selection
+    if not selected or not selected_file or not selected_folder:
         return {"name": None, "attributes": {}}, "Selected element: none"
 
     # Graphviz sometimes returns list for multiple selections
     if isinstance(selected, list) and selected:
         selected = selected[0]
 
+    # Load raw .dot text for this graph
+    dot_source = read_dot_file(selected_folder, selected_file)
+    if not dot_source:
+        return {"name": selected, "attributes": {}}, f"Selected element: {selected}"
+
     # Escape node name for regex safety (handles [ and ])
     node_escaped = re.escape(selected.strip('"'))
 
-    # Find the full node definition line, e.g.
-    # "[node1]" [fillcolor=orange, label="My Label", tooltip="text\r\nline2"];
+    # Find full node definition line
     pattern = rf'"{node_escaped}"\s*\[(.*?)\];'
     match = re.search(pattern, dot_source, re.DOTALL)
     if not match:
@@ -254,24 +268,17 @@ def show_selected_attributes(selected, dot_source):
 
     attrs_str = match.group(1)
 
-    # --------------------------------------------------------------
-    # Extract key=value pairs, supporting quoted values, escaped quotes,
-    # and newlines (e.g. tooltip="some \"quoted\" text\r\nline2")
-    # --------------------------------------------------------------
+    # Extract key=value pairs, supporting quoted values, escaped quotes, newlines
     attr_pattern = r'(\w+)=("([^"\\]|\\.)*"|\S+)'
     attrs = {}
     for m in re.finditer(attr_pattern, attrs_str, re.DOTALL):
         key = m.group(1)
         val = m.group(2)
-        # Clean up: remove outer quotes, unescape internal quotes, fix newlines
         cleaned_val = val.strip('"').replace('\\"', '"')
         cleaned_val = cleaned_val.replace("\\r\\n", "\n").replace("\\n", "\n")
         attrs[key] = cleaned_val
 
-    # --------------------------------------------------------------
-    # Build HTML representation
-    # tooltip is rendered in <pre> so line breaks are preserved
-    # --------------------------------------------------------------
+    # Build HTML representation with preserved line breaks for tooltips
     items = []
     for k, v in attrs.items():
         if k == "tooltip":
@@ -279,7 +286,7 @@ def show_selected_attributes(selected, dot_source):
                 html.Li(
                     [
                         html.B("tooltip: "),
-                        html.Pre(v, style={"whiteSpace": "pre-wrap", "margin": "0"})
+                        html.Pre(v, style={"whiteSpace": "pre-wrap", "margin": "0"}),
                     ]
                 )
             )
@@ -291,13 +298,13 @@ def show_selected_attributes(selected, dot_source):
         html.Div(
             [
                 html.B(f"Selected element: {selected}"),
-                html.Ul(items)
+                html.Ul(items),
             ]
         ),
     )
 
 # -------------------------------------------------------------------
-# RUN SERVER
+# MAIN
 # -------------------------------------------------------------------
 if __name__ == "__main__":
     app.run(debug=True)
