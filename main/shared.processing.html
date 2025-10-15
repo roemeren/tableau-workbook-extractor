@@ -7,7 +7,7 @@
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>shared.processing - Tableau Workbook Extractor</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
     
@@ -287,7 +287,7 @@ output file organization and logging.</p>
 file path and optional parameters for output handling and execution context.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="shared.processing.process_twb">
-<span class="sig-prename descclassname"><span class="pre">shared.processing.</span></span><span class="sig-name descname"><span class="pre">process_twb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uploadfolder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_executable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.processing.process_twb" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">shared.processing.</span></span><span class="sig-name descname"><span class="pre">process_twb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uploadfolder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_executable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fPNG</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.processing.process_twb" title="Link to this definition">¶</a></dt>
 <dd><p>Process a Tableau Workbook (TWB/TWBX) file to extract and analyze data sources,
 fields, and their dependencies.</p>
 <p>This function reads a TWB file, extracts data sources and field information,
@@ -302,6 +302,8 @@ output files to the specified upload folder.</p>
 if not running as an executable. Defaults to None.</p></li>
 <li><p><strong>is_executable</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag indicating if the function is being run
 as an executable script. Defaults to True.</p></li>
+<li><p><strong>fPNG</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag indicating if the function also has to
+generate PNG images next to SVG images</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

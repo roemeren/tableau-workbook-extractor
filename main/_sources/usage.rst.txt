@@ -145,6 +145,10 @@ tool, offering similar functionality to running an executable:
     :alt: Flask Output Download Button
     :width: 350
 
+By default, the application generates only SVG dependency graphs, but users can 
+optionally enable PNG generation through a checkbox on the upload page before 
+starting the processing.
+
 .. note::
 
     The main **advantage** of this web app compared to running the executable is that 

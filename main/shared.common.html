@@ -7,7 +7,7 @@
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>shared.common - Tableau Workbook Extractor</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
     
@@ -336,24 +336,24 @@ appended to each dictionary.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="shared.common.backwardDependencies">
-<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">backwardDependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.backwardDependencies" title="Link to this definition">¶</a></dt>
-<dd><p>Recursively get all backward dependencies of a field.</p>
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">backwardDependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.backwardDependencies" title="Link to this definition">¶</a></dt>
+<dd><p>Recursively get all backward dependencies of a field with memoization and
+canonical caching (cache stores subtree as if called with level=0).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Input data frame.</p></li>
 <li><p><strong>f</strong> (<em>str</em>) – Source field replacement ID.</p></li>
-<li><p><strong>level</strong> (<em>int</em><em>, </em><em>optional</em>) – Dependency level (0 = root,
--1 = level 1 backwards, etc.). Defaults to 0.</p></li>
-<li><p><strong>c</strong> (<em>str</em><em>, </em><em>optional</em>) – Originating child source field replacement ID.
-Defaults to None.</p></li>
+<li><p><strong>level</strong> (<em>int</em>) – Depth from the original root (0=root, 1=first dep, …).</p></li>
+<li><p><strong>c</strong> (<em>str</em><em>|</em><em>None</em>) – Parent (the child in your naming) at previous step.</p></li>
+<li><p><strong>_cache</strong> (<em>dict</em><em>|</em><em>None</em>) – Internal memoization cache mapping node -&gt; canonical list.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>List of all backward dependencies of the input source field.</p>
+<dd class="field-even"><p>Items like {“parent”, “child”, “level”, “category”} with string levels (e.g. “-1”).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
+<dd class="field-odd"><p>list[dict]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -524,25 +524,20 @@ dependency dictionaries.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="shared.common.forwardDependencies">
-<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">forwardDependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.forwardDependencies" title="Link to this definition">¶</a></dt>
-<dd><p>Recursively get all forward dependencies of a field.</p>
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">forwardDependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.forwardDependencies" title="Link to this definition">¶</a></dt>
+<dd><p>Recursively get all forward dependencies of a field with memoization
+and canonical caching (cache stores subtree as if called with level=0).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Input data frame.</p></li>
-<li><p><strong>f</strong> (<em>str</em>) – Source field replacement ID.</p></li>
-<li><p><strong>w</strong> (<em>list</em>) – List of root source field worksheet ID dependencies.</p></li>
-<li><p><strong>level</strong> (<em>int</em><em>, </em><em>optional</em>) – Dependency level (0 = root,
--1 = level 1 backwards, etc.). Defaults to 0.</p></li>
-<li><p><strong>p</strong> (<em>str</em><em>, </em><em>optional</em>) – Originating parent source field replacement ID.
-Defaults to None.</p></li>
-</ul>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Each item has keys</dt><dd><p>{“parent”,”child”,”level”,”category”,”sheets”}</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>List of all forward dependencies of the input source field.</p>
+</dl>
+<p>where “level” is always a string.</p>
+</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[dict]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -797,14 +792,14 @@ given source field.</p>
 <li><p><strong>g</strong> (<em>Graph</em>) – Master graph containing all source field and field node</p></li>
 <li><p><strong>objects.</strong></p></li>
 <li><p><strong>din</strong> (<em>str</em>) – Full path to root directory where graphs will be saved.</p></li>
-<li><p><strong>svg</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicator (True/False) whether or not to</p></li>
-<li><p><strong>False.</strong> (<em>generate SVG as well. Defaults to</em>)</p></li>
+<li><p><strong>png</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicator (True/False) whether or not to</p></li>
+<li><p><strong>False.</strong> (<em>generate PNG as well. Defaults to</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>PNG file is saved in
+<dd class="field-even"><p>SVG file is saved in
 “&lt;workbook path&gt; FilesGraphs&lt;source field name&gt;.png” and
-additional SVG file (with extra attributes) if svg is True.</p>
+additional PNG file (with extra attributes) if png is True.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
@@ -814,7 +809,7 @@ additional SVG file (with extra attributes) if svg is True.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="shared.common.visualizeSheetDependencies">
-<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">visualizeSheetDependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">din</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">svg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.visualizeSheetDependencies" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">visualizeSheetDependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">din</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">png</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.visualizeSheetDependencies" title="Link to this definition">¶</a></dt>
 <dd><p>Create output PNG/SVG files containing all dependencies for a given
 source field.</p>
 <dl class="field-list simple">
@@ -826,14 +821,14 @@ source field.</p>
 <li><p><strong>g</strong> (<em>Graph</em>) – Master graph containing all source field and field node</p></li>
 <li><p><strong>objects.</strong></p></li>
 <li><p><strong>din</strong> (<em>str</em>) – Full path to the root directory where graphs will be saved.</p></li>
-<li><p><strong>svg</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicator (True/False) to generate SVG as well.</p></li>
+<li><p><strong>png</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicator (True/False) to generate PNG as well.</p></li>
 <li><p><strong>False.</strong> (<em>Defaults to</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>PNG file is saved in
-“&lt;workbook path&gt; FilesGraphsSheets&lt;sheet name&gt;.png” and an
-additional SVG file (with extra attributes) if svg is True.</p>
+“&lt;workbook path&gt; FilesGraphsSheets&lt;sheet name&gt;.svg” and an
+additional PNG file (with extra attributes) if png is True.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>

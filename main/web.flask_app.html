@@ -7,7 +7,7 @@
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>web.flask_app - Tableau Workbook Extractor</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
     
@@ -323,7 +323,7 @@ processing progress and the filename being processed.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="web.flask_app.run_processing">
-<span class="sig-prename descclassname"><span class="pre">web.flask_app.</span></span><span class="sig-name descname"><span class="pre">run_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#web.flask_app.run_processing" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">web.flask_app.</span></span><span class="sig-name descname"><span class="pre">run_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generate_png</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#web.flask_app.run_processing" title="Link to this definition">¶</a></dt>
 <dd><p>Processes a Tableau workbook file in the background.</p>
 <p>This function calls the <cite>process_twb</cite> function to handle the
 processing of the specified Tableau workbook file. The processing
@@ -331,7 +331,10 @@ is done using the filepath provided as an argument, with a
 predefined upload folder and a flag indicating the executable state.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>filepath</strong> (<em>str</em>) – The path to the Tableau workbook file to be processed.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>str</em>) – The path to the Tableau workbook file to be processed.</p></li>
+<li><p><strong>generate_png</strong> (<em>bool</em>) – Flag indicating whether or not PNG files are generated</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
