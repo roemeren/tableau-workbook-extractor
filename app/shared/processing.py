@@ -194,18 +194,21 @@ def process_twb(filepath, uploadfolder=None, is_executable=True):
     stepLog("Processing dependencies...")
 
     # Get full list of backward dependencies
-    df["field_backward_dependencies"] = \
-        df["source_field_repl_id"].apply(lambda x: backwardDependencies(df, x))
+    shared_cache = {}
+    df["field_backward_dependencies"] = df["source_field_repl_id"].apply(
+        lambda x: backwardDependencies(df, x, _cache=shared_cache)
+    )
 
     # Get full list of forward dependencies using exploded version of df (faster)
     dfExplode = df[["source_field_repl_id", "field_category", \
         "field_worksheets_id", "field_calculation_dependencies"]]
     dfExplode = dfExplode.explode("field_calculation_dependencies")
     dfExplode.columns = ["id", "category", "worksheets", "dependency"]
+    shared_cache = {}
     df["field_forward_dependencies"] = \
         df.apply(lambda x: \
             forwardDependencies(dfExplode, x.source_field_repl_id, 
-            x.field_worksheets_id), axis = 1)
+            x.field_worksheets_id, _cache=shared_cache), axis = 1)
 
     # Only keep unique dependencies with their max level
     df["field_backward_dependencies"] = \

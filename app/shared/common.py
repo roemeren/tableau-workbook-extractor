@@ -21,6 +21,7 @@ import pydot
 import random
 import string
 import zipfile
+from functools import lru_cache
 
 # Script parameters
 fDepFields = True # create field dependency graphs?
@@ -298,79 +299,187 @@ def fieldCategory(s, c):
     if c != "": return "Calculated Field"
     else: return "Field"
 
-def backwardDependencies(df, f, level = 0, c = None):
+def backwardDependencies(df, f, level=0, c=None, _cache=None):
     """
-    Recursively get all backward dependencies of a field.
+    Recursively get all backward dependencies of a field with memoization and
+    canonical caching (cache stores subtree as if called with level=0).
 
     Args:
         df (pandas.DataFrame): Input data frame.
         f (str): Source field replacement ID.
-        level (int, optional): Dependency level (0 = root, 
-            -1 = level 1 backwards, etc.). Defaults to 0.
-        c (str, optional): Originating child source field replacement ID. 
-            Defaults to None.
+        level (int): Depth from the original root (0=root, 1=first dep, ...).
+        c (str|None): Parent (the child in your naming) at previous step.
+        _cache (dict|None): Internal memoization cache mapping node -> canonical list.
 
     Returns:
-        list: List of all backward dependencies of the input source field.
+        list[dict]: Items like {"parent", "child", "level", "category"} with string levels (e.g. "-1").
     """
-    x = df.loc[df.source_field_repl_id == f]
-    depList = list(x.field_calculation_dependencies)
-    cat = list(x.field_category)[0]
-    lst = []
+    if _cache is None:
+        _cache = {}
 
-    # add dependency
-    if level > 0: lst += [{"parent": f, "child": c, \
-        "level": "-{0}".format(level), "category": cat}]
-    
-    # add dependencies of dependency
-    if len(depList) > 0:
-        # remove reference by copying the list
-        for y in depList[0].copy():
-            lst += backwardDependencies(df, y, level + 1, f)
+    # If we have a canonical subtree for f, adapt it to the current depth
+    if f in _cache:
+        adapted = []
+        for item in _cache[f]:
+            adapted.append({
+                "parent": item["parent"],
+                "child":  item["child"],
+                "level":  str(int(item["level"]) - level),  # shift down and convert to string
+                "category": item["category"],
+            })
+        # Add the direct link from f -> c at this depth (if not root)
+        if level > 0:
+            cat = df.loc[df.source_field_repl_id == f, "field_category"].iloc[0]
+            adapted.append({
+                "parent": f,
+                "child":  c,
+                "level":  str(-level),  # always string
+                "category": cat,
+            })
+        return adapted
+
+    # --- Build subtree for f (possibly using cached children) ---
+    x = df.loc[df.source_field_repl_id == f]
+    if x.empty:
+        return []
+
+    # Get deps list robustly (empty if NaN/None)
+    raw_deps = x.field_calculation_dependencies.iloc[0]
+    depList = list(raw_deps) if isinstance(raw_deps, (list, tuple)) and raw_deps else []
+    cat = x.field_category.iloc[0]
+
+    lst = []
+    # At non-root, add the direct edge (dependency -> current root chain)
+    if level > 0:
+        lst.append({
+            "parent": f,
+            "child":  c,
+            "level":  str(-level),
+            "category": cat,
+        })
+
+    # Recurse into dependencies
+    for y in depList:
+        lst.extend(backwardDependencies(df, y, level + 1, f, _cache))
+
+    # --- Store canonical subtree in cache ---
+    if level == 0:
+        canonical = []
+        for item in lst:
+            # ensure level is string
+            canonical.append({
+                "parent": item["parent"],
+                "child":  item["child"],
+                "category": item["category"],
+                "level":  str(item["level"]),
+            })
+    else:
+        canonical = []
+        for item in lst:
+            # drop the direct link from this call
+            if item["parent"] == f and item["child"] == c and str(item["level"]) == str(-level):
+                continue
+            canonical.append({
+                "parent": item["parent"],
+                "child":  item["child"],
+                "category": item["category"],
+                # normalize and convert to string
+                "level":  str(int(item["level"]) + level),
+            })
+
+    _cache[f] = canonical
     return lst
 
-def forwardDependencies(df, f, w, level = 0, p = None, ):
+def forwardDependencies(df, f, w, level=0, p=None, _cache=None):
     """
-    Recursively get all forward dependencies of a field.
-
-    Args:
-        df (pandas.DataFrame): Input data frame.
-        f (str): Source field replacement ID.
-        w (list): List of root source field worksheet ID dependencies.
-        level (int, optional): Dependency level (0 = root, 
-            -1 = level 1 backwards, etc.). Defaults to 0.
-        p (str, optional): Originating parent source field replacement ID. 
-            Defaults to None.
+    Recursively get all forward dependencies of a field with memoization
+    and canonical caching (cache stores subtree as if called with level=0).
 
     Returns:
-        list: List of all forward dependencies of the input source field.
+        list[dict]: Each item has keys
+            {"parent","child","level","category","sheets"}
+        where "level" is always a string.
     """
-    x = df.loc[df.id == f][["category", "worksheets"]]
+    if _cache is None:
+        _cache = {}
+
+    # --- Reuse cached canonical subtree if available ---
+    if f in _cache:
+        adapted = []
+        for item in _cache[f]:
+            adapted.append({
+                "parent":   item["parent"],
+                "child":    item["child"],
+                "level":    str(int(item["level"]) + level),
+                "category": item["category"],
+                "sheets":   item["sheets"],
+            })
+        # Add direct link from parent -> f (if not root)
+        if level > 0:
+            cat = df.loc[df.id == f, "category"].iloc[0]
+            ws  = df.loc[df.id == f, "worksheets"].iloc[0]
+            ws  = ws if isinstance(ws, (list, tuple)) else []
+            nSheet = len([x for x in w if x in ws])
+            adapted.append({
+                "parent":   p,
+                "child":    f,
+                "level":    str(level),
+                "category": cat,
+                "sheets":   nSheet,
+            })
+        return adapted
+
+    # --- Build subtree for f (fresh computation) ---
+    x = df.loc[df.id == f, ["category", "worksheets"]]
+    if x.empty:
+        return []
+
     cat, ws = x.head(1).values.flatten()
-    depList = list(df.loc[df.dependency == f]["id"])
+    ws = ws if isinstance(ws, (list, tuple)) else []
+    depList = list(df.loc[df.dependency == f, "id"])
+
     lst = []
 
-    # get overlap of worksheets with root list
+    # Add all sheet dependencies just like any other (leveled)
     nSheet = len([x for x in w if x in ws])
+    for sh in ws:
+        lst.append({
+            "parent":   f,
+            "child":    sh,
+            "level":    str(level),
+            "category": "Sheet",
+            "sheets":   nSheet,
+        })
 
-    if level > 0: 
-        # add field dependencies
-        lst += [{"parent": p, "child": f, \
-            "level": "{0}".format(level), "category": cat, 
-            "sheets": nSheet}]
-    else:
-        # add root sheet dependencies (already is full list)
-        for sh in ws:
-            lst += [{"parent": f, "child": sh, \
-                "level": "0", "category": "Sheet", 
-            "sheets": 1}]
-    
-    # add dependencies of dependency
-    if len(depList) > 0:
-        # remove reference by copying the list
-        for y in depList.copy(): 
-            lst += forwardDependencies(df, y, w, level + 1, f)
+    # For non-root calls, add the direct parent->field link at current level
+    if level > 0:
+        lst.append({
+            "parent":   p,
+            "child":    f,
+            "level":    str(level),
+            "category": cat,
+            "sheets":   nSheet,
+        })
 
+    # Recurse into forward dependencies
+    for y in depList:
+        lst.extend(forwardDependencies(df, y, w, level + 1, f, _cache))
+
+    # --- Store canonical subtree (as-if level == 0) ---
+    canonical = []
+    for item in lst:
+        # Drop the direct parent->f link when normalizing to level 0
+        if level > 0 and item["parent"] == p and item["child"] == f and item["level"] == str(level):
+            continue
+        canonical.append({
+            "parent":   item["parent"],
+            "child":    item["child"],
+            "level":    str(int(item["level"]) - level),
+            "category": item["category"],
+            "sheets":   item["sheets"],
+        })
+
+    _cache[f] = canonical
     return lst
 
 def uniqueDependencies(d, g, f):
@@ -610,10 +719,18 @@ def visualizeSheetDependencies(df, sh, g, din, svg = False):
         "<workbook path> Files\Graphs\Sheets\<sheet name>.png" and an 
         additional SVG file (with extra attributes) if svg is True.
     """
-    # get field -> sheet edges
-    depSheet = df[(df.dependency_category == "Sheet") & 
-        (df.dependency_to == sh)][["dependency_from", "dependency_to", 
-        "dependency_category", "source_field_label", "source_field_repl_id"]]
+    # --- get field -> sheet edges (only level == "0") ---
+    depSheet = df[
+        (df.dependency_category == "Sheet")
+        & (df.dependency_to == sh)
+        & (df.dependency_level.astype(str) == "0")
+    ][[
+        "dependency_from",
+        "dependency_to",
+        "dependency_category",
+        "source_field_label",
+        "source_field_repl_id",
+    ]]
 
     # get field -> field edges
     lstFields = list(depSheet["source_field_repl_id"])
