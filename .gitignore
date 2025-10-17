@@ -7,10 +7,10 @@ build
 dist
 *.spec
 # Ignore all of data except data/sample
-data/**
-!data/sample/
-!data/sample/**
-app/web/static/
+data/
+app/web/static/**
+!app/web/static/sample/
+!app/web/static/sample/**
 app/assets/
 *.pyc
 docs/source/generated/
