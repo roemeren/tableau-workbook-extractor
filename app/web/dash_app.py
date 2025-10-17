@@ -14,6 +14,7 @@ import shutil
 # --- initialize folders ---
 os.makedirs(STATIC_FOLDER, exist_ok=True)
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
 # --- module-level state ---
 _processing_thread = None
@@ -55,7 +56,7 @@ app.layout = dbc.Container(
                                                 id="sample-file-dropdown",
                                                 options=[
                                                     {"label": f.name, "value": str(f)}
-                                                    for f in Path("../data/sample").glob("*.twb*")
+                                                    for f in SAMPLE_FOLDER.glob("*.twb*")
                                                 ],
                                                 placeholder="Choose sample workbook...",
                                                 style={"width": "100%", "marginBottom": "33px"},
@@ -342,33 +343,24 @@ app.layout = dbc.Container(
 )
 def handle_file_selection(active_tab, upload_contents, upload_filename, sample_path, sample_filename):
     """
-    Handle both sample file selection and user uploads based on the active tab.
-    Copies or decodes the selected ZIP into UPLOAD_FOLDER and updates readiness
-    flags, while preserving the previously selected or uploaded file from the
-    inactive tab.
+    Handle both sample selection and user uploads depending on the active tab.
+    No file copying is needed for samples since they are served directly
+    from the static/sample folder.
     """
-    # sample tab: copy paste sample file if not done already
+    # sample tab: simply register the selected sample file
     if active_tab == "tab-sample":
         if sample_path:
             sample_basename = os.path.basename(sample_path)
-            dest_path = os.path.join(UPLOAD_FOLDER, sample_basename)
-            if not os.path.exists(dest_path):
-                shutil.copy(sample_path, dest_path)
             return True, upload_filename, sample_basename
-        else:
-            # no sample file selected or selection is cleared
-            return upload_filename is not None, upload_filename, None
+        return upload_filename is not None, upload_filename, None
 
-    # upload tab: upload file if not uploaded yet
-    elif active_tab == "tab-upload" and upload_contents and upload_filename:
+    # upload tab: decode uploaded file if provided
+    if active_tab == "tab-upload" and upload_contents and upload_filename:
         dest_path = os.path.join(UPLOAD_FOLDER, upload_filename)
-        # works for ZIP as well as structured workbook files like .twb*
         if not os.path.exists(dest_path):
-            _, content_string = upload_contents.split(",")
-            decoded = base64.b64decode(content_string)
+            _, content_string = upload_contents.split(",", 1)
             with open(dest_path, "wb") as f:
-                f.write(decoded)
-
+                f.write(base64.b64decode(content_string))
         return True, upload_filename, sample_filename
 
     raise PreventUpdate
@@ -407,24 +399,27 @@ def start_processing(_, upload_filename, sample_filename, file_ready, active_tab
         if not upload_filename:
             raise PreventUpdate
         filename = upload_filename
+        input_folder = UPLOAD_FOLDER
     elif active_tab == "tab-sample":
         if not sample_filename:
             raise PreventUpdate
         filename = sample_filename
+        input_folder = str(SAMPLE_FOLDER)
 
     # initialize additional progress data
     progress_data["progress"] = 0 # ensures correct progress bar behavior
     progress_data["current-task"] = f"Preparing to process {filename}"
     progress_data["show-dots"] = True
-    
-    filepath = os.path.join(UPLOAD_FOLDER, filename)
+
+    # calculate file path and relative path used in download links (public URL)
+    filepath = os.path.join(input_folder, filename)
 
     def worker():
         progress_data["status"] = "running"
 
         error_msg = process_twb(
             filepath=filepath, 
-            uploadfolder=UPLOAD_FOLDER, 
+            output_folder=OUTPUT_FOLDER, 
             is_executable=False,
             fPNG=True
         )
@@ -433,7 +428,7 @@ def start_processing(_, upload_filename, sample_filename, file_ready, active_tab
 
         # early exit if an error was returned
         if error_msg:
-            progress_data['filename'] = None
+            progress_data['output_file'] = None
             progress_data["current-task"] = f"Processing failed for {filename}: {error_msg}"
             progress_data["status"] = "exited"
             progress_data["progress"] = 100
@@ -488,8 +483,9 @@ def update_progress(*args):
     pct = progress_data.get("progress", 0)
     label = f"{pct}%" if pct >= 5 else ""
     btn_disabled = True
-    f = progress_data.get("filename")
-    href = f and os.path.join(UPLOAD_URL_PATH, f)
+    out_file = progress_data.get("filename")
+    # Build href only if out_file exists
+    href = out_file and os.path.join(OUTPUT_FOLDER_URL, out_file)
     style = {"width": "40%", "visibility": "hidden"}
     finished_at = progress_data.get("finished_at")
     status = progress_data.get("status")
@@ -512,7 +508,6 @@ def update_progress(*args):
             pct = 0
             label = ""
             poller_disabled = True
-            progress_data.pop("finished_at", None)
             btn_disabled = False
             style["visibility"] = "visible"
             upload_tab_disabled = False
