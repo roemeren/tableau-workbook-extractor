@@ -114,7 +114,7 @@ def run_processing(filepath, generate_png):
     """
     process_twb(
         filepath=filepath, 
-        uploadfolder=app.config['UPLOAD_FOLDER'], 
+        output_folder=app.config['UPLOAD_FOLDER'], 
         is_executable=False,
         fPNG=generate_png
     )
