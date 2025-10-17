@@ -42,7 +42,7 @@ jobs:
           artifacts: dist/${{env.EXE_NAME}} # Path to the executable to upload
           token: ${{secrets.GITHUB_TOKEN}}  # Use the built-in GITHUB_TOKEN
           allowUpdates: true # Update a release if it already exists
-  deploy-flask:
+  deploy-app:
     runs-on: ubuntu-latest  # The job will run on the latest Ubuntu runner
 
     environment: 
