@@ -17,4 +17,4 @@ RUN apt-get update && apt-get install -y graphviz
 EXPOSE 5000
 
 # Run flask_app.py when the container launches
-CMD ["gunicorn", "web.flask_app:app", "--bind", "0.0.0.0:5000"]
+CMD ["gunicorn", "web.dash_app:app", "--bind", "0.0.0.0:5000"]
