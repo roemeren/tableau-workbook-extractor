@@ -46,7 +46,7 @@ def setup_logging(is_executable, uploadfolder):
     # Add the handler to the logger
     logger.addHandler(handler)
 
-def stepLog(message, *args, **kwargs):
+def stepLog(message):
     """
     Log a message that includes an incremental step counter in a main script
 
@@ -60,6 +60,12 @@ def stepLog(message, *args, **kwargs):
     if not hasattr(stepLog, 'counter'):
         stepLog.counter = 1
 
-    # Print message and increment counter   
-    logger.info(" STEP %d: " % stepLog.counter + message, *args, **kwargs)
+    # Construct the full message
+    log_message = f" STEP {stepLog.counter}: {message}..."
+
+    # Print message and increment counter
+    logger.info(log_message)
     stepLog.counter += 1
+
+    # Return message (for Dash app)
+    return message
