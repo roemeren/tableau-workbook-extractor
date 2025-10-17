@@ -5,9 +5,11 @@ notebooks
 __pycache__
 build
 dist
-data
 *.spec
-data/
+# Ignore all of data except data/sample
+data/**
+!data/sample/
+!data/sample/**
 app/web/static/
 app/assets/
 *.pyc
