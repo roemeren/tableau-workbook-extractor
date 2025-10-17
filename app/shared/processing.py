@@ -44,7 +44,7 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
-def process_twb(filepath, uploadfolder=None, is_executable=True, fPNG=True):
+def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
     """
     Process a Tableau Workbook (TWB/TWBX) file to extract and analyze data sources,
     fields, and their dependencies.
@@ -56,7 +56,7 @@ def process_twb(filepath, uploadfolder=None, is_executable=True, fPNG=True):
 
     Args:
         filepath (str): The path to the Tableau workbook (TWB*) file to be processed.
-        uploadfolder (str, optional): The directory where output files will be saved
+        output_folder (str, optional): The directory where output files will be saved
             if not running as an executable. Defaults to None.
         is_executable (bool, optional): Flag indicating if the function is being run
             as an executable script. Defaults to True.
@@ -68,7 +68,7 @@ def process_twb(filepath, uploadfolder=None, is_executable=True, fPNG=True):
     """
     try:
         # Initialize logging for Flask app
-        if not is_executable: setup_logging(is_executable, uploadfolder)
+        if not is_executable: setup_logging(is_executable, output_folder)
 
         # Ignore future warnings when reading field attributes (not applicable)
         warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -79,9 +79,10 @@ def process_twb(filepath, uploadfolder=None, is_executable=True, fPNG=True):
         if is_executable:
             outFileDirectory =f"{filepath} Files"
         else:
-            outFileDirectory = os.path.join(uploadfolder, 'temp')
+            outFileDirectory = os.path.join(output_folder, 'temp')
 
         # Get initial data frame with nested data source and field objects
+        progress_data["progress"] = 3
         progress_data['task'] = stepLog("Extract data sources and fields from workbook")
 
         with suppress_stdout():
@@ -109,6 +110,7 @@ def process_twb(filepath, uploadfolder=None, is_executable=True, fPNG=True):
         for attr in fieldAttr:
             df["field_" + attr] = df.apply(lambda x: getattr(x.value, attr), axis = 1)
 
+        progress_data["progress"] = 6
         progress_data["current-task"] = stepLog("Processing fields")
 
         # Additional transformations
@@ -194,6 +196,7 @@ def process_twb(filepath, uploadfolder=None, is_executable=True, fPNG=True):
         df["field_category"] = df.apply(lambda x: \
             fieldCategory(x.source_field_label, x.field_calculation_cleaned), axis = 1)
 
+        progress_data["progress"] = 9
         progress_data["current-task"] = stepLog("Processing dependencies")
 
         # Get full list of backward dependencies
@@ -306,6 +309,7 @@ def process_twb(filepath, uploadfolder=None, is_executable=True, fPNG=True):
         outSheetDirectory = os.path.join(outFileDirectory, 'Fields')
         outFilePath = os.path.join(outSheetDirectory, inpFileName + '.xlsx')
 
+        progress_data["progress"] = 12
         progress_data["current-task"] = stepLog("Saving table results in " + outFilePath)
 
         if not os.path.isdir(outSheetDirectory):
@@ -356,11 +360,18 @@ def process_twb(filepath, uploadfolder=None, is_executable=True, fPNG=True):
         nField = df_original.shape[0] if fDepFields else 0
         nSheet = len(lstSheets) if fDepSheets else 0
         nTot = nField + nSheet
+        # counter within graph creation
         current_progress = 0
+
+        # progress bar bounds
+        start_progress = 15
+        end_progress = 90
+        progress_range = end_progress - start_progress
 
         if fDepFields:
             inpPath = os.path.join(outFileDirectory, 'Graphs')
 
+            progress_data["progress"] = start_progress
             progress_data["current-task"] = \
                 stepLog(f"Creating field dependency graphs per source in {inpPath}")
 
@@ -378,7 +389,8 @@ def process_twb(filepath, uploadfolder=None, is_executable=True, fPNG=True):
 
                 if not is_executable:
                     current_progress += 1
-                    progress_data['progress'] = int((current_progress / nTot) * 100)
+                    progress_data["progress"] = \
+                        int(start_progress + (current_progress / nTot) * progress_range)
 
         if fDepSheets:
             # Create output folder if it doesn't exist yet
@@ -396,19 +408,19 @@ def process_twb(filepath, uploadfolder=None, is_executable=True, fPNG=True):
                 visualizeSheetDependencies(df2_original, sh, gMaster, inpPath, fPNG)
                 if not is_executable:
                     current_progress += 1
-                    progress_data['progress'] = int((current_progress / nTot) * 100)
+                    progress_data["progress"] = \
+                        int(start_progress + (current_progress / nTot) * progress_range)
         
         zip_filename = inpFileName + ' Files.zip'
         # Set the filename for download once processing is complete
         progress_data['filename'] = zip_filename
-        # Ensure progress reaches 100 after processing
-        progress_data['progress'] = 100
+        progress_data['progress'] = 90
 
         if is_executable: 
             input("Done! Press Enter to exit...")
         else:
             # Zip the output files
-            zip_path = os.path.join(uploadfolder, zip_filename)
+            zip_path = os.path.join(output_folder, zip_filename)
             zip_folder(folder_path=outFileDirectory, output_zip_path=zip_path)
 
             # Clean up and close the logger
@@ -416,8 +428,9 @@ def process_twb(filepath, uploadfolder=None, is_executable=True, fPNG=True):
                 handler.close()
                 logger.removeHandler(handler)
 
-            # Remove temp directory
+            # Remove temp directory + ensure progress is 100%
             shutil.rmtree(outFileDirectory)
+            progress_data['progress'] = 100
 
         # Return success indicator
         return None
