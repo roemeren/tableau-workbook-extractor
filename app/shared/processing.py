@@ -412,6 +412,7 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
         
         zip_filename = inpFileName + ' Files.zip'
         # Set the filename for download once processing is complete
+        progress_data['foldername'] = outFileDirectory
         progress_data['filename'] = zip_filename
         progress_data['progress'] = 90
 
