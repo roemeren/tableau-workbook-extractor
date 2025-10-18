@@ -5,11 +5,12 @@ from dash import no_update, Dash, html, dcc, Output, Input, State, dash_table
 import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
 from dash import callback_context as ctx
+import dash_interactive_graphviz
 import time
+import re
 from shared.utils import *
 from shared.processing import process_twb
 from shared.common import progress_data
-import shutil
 
 # --- initialize folders ---
 os.makedirs(STATIC_FOLDER, exist_ok=True)
@@ -146,11 +147,12 @@ app.layout = dbc.Container(
                             html.A("GitHub", href=REPO_URL, target="_blank"),
                         ]),
                     ], style={"fontSize": "12px", "color": "#666", "marginTop": "10px", "lineHeight": "1.4"}),
-
                     # =======================
                     # HIDDEN ELEMENTS
                     # =======================
-                    # hidden polling interval
+                    # path to the graphs folder
+                    dcc.Store(id="dot-root-store"),
+                    # polling interval
                     dcc.Interval(id="progress-poller", interval=2000, disabled=True),
                     # stores for some of the callback outputs
                     dcc.Store(id="file-ready"),
@@ -159,7 +161,7 @@ app.layout = dbc.Container(
                     dcc.Store(id="sample-file-store", data={}),
                 ],
                 # left panel width: around 2.5/12 (22%)
-                width = "auto",
+                # width = "auto",
                 className="p-3 rounded",
                 style={"flex": "0 0 22%", "backgroundColor": "#f0f0f0"},
             ),
@@ -320,13 +322,102 @@ app.layout = dbc.Container(
                             width=3
                         ),
                     ], className="mb-3"),
+
+                    # Control row (folder/file/engine)
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                [
+                                    html.Label("Folder", className="fw-bold"),
+                                    dcc.Dropdown(
+                                        id="folder-dropdown",
+                                        placeholder="Select folder",
+                                        clearable=False,
+                                    ),
+                                ],
+                                width=4,
+                            ),
+                            dbc.Col(
+                                [
+                                    html.Label(".dot File", className="fw-bold"),
+                                    dcc.Dropdown(
+                                        id="file-dropdown",
+                                        placeholder="Select file",
+                                    ),
+                                ],
+                                width=4,
+                            ),
+                            dbc.Col(
+                                [
+                                    html.Label("Engine", className="fw-bold"),
+                                    dcc.Dropdown(
+                                        id="engine",
+                                        value="dot",
+                                        options=[
+                                            {"label": e, "value": e}
+                                            for e in ["dot", "neato", "fdp", "sfdp", "twopi", "circo", "osage", "patchwork"]
+                                        ],
+                                        clearable=False,
+                                    ),
+                                ],
+                                width=4,
+                            ),
+                        ],
+                        className="g-3 mb-3 px-2",
+                    ),
+
+                    # Visualization row
+                    dbc.Row(
+                        [
+                            # Graph container
+                            dbc.Col(
+                                [
+                                    dbc.Card(
+                                        dbc.CardBody(
+                                            [
+                                                html.H5("Network Visualization", className="card-title"),
+                                                dash_interactive_graphviz.DashInteractiveGraphviz(
+                                                    id="gv",
+                                                    style={
+                                                        "height": "400px",
+                                                        "width": "99%",
+                                                        "align": "bottom",
+                                                    }
+                                                ),
+                                            ]
+                                        ),
+                                        className="shadow-sm",
+                                    )
+                                ],
+                                width=8,
+                            ),
+
+                            # Node info panel
+                            dbc.Col(
+                                [
+                                    dcc.Store(id="selected-store"),
+                                    dbc.Card(
+                                        dbc.CardBody(
+                                            [
+                                                html.H5("Node Info", className="card-title"),
+                                                html.Div(id="selected-element", className="small"),
+                                            ]
+                                        ),
+                                        className="shadow-sm",
+                                    ),
+                                ],
+                                width=4,
+                            ),
+                        ],
+                        className="g-3 px-2",
+                    ),
                 ],
                 # right panel width: fill up leftover space
-                style={"flex": "1"}
+                style={"flex": "1"},
             )
-        ])
+        ]),
     ],
-    fluid=True
+    fluid=True,
 )
 
 # ---------- Callbacks ----------
@@ -461,6 +552,7 @@ def start_processing(_, upload_filename, sample_filename, file_ready, active_tab
     Output("sample-file-dropdown", "disabled"),
     Output("tab-upload-content", "disabled"),
     Output("tab-sample-content", "disabled"),
+    Output("dot-root-store", "data"),
     Input("progress-poller", "n_intervals"), # initially None
     Input("processing-started", "data"), # will (re)activate the poller
     State("file-tabs", "active_tab"),
@@ -484,8 +576,10 @@ def update_progress(*args):
     label = f"{pct}%" if pct >= 5 else ""
     btn_disabled = True
     out_file = progress_data.get("filename")
+    out_folder = progress_data.get("foldername")
     # Build href only if out_file exists
     href = out_file and os.path.join(OUTPUT_FOLDER_URL, out_file)
+    graphs_folder = out_folder and os.path.join(out_folder, "Graphs")
     style = {"width": "40%", "visibility": "hidden"}
     finished_at = progress_data.get("finished_at")
     status = progress_data.get("status")
@@ -526,6 +620,145 @@ def update_progress(*args):
         btn_disabled,
         upload_tab_disabled,
         sample_tab_disabled,
+        graphs_folder,
+    )
+
+# Output data -> Folder dropdown
+@app.callback(
+    Output("folder-dropdown", "options"),
+    Output("folder-dropdown", "value"),
+    Input("btn-download", "disabled"),
+    State("dot-root-store", "data")
+)
+def update_folder_dropdown(download_disabled, base_dir):
+    if not base_dir or download_disabled:
+        raise PreventUpdate
+
+    folders = list_subfolders(base_dir)
+
+    # Sort alphabetically, but push "Sheets" and "Parameters" to the end
+    folders.sort(key=lambda x: (x in ["Sheets", "Parameters"], x.lower()))
+
+    options = [{"label": f, "value": f} for f in folders]
+    first_value = folders[0] if folders else None
+
+    return options, first_value
+
+# Folder -> update file dropdown
+@app.callback(
+    Output("file-dropdown", "options"),
+    Output("file-dropdown", "value"),
+    State("dot-root-store", "data"),
+    Input("folder-dropdown", "value"),
+)
+def update_file_dropdown(base_dir, selected_folder):
+    """Update .dot file list based on selected folder."""
+    if not selected_folder:
+        return [], None
+
+    files = list_dot_files(base_dir, selected_folder)
+    options = [{"label": f, "value": f} for f in files]
+
+    # Auto-select first file if available
+    return options, files[0] if files else None
+
+# File or engine change -> render graph
+@app.callback(
+    Output("gv", "dot_source"),
+    Output("gv", "engine"),
+    Input("file-dropdown", "value"),
+    Input("engine", "value"),
+    State("dot-root-store", "data"),
+    State("folder-dropdown", "value"),
+)
+def update_graph(selected_file, engine, base_dir, selected_folder):
+    """Load and render the selected .dot file."""
+    if not selected_file or not selected_folder:
+        return no_update, no_update
+
+    path = os.path.join(base_dir, selected_folder, f"{selected_file}.dot")
+    if not os.path.exists(path):
+        return no_update, no_update
+
+    with open(path, "r", encoding="utf-8") as f:
+        dot_text = f.read()
+
+    return dot_text, engine
+
+# When a node is clicked: parse and display its attributes
+@app.callback(
+    Output("selected-store", "data"),
+    Output("selected-element", "children"),
+    Input("gv", "selected"),
+    State("dot-root-store", "data"),
+    State("folder-dropdown", "value"),
+    State("file-dropdown", "value"),
+)
+def show_selected_attributes(selected, base_dir, selected_folder, selected_file):
+    """
+    When a user clicks on a node, extract its attributes from the raw DOT source.
+
+    Returns:
+        - selected-store.data: a dict {"name": node_name, "attributes": {...}}
+        - selected-element.children: human-readable HTML summary
+    """
+    # Handle missing selection
+    if not selected or not selected_file or not selected_folder:
+        return {"name": None, "attributes": {}}, "Selected element: none"
+
+    # Graphviz sometimes returns list for multiple selections
+    if isinstance(selected, list) and selected:
+        selected = selected[0]
+
+    # Load raw .dot text for this graph
+    dot_source = read_dot_file(base_dir, selected_folder, selected_file)
+    if not dot_source:
+        return {"name": selected, "attributes": {}}, f"Selected element: {selected}"
+
+    # Escape node name for regex safety (handles [ and ])
+    node_escaped = re.escape(selected.strip('"'))
+
+    # Find full node definition line
+    pattern = rf'"{node_escaped}"\s*\[(.*?)\];'
+    match = re.search(pattern, dot_source, re.DOTALL)
+    if not match:
+        return {"name": selected, "attributes": {}}, f"Selected element: {selected}"
+
+    attrs_str = match.group(1)
+
+    # Extract key=value pairs, supporting quoted values, escaped quotes, newlines
+    attr_pattern = r'(\w+)=("([^"\\]|\\.)*"|\S+)'
+    attrs = {}
+    for m in re.finditer(attr_pattern, attrs_str, re.DOTALL):
+        key = m.group(1)
+        val = m.group(2)
+        cleaned_val = val.strip('"').replace('\\"', '"')
+        cleaned_val = cleaned_val.replace("\\r\\n", "\n").replace("\\n", "\n")
+        attrs[key] = cleaned_val
+
+    # Build HTML representation with preserved line breaks for tooltips
+    items = []
+    for k, v in attrs.items():
+        if k == "tooltip":
+            items.append(
+                html.Li(
+                    [
+                        html.B("tooltip: "),
+                        html.Pre(v, style={"whiteSpace": "pre-wrap", "margin": "0"}),
+                    ]
+                )
+            )
+        else:
+            items.append(html.Li(f"{k}: {v}"))
+
+    return (
+        {"name": selected, "attributes": attrs},
+        html.Div(
+            [
+                html.B(f"Selected element: {selected}"),
+                html.Ul(items),
+            ]
+        ),
     )
 
 if __name__ == '__main__':

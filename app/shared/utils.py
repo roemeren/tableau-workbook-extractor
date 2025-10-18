@@ -22,3 +22,32 @@ def get_app_version():
     if VERSION_FILE.exists():
         return VERSION_FILE.read_text().strip()
     return "unknown"
+
+def list_subfolders(base_dir):
+    """Return all subfolders inside assets/<base_dir>."""
+    if not os.path.exists(base_dir):
+        return []
+
+    return [
+        f for f in os.listdir(base_dir)
+        if os.path.isdir(os.path.join(base_dir, f))
+    ]
+
+def list_dot_files(base_dir, subfolder):
+    """Return all .dot filenames (without extension) inside a subfolder."""
+    subfolder_path = os.path.join(base_dir, subfolder)
+    if not os.path.exists(subfolder_path):
+        return []
+    return [
+        os.path.splitext(f)[0]
+        for f in os.listdir(subfolder_path)
+        if f.endswith(".dot")
+    ]
+
+def read_dot_file(base_dir, subfolder, filename):
+    """Return the raw DOT source for the given folder + file."""
+    path = os.path.join(base_dir, subfolder, f"{filename}.dot")
+    if not os.path.exists(path):
+        return ""
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
