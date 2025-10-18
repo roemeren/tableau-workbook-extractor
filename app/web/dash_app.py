@@ -160,10 +160,15 @@ app.layout = dbc.Container(
                     # store selected sample file
                     dcc.Store(id="sample-file-store", data={}),
                 ],
-                # left panel width: around 2.5/12 (22%)
-                # width = "auto",
+                
                 className="p-3 rounded",
-                style={"flex": "0 0 22%", "backgroundColor": "#f0f0f0"},
+                    style={
+                        # left panel width: around 2.5/12 (22%)
+                        "flex": "0 0 22%",           
+                        "backgroundColor": "#f0f0f0",
+                        # make sure that column stretches to full browser height
+                        "height": "100vh",
+                    },
             ),
             # Right panel
             dbc.Col(
