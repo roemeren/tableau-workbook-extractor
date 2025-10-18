@@ -735,17 +735,71 @@ def update_network_title(main_node_name):
         return "Network Visualization"
     return f"Network Visualization for {main_node_name}"
 
-# File or engine change -> render graph
 @app.callback(
     Output("gv", "dot_source"),
     Output("gv", "engine"),
     Input("dot-store", "data"),
     Input("engine", "value"),
+    Input("gv", "selected"),
+    prevent_initial_call=True,
 )
-def update_graph(dot_source, engine):
+def update_graph(dot_source, engine, selected):
+    """Render DOT; if a node is selected, make it visually bigger and bold."""
     if not dot_source:
         raise PreventUpdate
-    return dot_source, engine
+
+    new_dot = dot_source
+
+    if selected:
+        if isinstance(selected, list) and selected:
+            selected = selected[0]
+
+        node_escaped = re.escape(selected.strip('"'))
+        node_pat = rf'("{node_escaped}"\s*\[)(.*?)(\]\s*;)'
+
+        def bump_attrs(m):
+            before, attrs, after = m.group(1), m.group(2), m.group(3)
+            a = attrs
+
+            # --- bump fontsize ---
+            fs = re.search(r'fontsize\s*=\s*([0-9]+(?:\.[0-9]+)?)', a)
+            if fs:
+                curr = float(fs.group(1))
+                a = re.sub(r'fontsize\s*=\s*[0-9]+(?:\.[0-9]+)?', f'fontsize={curr + 4:g}', a, count=1)
+            else:
+                a = a.strip()
+                if a and not a.endswith(','):
+                    a += ', '
+                a += 'fontsize=18'
+
+            # --- bump penwidth ---
+            if re.search(r'\bpenwidth\s*=', a):
+                a = re.sub(r'\bpenwidth\s*=\s*([0-9]+(?:\.[0-9]+)?)', 'penwidth=3', a, count=1)
+            else:
+                a = a.strip()
+                if a and not a.endswith(','):
+                    a += ', '
+                a += 'penwidth=3'
+
+            # --- make font bold (switch to bold variant if available) ---
+            if re.search(r'\bfontname\s*=', a):
+                a = re.sub(
+                    r'\bfontname\s*=\s*"?(.*?)"?\b',
+                    lambda m: f'fontname="{m.group(1).replace("-Bold", "")}-Bold"',
+                    a,
+                    count=1,
+                )
+            else:
+                a = a.strip()
+                if a and not a.endswith(','):
+                    a += ', '
+                a += 'fontname="Helvetica-Bold"'
+
+            return before + a + after
+
+        new_dot = re.sub(node_pat, bump_attrs, new_dot, count=1, flags=re.DOTALL)
+
+    return new_dot, engine
 
 # When a node is clicked: parse and display its attributes
 @app.callback(
