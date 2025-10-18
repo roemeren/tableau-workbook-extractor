@@ -9,7 +9,7 @@ import logging
 
 logger = logging.getLogger("TWE_LOGGER")
 
-def setup_logging(is_executable, uploadfolder):
+def setup_logging(is_executable, out_folder=None):
     """
     Set up conditional logging based on type
 
@@ -19,12 +19,6 @@ def setup_logging(is_executable, uploadfolder):
                     If not provided, logs will be saved in a 'temp' 
                     directory adjacent to this module.
     """
-
-    # Set up logging for Flask app
-    log_directory = os.path.join(uploadfolder or os.path.dirname(__file__), 'temp')
-    os.makedirs(log_directory, exist_ok=True)
-    log_file = os.path.join(log_directory, 'log_file.log')
-
     # Prevent the logger from propagating log messages to the root logger
     logger.propagate = False
 
@@ -37,6 +31,9 @@ def setup_logging(is_executable, uploadfolder):
         handler = logging.StreamHandler(sys.stdout)
     else:
         # Log to file
+        log_directory = out_folder or os.path.join(os.path.dirname(__file__), 'temp')
+        log_file = os.path.join(log_directory, 'log_file.log')
+        os.makedirs(log_directory, exist_ok=True)
         handler = logging.FileHandler(log_file)
 
     # Set the formatter
