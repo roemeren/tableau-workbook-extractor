@@ -153,6 +153,8 @@ app.layout = dbc.Container(
                     # path to the graphs folder and currently selected file
                     dcc.Store(id="dot-root-store"),
                     dcc.Store(id="dot-store"),
+                    dcc.Store(id="attrs-store"),
+                    dcc.Store(id="main-node-store"),
                     # polling interval
                     dcc.Interval(id="progress-poller", interval=2000, disabled=True),
                     # stores for some of the callback outputs
@@ -378,7 +380,11 @@ app.layout = dbc.Container(
                             # Graph container
                             dbc.Col(
                                 [
-                                    html.H5("Network Visualization", className="card-title mb-3"),
+                                    html.H5(
+                                        "Network Visualization",
+                                        id = "network-title",  
+                                        className="card-title mb-3"
+                                    ),
                                     dash_interactive_graphviz.DashInteractiveGraphviz(
                                         id="gv",
                                         style={
@@ -660,14 +666,17 @@ def update_file_dropdown(base_dir, selected_folder):
     # Auto-select first file if available
     return options, files[0] if files else None
 
-
+# File -> load and parse .dot source
 @app.callback(
     Output("dot-store", "data"),
+    Output("attrs-store", "data"),
+    Output("main-node-store", "data"),
     Input("file-dropdown", "value"),
     State("dot-root-store", "data"),
     State("folder-dropdown", "value"),
 )
 def load_dot_source(selected_file, base_dir, selected_folder):
+    """Load the selected .dot file, parse its node attributes, and identify the main node."""
     if not selected_file or not selected_folder:
         raise PreventUpdate
 
@@ -678,7 +687,53 @@ def load_dot_source(selected_file, base_dir, selected_folder):
     with open(path, "r", encoding="utf-8") as f:
         dot_text = f.read()
 
-    return dot_text
+    # --- robust, line-anchored parse of node attributes ---
+    # - Only match lines that START with a quoted node name
+    # - Ignore edge lines and graph-level attributes
+    node_pattern = r'^\s*"([^"]+)"\s*\[(.*?)\]\s*;'
+    attr_pattern = r'(\w+)=("([^"\\]|\\.)*"|[^,\]]+)'  # value is quoted or runs until comma or ']'
+
+    node_attrs = {}
+    main_node = None
+
+    for node_match in re.finditer(node_pattern, dot_text, re.MULTILINE | re.DOTALL):
+        node_name = node_match.group(1)
+        attrs_str = node_match.group(2)
+
+        attrs = {}
+        for m in re.finditer(attr_pattern, attrs_str):
+            key = m.group(1)
+            val = m.group(2).strip()
+
+            # normalize + clean value
+            if len(val) >= 2 and val[0] == '"' and val[-1] == '"':
+                # strip outer quotes and unescape
+                val = val[1:-1].replace('\\"', '"')
+                val = val.replace("\\r\\n", "\n").replace("\\n", "\n")
+            else:
+                # unquoted token; trim any stray whitespace
+                val = val.strip()
+
+            attrs[key] = val
+
+        node_attrs[node_name] = attrs
+
+        # detect the "main" node (DOT uses 'fillcolor', not 'fill_color')
+        fill = (attrs.get("fillcolor") or attrs.get("fill_color") or "").lower()
+        if fill == "lightblue" and main_node is None:
+            main_node = attrs.get("label", node_name)
+
+    return dot_text, node_attrs, main_node
+
+
+@app.callback(
+    Output("network-title", "children"),
+    Input("main-node-store", "data"),
+)
+def update_network_title(main_node_name):
+    if not main_node_name:
+        return "Network Visualization"
+    return f"Network Visualization for {main_node_name}"
 
 # File or engine change -> render graph
 @app.callback(
@@ -697,69 +752,44 @@ def update_graph(dot_source, engine):
     Output("selected-store", "data"),
     Output("selected-element", "children"),
     Input("gv", "selected"),
-    State("dot-store", "data"),
+    State("attrs-store", "data"),
 )
-def show_selected_attributes(selected, dot_source):
+def show_selected_attributes(selected, node_attrs):
     """
-    When a user clicks on a node, extract its attributes from the raw DOT source.
+    When a user clicks on a node, retrieve its attributes from the stored data.
 
     Returns:
         - selected-store.data: a dict {"name": node_name, "attributes": {...}}
         - selected-element.children: human-readable HTML summary
     """
-    # Handle missing selection
-    if not selected or not dot_source:
+    if not selected or not node_attrs:
         return {"name": None, "attributes": {}}, "Selected element: none"
 
-    # Graphviz sometimes returns list for multiple selections
     if isinstance(selected, list) and selected:
         selected = selected[0]
 
-    # Escape node name for regex safety (handles [ and ])
-    node_escaped = re.escape(selected.strip('"'))
+    attrs = node_attrs.get(selected.strip('"'), {})
 
-    # Find full node definition line
-    pattern = rf'"{node_escaped}"\s*\[(.*?)\];'
-    match = re.search(pattern, dot_source, re.DOTALL)
-    if not match:
-        return {"name": selected, "attributes": {}}, f"Selected element: {selected}"
-
-    attrs_str = match.group(1)
-
-    # Extract key=value pairs, supporting quoted values, escaped quotes, newlines
-    attr_pattern = r'(\w+)=("([^"\\]|\\.)*"|\S+)'
-    attrs = {}
-    for m in re.finditer(attr_pattern, attrs_str, re.DOTALL):
-        key = m.group(1)
-        val = m.group(2)
-        cleaned_val = val.strip('"').replace('\\"', '"')
-        cleaned_val = cleaned_val.replace("\\r\\n", "\n").replace("\\n", "\n")
-        attrs[key] = cleaned_val
-
-    # Build HTML representation with preserved line breaks for tooltips
     items = []
     for k, v in attrs.items():
         if k == "tooltip":
             items.append(
-                html.Li(
-                    [
-                        html.B("tooltip: "),
-                        html.Pre(v, style={"whiteSpace": "pre-wrap", "margin": "0"}),
-                    ]
-                )
+                html.Li([
+                    html.B("tooltip: "),
+                    html.Pre(v, style={"whiteSpace": "pre-wrap", "margin": "0"}),
+                ])
             )
         else:
             items.append(html.Li(f"{k}: {v}"))
 
     return (
         {"name": selected, "attributes": attrs},
-        html.Div(
-            [
-                html.B(f"Selected element: {selected}"),
-                html.Ul(items),
-            ]
-        ),
+        html.Div([
+            html.B(f"Selected element: {selected}"),
+            html.Ul(items),
+        ]),
     )
+
 
 if __name__ == '__main__':
     app.run(debug=DEBUG_MODE)
