@@ -150,8 +150,9 @@ app.layout = dbc.Container(
                     # =======================
                     # HIDDEN ELEMENTS
                     # =======================
-                    # path to the graphs folder
+                    # path to the graphs folder and currently selected file
                     dcc.Store(id="dot-root-store"),
+                    dcc.Store(id="dot-store"),
                     # polling interval
                     dcc.Interval(id="progress-poller", interval=2000, disabled=True),
                     # stores for some of the callback outputs
@@ -659,39 +660,46 @@ def update_file_dropdown(base_dir, selected_folder):
     # Auto-select first file if available
     return options, files[0] if files else None
 
-# File or engine change -> render graph
+
 @app.callback(
-    Output("gv", "dot_source"),
-    Output("gv", "engine"),
+    Output("dot-store", "data"),
     Input("file-dropdown", "value"),
-    Input("engine", "value"),
     State("dot-root-store", "data"),
     State("folder-dropdown", "value"),
 )
-def update_graph(selected_file, engine, base_dir, selected_folder):
-    """Load and render the selected .dot file."""
+def load_dot_source(selected_file, base_dir, selected_folder):
     if not selected_file or not selected_folder:
-        return no_update, no_update
+        raise PreventUpdate
 
     path = os.path.join(base_dir, selected_folder, f"{selected_file}.dot")
     if not os.path.exists(path):
-        return no_update, no_update
+        raise PreventUpdate
 
     with open(path, "r", encoding="utf-8") as f:
         dot_text = f.read()
 
-    return dot_text, engine
+    return dot_text
+
+# File or engine change -> render graph
+@app.callback(
+    Output("gv", "dot_source"),
+    Output("gv", "engine"),
+    Input("dot-store", "data"),
+    Input("engine", "value"),
+)
+def update_graph(dot_source, engine):
+    if not dot_source:
+        raise PreventUpdate
+    return dot_source, engine
 
 # When a node is clicked: parse and display its attributes
 @app.callback(
     Output("selected-store", "data"),
     Output("selected-element", "children"),
     Input("gv", "selected"),
-    State("dot-root-store", "data"),
-    State("folder-dropdown", "value"),
-    State("file-dropdown", "value"),
+    State("dot-store", "data"),
 )
-def show_selected_attributes(selected, base_dir, selected_folder, selected_file):
+def show_selected_attributes(selected, dot_source):
     """
     When a user clicks on a node, extract its attributes from the raw DOT source.
 
@@ -700,17 +708,12 @@ def show_selected_attributes(selected, base_dir, selected_folder, selected_file)
         - selected-element.children: human-readable HTML summary
     """
     # Handle missing selection
-    if not selected or not selected_file or not selected_folder:
+    if not selected or not dot_source:
         return {"name": None, "attributes": {}}, "Selected element: none"
 
     # Graphviz sometimes returns list for multiple selections
     if isinstance(selected, list) and selected:
         selected = selected[0]
-
-    # Load raw .dot text for this graph
-    dot_source = read_dot_file(base_dir, selected_folder, selected_file)
-    if not dot_source:
-        return {"name": selected, "attributes": {}}, f"Selected element: {selected}"
 
     # Escape node name for regex safety (handles [ and ])
     node_escaped = re.escape(selected.strip('"'))
