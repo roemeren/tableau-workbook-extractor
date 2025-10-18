@@ -17,7 +17,6 @@ The `process_twb` function serves as the main entry point, taking a
 file path and optional parameters for output handling and execution context.
 """
 import warnings
-import shutil
 from tqdm import tqdm
 from shared.logging import setup_logging, stepLog, logger
 from shared.common import *
@@ -67,19 +66,19 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
         None: This function does not return a value but generates output files
     """
     try:
-        # Initialize logging for Flask app
-        if not is_executable: setup_logging(is_executable, output_folder)
-
-        # Ignore future warnings when reading field attributes (not applicable)
-        warnings.simplefilter(action='ignore', category=FutureWarning)
-
         # Extract file/directory names from twb file
         inpFileName = os.path.splitext(os.path.basename(filepath))[0]
 
         if is_executable:
             outFileDirectory =f"{filepath} Files"
         else:
-            outFileDirectory = os.path.join(output_folder, 'temp')
+            outFileDirectory = os.path.join(output_folder, f"{inpFileName} Files")
+
+        # Initialize logging for app
+        if not is_executable: setup_logging(is_executable, outFileDirectory)
+
+        # Ignore future warnings when reading field attributes (not applicable)
+        warnings.simplefilter(action='ignore', category=FutureWarning)
 
         # Get initial data frame with nested data source and field objects
         progress_data["progress"] = 3
@@ -310,7 +309,7 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
         outFilePath = os.path.join(outSheetDirectory, inpFileName + '.xlsx')
 
         progress_data["progress"] = 12
-        progress_data["current-task"] = stepLog("Saving table results in " + outFilePath)
+        progress_data["current-task"] = stepLog("Saving table results")
 
         if not os.path.isdir(outSheetDirectory):
             os.makedirs(outSheetDirectory)
@@ -369,11 +368,11 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
         progress_range = end_progress - start_progress
 
         if fDepFields:
-            inpPath = os.path.join(outFileDirectory, 'Graphs')
+            outPath = os.path.join(outFileDirectory, 'Graphs')
 
             progress_data["progress"] = start_progress
             progress_data["current-task"] = \
-                stepLog(f"Creating field dependency graphs per source in {inpPath}")
+                stepLog(f"Creating field dependency graphs per source")
 
             # Use tqdm for progress bar if executable, else simple progress
             iterator = tqdm(df_original.iterrows(), total=nField) if is_executable else df_original.iterrows()
@@ -385,7 +384,7 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
                 nDependency = row.n_backward_dependencies + row.n_forward_dependencies
                 if nDependency > 0:
                     visualizeFieldDependencies(df_original, row.source_field_repl_id, 
-                        row.source_field_label, gMaster, inpPath, fPNG)
+                        row.source_field_label, gMaster, outPath, fPNG)
 
                 if not is_executable:
                     current_progress += 1
@@ -394,18 +393,18 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
 
         if fDepSheets:
             # Create output folder if it doesn't exist yet
-            inpPath = os.path.join(outFileDirectory, 'Graphs', 'Sheets')
-            if not os.path.isdir(inpPath): os.makedirs(inpPath)
+            outPath = os.path.join(outFileDirectory, 'Graphs', 'Sheets')
+            if not os.path.isdir(outPath): os.makedirs(outPath)
 
             progress_data["current-task"] = \
-                stepLog(f"Creating sheet dependency graphs in {inpPath}")
+                stepLog(f"Creating sheet dependency graphs")
 
             # Use tqdm for progress bar if executable, else simple progress
             iterator = tqdm(lstSheets, total=nSheet) if is_executable else lstSheets
 
             # Create dependency graphs per sheet
             for sh in iterator:
-                visualizeSheetDependencies(df2_original, sh, gMaster, inpPath, fPNG)
+                visualizeSheetDependencies(df2_original, sh, gMaster, outPath, fPNG)
                 if not is_executable:
                     current_progress += 1
                     progress_data["progress"] = \
@@ -428,8 +427,7 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
                 handler.close()
                 logger.removeHandler(handler)
 
-            # Remove temp directory + ensure progress is 100%
-            shutil.rmtree(outFileDirectory)
+            # Ensure progress is 100%
             progress_data['progress'] = 100
 
         # Return success indicator

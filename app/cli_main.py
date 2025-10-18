@@ -32,7 +32,7 @@ def main():
     """
 
     # Initialize logging for Flask app
-    setup_logging(True, None)
+    setup_logging(True)
 
     # Ask the user to select a .twb file using easygui
     stepLog("Prompt for input Tableau workbook...")
