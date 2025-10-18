@@ -377,22 +377,14 @@ app.layout = dbc.Container(
                             # Graph container
                             dbc.Col(
                                 [
-                                    dbc.Card(
-                                        dbc.CardBody(
-                                            [
-                                                html.H5("Network Visualization", className="card-title"),
-                                                dash_interactive_graphviz.DashInteractiveGraphviz(
-                                                    id="gv",
-                                                    style={
-                                                        "height": "400px",
-                                                        "width": "99%",
-                                                        "align": "bottom",
-                                                    }
-                                                ),
-                                            ]
-                                        ),
-                                        className="shadow-sm",
-                                    )
+                                    html.H5("Network Visualization", className="card-title mb-3"),
+                                    dash_interactive_graphviz.DashInteractiveGraphviz(
+                                        id="gv",
+                                        style={
+                                            "height": "425px",
+                                            "width": "50%",
+                                        }
+                                    ),
                                 ],
                                 width=8,
                             ),
