@@ -11,6 +11,8 @@ import re
 from shared.utils import *
 from shared.processing import process_twb
 from shared.common import progress_data
+import networkx as nx
+import pydot
 
 # --- initialize folders ---
 os.makedirs(STATIC_FOLDER, exist_ok=True)
@@ -399,7 +401,6 @@ app.layout = dbc.Container(
                             # Node info panel
                             dbc.Col(
                                 [
-                                    dcc.Store(id="selected-store"),
                                     dbc.Card(
                                         dbc.CardBody(
                                             [
@@ -676,7 +677,7 @@ def update_file_dropdown(base_dir, selected_folder):
     State("folder-dropdown", "value"),
 )
 def load_dot_source(selected_file, base_dir, selected_folder):
-    """Load the selected .dot file, parse its node attributes, and identify the main node."""
+    """Load the selected .dot file, parse its node attributes, and identify the main node as [id, label]."""
     if not selected_file or not selected_folder:
         raise PreventUpdate
 
@@ -688,8 +689,6 @@ def load_dot_source(selected_file, base_dir, selected_folder):
         dot_text = f.read()
 
     # --- robust, line-anchored parse of node attributes ---
-    # - Only match lines that START with a quoted node name
-    # - Ignore edge lines and graph-level attributes
     node_pattern = r'^\s*"([^"]+)"\s*\[(.*?)\]\s*;'
     attr_pattern = r'(\w+)=("([^"\\]|\\.)*"|[^,\]]+)'  # value is quoted or runs until comma or ']'
 
@@ -697,7 +696,7 @@ def load_dot_source(selected_file, base_dir, selected_folder):
     main_node = None
 
     for node_match in re.finditer(node_pattern, dot_text, re.MULTILINE | re.DOTALL):
-        node_name = node_match.group(1)
+        node_id = node_match.group(1)
         attrs_str = node_match.group(2)
 
         attrs = {}
@@ -707,33 +706,30 @@ def load_dot_source(selected_file, base_dir, selected_folder):
 
             # normalize + clean value
             if len(val) >= 2 and val[0] == '"' and val[-1] == '"':
-                # strip outer quotes and unescape
                 val = val[1:-1].replace('\\"', '"')
                 val = val.replace("\\r\\n", "\n").replace("\\n", "\n")
             else:
-                # unquoted token; trim any stray whitespace
                 val = val.strip()
 
             attrs[key] = val
 
-        node_attrs[node_name] = attrs
+        node_attrs[node_id] = attrs
 
-        # detect the "main" node (DOT uses 'fillcolor', not 'fill_color')
+        # detect the "main" node by fill color
         fill = (attrs.get("fillcolor") or attrs.get("fill_color") or "").lower()
         if fill == "lightblue" and main_node is None:
-            main_node = attrs.get("label", node_name)
+            main_node = [node_id, attrs.get("label", node_id)]
 
     return dot_text, node_attrs, main_node
-
 
 @app.callback(
     Output("network-title", "children"),
     Input("main-node-store", "data"),
 )
-def update_network_title(main_node_name):
-    if not main_node_name:
+def update_network_title(main_node):
+    if not main_node:
         return "Network Visualization"
-    return f"Network Visualization for {main_node_name}"
+    return f"Network Visualization for {main_node[1]}"
 
 @app.callback(
     Output("gv", "dot_source"),
@@ -776,29 +772,32 @@ def update_graph(dot_source, engine, selected):
 
     return new_dot, engine
 
-# When a node is clicked: parse and display its attributes
 @app.callback(
-    Output("selected-store", "data"),
     Output("selected-element", "children"),
     Input("gv", "selected"),
     State("attrs-store", "data"),
+    State("dot-store", "data"),
+    State("main-node-store", "data"),
 )
-def show_selected_attributes(selected, node_attrs):
+def show_selected_attributes(selected, node_attrs, dot_text, main_node):
     """
-    When a user clicks on a node, retrieve its attributes from the stored data.
-
-    Returns:
-        - selected-store.data: a dict {"name": node_name, "attributes": {...}}
-        - selected-element.children: human-readable HTML summary
+    When a user clicks on a node, retrieve its attributes and show:
+    - the shortest dependency path (forward/backward)
+    - the calculation path (tooltips along the path)
+    Always include Step 1 even if it has no tooltip.
     """
-    if not selected or not node_attrs:
-        return {"name": None, "attributes": {}}, "Selected element: none"
+    if not selected or not node_attrs or not dot_text or not main_node:
+        return "Selected element: none"
 
+    # Normalize selection
     if isinstance(selected, list) and selected:
         selected = selected[0]
+    selected = selected.strip('"')
 
-    attrs = node_attrs.get(selected.strip('"'), {})
+    main_id, main_label = main_node
+    attrs = node_attrs.get(selected, {})
 
+    # --- Attribute list ---
     items = []
     for k, v in attrs.items():
         if k == "tooltip":
@@ -811,13 +810,73 @@ def show_selected_attributes(selected, node_attrs):
         else:
             items.append(html.Li(f"{k}: {v}"))
 
-    return (
-        {"name": selected, "attributes": attrs},
-        html.Div([
-            html.B(f"Selected element: {selected}"),
-            html.Ul(items),
-        ]),
-    )
+    # --- Compute shortest path ---
+    path_text = "No direct dependency path found."
+    calc_text = None
+
+    try:
+        pydot_graphs = pydot.graph_from_dot_data(dot_text)
+        if pydot_graphs:
+            G = nx.nx_pydot.from_pydot(pydot_graphs[0])
+            path, direction = None, None
+
+            if nx.has_path(G, main_id, selected):
+                path = nx.shortest_path(G, source=main_id, target=selected)
+                direction = "forward"
+            elif nx.has_path(G, selected, main_id):
+                path = nx.shortest_path(G, source=selected, target=main_id)
+                direction = "backward"
+
+            if path:
+                # Path text
+                path_labels = [node_attrs.get(n, {}).get("label", n) for n in path]
+                arrow = " → ".join(path_labels)
+                path_text = f"{direction.capitalize()} dependency: {arrow}"
+
+                # --- Build calculation chain ---
+                calc_chain = []
+                for i, node in enumerate(path):
+                    label = node_attrs.get(node, {}).get("label", node)
+                    tooltip = node_attrs.get(node, {}).get("tooltip", "").strip()
+
+                    # Always include step, even if tooltip empty
+                    tooltip_display = tooltip if tooltip else "(no calculation)"
+                    calc_chain.append(
+                        html.Div([
+                            html.B(f"▶ Step {i+1}: {label}"),
+                            html.Pre(
+                                tooltip_display,
+                                style={
+                                    "whiteSpace": "pre-wrap",
+                                    "margin": "4px 0 12px 12px",
+                                    "fontFamily": "monospace",
+                                },
+                            ),
+                        ])
+                    )
+
+                if calc_chain:
+                    calc_text = html.Div([
+                        html.Hr(),
+                        html.B("Calculation path:"),
+                        html.Div(calc_chain, style={"marginTop": "6px"})
+                    ])
+
+    except Exception as e:
+        path_text = f"Error computing path: {e}"
+
+    # --- Final output ---
+    children = [
+        html.B(f"Selected element: {attrs.get('label', selected)}"),
+        html.Ul(items),
+        html.Hr(),
+        html.B("Shortest path relative to main node:"),
+        html.Div(path_text, style={"marginTop": "4px"}),
+    ]
+    if calc_text:
+        children.append(calc_text)
+
+    return html.Div(children)
 
 
 if __name__ == '__main__':
