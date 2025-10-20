@@ -516,7 +516,7 @@ def maxDependencyLevel(l):
     res = 0
     # note: values are formatted as text -> max('-1', '-4') = -4
     if len(l) > 0: res = max([d.get("level") for d in l])
-    return res
+    return int(res)
 
 def fieldsFromCategory(l, c, f):
     """

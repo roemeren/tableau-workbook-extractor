@@ -247,8 +247,7 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
             df["n_worksheet_dependencies"] 
 
         # Flag unused fields (field and its forward dependencies not used in sheets)
-        df["flag_unused"] = df.apply(lambda x: \
-            np.where(x.n_worksheet_dependencies == 0, 1, 0), axis = 1)
+        df["flag_unused"] = (df["n_worksheet_dependencies"] == 0).astype(int)
 
         # Finalize calculated field expressions
         dictFieldToID = fieldMappingTable(df, "source_field_label", 
@@ -324,7 +323,7 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
             df[col] = df.apply(lambda x: fieldIDMapping(x[col], x.source_label, 
                 dictLabelToID), axis = 1)
 
-        colKeep = ["source_label", "field_label", "source_field_label",
+        colKeep = ["source_field_repl_id", "source_label", "field_label", "source_field_label",
             "field_datatype", "field_role", 
             "field_type", "field_aliases", "field_description", 
             "field_hidden", "field_worksheets", "field_category", 
@@ -341,7 +340,8 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
         for col in lstClean:
             df2[col] = df2.apply(lambda x: fieldIDMapping(x[col], x.source_label, 
                 dictLabelToID), axis = 1)
-        df2 = df2.drop(["source_field_repl_id"], axis = 1)
+        # Move "source_field_repl_id" to first position
+        df2.insert(0, "source_field_repl_id", df2.pop("source_field_repl_id"))
 
         # Store results and finish
         if not os.path.isdir(outFileDirectory):
@@ -350,6 +350,11 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
         with pd.ExcelWriter(outFilePath) as writer:
             df.to_excel(writer, sheet_name = "fields", index = False)
             df2.to_excel(writer, sheet_name = "dependencies", index = False)
+
+        outParquetPath = os.path.join(outSheetDirectory, 'fields.parquet')
+        df.to_parquet(outParquetPath, engine="pyarrow", index=False)
+        outParquetPath = os.path.join(outSheetDirectory, 'dependencies.parquet')
+        df2.to_parquet(outParquetPath, engine="pyarrow", index=False)
 
         # Get list of unique sheets
         lstSheets = list(df2_original[df2_original.dependency_category == "Sheet"]
