@@ -744,7 +744,7 @@ def update_network_title(main_node_name):
     prevent_initial_call=True,
 )
 def update_graph(dot_source, engine, selected):
-    """Render DOT; if a node is selected, make it visually bigger and bold."""
+    """Render DOT; if a node is selected, make its border thicker (penwidth=3)."""
     if not dot_source:
         raise PreventUpdate
 
@@ -757,47 +757,22 @@ def update_graph(dot_source, engine, selected):
         node_escaped = re.escape(selected.strip('"'))
         node_pat = rf'("{node_escaped}"\s*\[)(.*?)(\]\s*;)'
 
-        def bump_attrs(m):
+        def bump_penwidth(m):
             before, attrs, after = m.group(1), m.group(2), m.group(3)
             a = attrs
 
-            # --- bump fontsize ---
-            fs = re.search(r'fontsize\s*=\s*([0-9]+(?:\.[0-9]+)?)', a)
-            if fs:
-                curr = float(fs.group(1))
-                a = re.sub(r'fontsize\s*=\s*[0-9]+(?:\.[0-9]+)?', f'fontsize={curr + 4:g}', a, count=1)
-            else:
-                a = a.strip()
-                if a and not a.endswith(','):
-                    a += ', '
-                a += 'fontsize=18'
-
-            # --- bump penwidth ---
+            # --- set or update penwidth ---
             if re.search(r'\bpenwidth\s*=', a):
-                a = re.sub(r'\bpenwidth\s*=\s*([0-9]+(?:\.[0-9]+)?)', 'penwidth=3', a, count=1)
+                a = re.sub(r'\bpenwidth\s*=\s*[0-9]+(?:\.[0-9]+)?', 'penwidth=3', a, count=1)
             else:
                 a = a.strip()
                 if a and not a.endswith(','):
                     a += ', '
                 a += 'penwidth=3'
 
-            # --- make font bold (switch to bold variant if available) ---
-            if re.search(r'\bfontname\s*=', a):
-                a = re.sub(
-                    r'\bfontname\s*=\s*"?(.*?)"?\b',
-                    lambda m: f'fontname="{m.group(1).replace("-Bold", "")}-Bold"',
-                    a,
-                    count=1,
-                )
-            else:
-                a = a.strip()
-                if a and not a.endswith(','):
-                    a += ', '
-                a += 'fontname="Helvetica-Bold"'
-
             return before + a + after
 
-        new_dot = re.sub(node_pat, bump_attrs, new_dot, count=1, flags=re.DOTALL)
+        new_dot = re.sub(node_pat, bump_penwidth, new_dot, count=1, flags=re.DOTALL)
 
     return new_dot, engine
 
