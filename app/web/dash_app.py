@@ -10,7 +10,7 @@ import time
 import re
 from shared.utils import *
 from shared.processing import process_twb
-from shared.common import progress_data
+from shared.common import progress_data, pd
 import networkx as nx
 import pydot
 
@@ -154,6 +154,7 @@ app.layout = dbc.Container(
                     # =======================
                     # path to the graphs folder and currently selected file
                     dcc.Store(id="dot-root-store"),
+                    dcc.Store(id="df-root-store"),
                     dcc.Store(id="dot-store"),
                     dcc.Store(id="attrs-store"),
                     dcc.Store(id="main-node-store"),
@@ -405,7 +406,39 @@ app.layout = dbc.Container(
                                         dbc.CardBody(
                                             [
                                                 html.H5("Node Info", className="card-title"),
-                                                html.Div(id="selected-element", className="small"),
+                                                dbc.Tabs(
+                                                    id="node-info-tabs",
+                                                    active_tab="tab-general",
+                                                    class_name="mt-2",
+                                                    children=[
+                                                        dbc.Tab(
+                                                            label="General Info",
+                                                            tab_id="tab-general",
+                                                            children=html.Div(
+                                                                id="selected-element-general",
+                                                                className="small",
+                                                                style={
+                                                                    "maxHeight": "400px",
+                                                                    "overflowY": "auto",
+                                                                    "paddingRight": "8px",
+                                                                },
+                                                            ),
+                                                        ),
+                                                        dbc.Tab(
+                                                            label="Calculation Path",
+                                                            tab_id="tab-calc",
+                                                            children=html.Div(
+                                                                id="selected-element-calc",
+                                                                className="small",
+                                                                style={
+                                                                    "maxHeight": "400px",
+                                                                    "overflowY": "auto",
+                                                                    "paddingRight": "8px",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    ],
+                                                ),
                                             ]
                                         ),
                                         className="shadow-sm",
@@ -558,6 +591,7 @@ def start_processing(_, upload_filename, sample_filename, file_ready, active_tab
     Output("tab-upload-content", "disabled"),
     Output("tab-sample-content", "disabled"),
     Output("dot-root-store", "data"),
+    Output("df-root-store", "data"),
     Input("progress-poller", "n_intervals"), # initially None
     Input("processing-started", "data"), # will (re)activate the poller
     State("file-tabs", "active_tab"),
@@ -585,6 +619,7 @@ def update_progress(*args):
     # Build href only if out_file exists
     href = out_file and os.path.join(OUTPUT_FOLDER_URL, out_file)
     graphs_folder = out_folder and os.path.join(out_folder, "Graphs")
+    tables_folder = out_folder and os.path.join(out_folder, "Fields")
     style = {"width": "40%", "visibility": "hidden"}
     finished_at = progress_data.get("finished_at")
     status = progress_data.get("status")
@@ -626,6 +661,7 @@ def update_progress(*args):
         upload_tab_disabled,
         sample_tab_disabled,
         graphs_folder,
+        tables_folder,
     )
 
 # Output data -> Folder dropdown
@@ -773,44 +809,83 @@ def update_graph(dot_source, engine, selected):
     return new_dot, engine
 
 @app.callback(
-    Output("selected-element", "children"),
+    Output("selected-element-general", "children"),
+    Output("selected-element-calc", "children"),
     Input("gv", "selected"),
     State("attrs-store", "data"),
     State("dot-store", "data"),
     State("main-node-store", "data"),
+    State("df-root-store", "data"),
 )
-def show_selected_attributes(selected, node_attrs, dot_text, main_node):
+def show_selected_attributes(selected, node_attrs, dot_text, main_node, df_root):
     """
-    When a user clicks on a node, retrieve its attributes and show:
-    - the shortest dependency path (forward/backward)
-    - the calculation path (tooltips along the path)
-    Always include Step 1 even if it has no tooltip.
+    When a node is clicked:
+    - Display node info from fields.parquet
+    - Show shortest dependency path (forward/backward)
+    - Display calculation path using node tooltips
     """
     if not selected or not node_attrs or not dot_text or not main_node:
-        return "Selected element: none"
+        return (
+            html.Div(
+                html.I(
+                    "(no element selected)"),
+                style={"marginTop": "10px"}
+            ),
+            html.Div(
+                html.I(
+                    "(no calculation path available)"),
+                style={"marginTop": "10px"}
+            ),
+        )
 
     # Normalize selection
     if isinstance(selected, list) and selected:
         selected = selected[0]
     selected = selected.strip('"')
 
-    main_id, main_label = main_node
+    main_id = main_node[0]
     attrs = node_attrs.get(selected, {})
+    label = attrs.get("label", selected)
 
-    # --- Attribute list ---
-    items = []
-    for k, v in attrs.items():
-        if k == "tooltip":
-            items.append(
-                html.Li([
-                    html.B("tooltip: "),
-                    html.Pre(v, style={"whiteSpace": "pre-wrap", "margin": "0"}),
-                ])
-            )
-        else:
-            items.append(html.Li(f"{k}: {v}"))
+    # --- Load metadata from fields.parquet ---
+    metadata_section = html.Div("Node information not available.")
+    try:
+        parquet_path = os.path.join(df_root, "fields.parquet")
+        if os.path.exists(parquet_path):
+            df = pd.read_parquet(parquet_path)
+            row = df.loc[df["source_field_repl_id"] == selected]
 
-    # --- Compute shortest path ---
+            if len(row) == 1:
+                rec = row.iloc[0]
+                metadata_section = html.Div(
+                    [
+                        html.B("Field Information", style={"display": "block", "marginBottom": "6px"}),
+                        html.Ul(
+                            [
+                                html.Li([html.B("Data source: "), rec["source_label"]]),
+                                html.Li([html.B("Category: "), rec["field_category"]]),
+                                html.Li([html.B("Data type: "), rec["field_datatype"]]),
+                                html.Li([html.B("Role: "), rec["field_role"]]),
+                            ],
+                            style={"marginLeft": "10px"},
+                        ),
+                    ],
+                    style={
+                        "marginBottom": "12px",
+                        "padding": "8px 10px",
+                        "backgroundColor": "#f9f9f9",
+                        "borderRadius": "6px",
+                        "border": "1px solid #ddd",
+                    },
+                )
+            elif len(row) == 0:
+                metadata_section = html.Div(f"No record found for node ID: {selected}")
+            else:
+                metadata_section = html.Div(f"Multiple records found for node ID: {selected}")
+    except Exception as e:
+        metadata_section = html.Div(f"Error reading fields.parquet: {e}")
+
+    # --- Compute dependency path and calculation chain ---
     path_text = "No direct dependency path found."
     calc_text = None
 
@@ -828,19 +903,18 @@ def show_selected_attributes(selected, node_attrs, dot_text, main_node):
                 direction = "backward"
 
             if path:
-                # Path text
+                # Show dependency path
                 path_labels = [node_attrs.get(n, {}).get("label", n) for n in path]
                 arrow = " → ".join(path_labels)
                 path_text = f"{direction.capitalize()} dependency: {arrow}"
 
-                # --- Build calculation chain ---
+                # Build calculation chain
                 calc_chain = []
                 for i, node in enumerate(path):
                     label = node_attrs.get(node, {}).get("label", node)
                     tooltip = node_attrs.get(node, {}).get("tooltip", "").strip()
-
-                    # Always include step, even if tooltip empty
                     tooltip_display = tooltip if tooltip else "(no calculation)"
+
                     calc_chain.append(
                         html.Div([
                             html.B(f"▶ Step {i+1}: {label}"),
@@ -856,27 +930,31 @@ def show_selected_attributes(selected, node_attrs, dot_text, main_node):
                     )
 
                 if calc_chain:
-                    calc_text = html.Div([
-                        html.Hr(),
-                        html.B("Calculation path:"),
-                        html.Div(calc_chain, style={"marginTop": "6px"})
-                    ])
-
+                    calc_text = html.Div(
+                        calc_chain, 
+                        style={"marginTop": "6px"}
+                    )
+                    
     except Exception as e:
         path_text = f"Error computing path: {e}"
 
-    # --- Final output ---
-    children = [
-        html.B(f"Selected element: {attrs.get('label', selected)}"),
-        html.Ul(items),
+    # --- General Info (everything except calculation path)
+    general_info = html.Div([
+        html.B(
+            f"Selected element: {label}", 
+            style={"display": "block", 
+                   "marginTop": "10px", "marginBottom": "10px"
+        }),
+        metadata_section,
         html.Hr(),
         html.B("Shortest path relative to main node:"),
         html.Div(path_text, style={"marginTop": "4px"}),
-    ]
-    if calc_text:
-        children.append(calc_text)
+    ])
 
-    return html.Div(children)
+    # --- Calculation Path (can be None)
+    calc_section = calc_text if calc_text else html.Div("(no calculation path available)")
+
+    return general_info, calc_section
 
 
 if __name__ == '__main__':
