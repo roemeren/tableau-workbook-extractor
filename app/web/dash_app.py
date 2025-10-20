@@ -427,15 +427,24 @@ app.layout = dbc.Container(
                                                         dbc.Tab(
                                                             label="Calculation Path",
                                                             tab_id="tab-calc",
-                                                            children=html.Div(
-                                                                id="selected-element-calc",
-                                                                className="small",
-                                                                style={
-                                                                    "maxHeight": "400px",
-                                                                    "overflowY": "auto",
-                                                                    "paddingRight": "8px",
-                                                                },
-                                                            ),
+                                                            children=[
+                                                                dbc.Button(
+                                                                    "Expand view",
+                                                                    id="open-calc-modal",
+                                                                    color="secondary",
+                                                                    size="sm",
+                                                                    className="mt-2 mb-2",
+                                                                ),
+                                                                html.Div(
+                                                                    id="selected-element-calc",
+                                                                    className="small",
+                                                                    style={
+                                                                        "maxHeight": "350px",
+                                                                        "overflowY": "auto",
+                                                                        "paddingRight": "8px",
+                                                                    },
+                                                                ),
+                                                            ]
                                                         ),
                                                     ],
                                                 ),
@@ -448,6 +457,30 @@ app.layout = dbc.Container(
                             ),
                         ],
                         className="g-3 px-2",
+                    ),
+                    # Modal popup to display the expanded full calculation
+                    dbc.Modal(
+                        [
+                            dbc.ModalHeader("Expanded View"),
+                            dbc.ModalBody(
+                                html.Div(
+                                    id="calc-modal-content",
+                                    style={
+                                        "whiteSpace": "pre-wrap",
+                                        "fontFamily": "monospace",
+                                        "maxHeight": "75vh",
+                                        "overflowY": "auto",
+                                        "paddingRight": "10px",
+                                    },
+                                )
+                            ),
+                            dbc.ModalFooter(
+                                dbc.Button("Close", id="close-calc-modal", color="secondary", className="ms-auto")
+                            ),
+                        ],
+                        id="calc-modal",
+                        size="xl",  # xl = wide; lg = medium
+                        is_open=False,
                     ),
                 ],
                 # right panel width: fill up leftover space
@@ -956,6 +989,27 @@ def show_selected_attributes(selected, node_attrs, dot_text, main_node, df_root)
 
     return general_info, calc_section
 
+@app.callback(
+    Output("calc-modal", "is_open"),
+    Output("calc-modal-content", "children"),
+    Input("open-calc-modal", "n_clicks"),
+    Input("close-calc-modal", "n_clicks"),
+    State("calc-modal", "is_open"),
+    State("selected-element-calc", "children"),
+)
+def toggle_calc_modal(open_click, close_click, is_open, calc_content):
+
+    if not ctx.triggered:
+        raise PreventUpdate
+
+    trigger = ctx.triggered_id
+
+    if trigger == "open-calc-modal" and calc_content:
+        # Open modal and show the current calc tab content
+        return True, calc_content
+
+    # Close button or no content
+    return False, None
 
 if __name__ == '__main__':
     app.run(debug=DEBUG_MODE)
