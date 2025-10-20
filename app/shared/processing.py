@@ -352,8 +352,10 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
             df2.to_excel(writer, sheet_name = "dependencies", index = False)
 
         outParquetPath = os.path.join(outSheetDirectory, 'fields.parquet')
+        df["field_aliases"] = df["field_aliases"].astype(str) # to avoid errors
         df.to_parquet(outParquetPath, engine="pyarrow", index=False)
         outParquetPath = os.path.join(outSheetDirectory, 'dependencies.parquet')
+        df2["dependency_level"] = df2["dependency_level"].astype(int)
         df2.to_parquet(outParquetPath, engine="pyarrow", index=False)
 
         # Get list of unique sheets
