@@ -800,11 +800,6 @@ def update_network_title(main_node):
         return "Network Visualization"
     return f"Network Visualization for {main_node[1]}"
 
-import re
-import pydot
-import networkx as nx
-from dash.exceptions import PreventUpdate
-
 @app.callback(
     Output("gv", "dot_source"),
     Output("gv", "engine"),
