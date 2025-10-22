@@ -804,7 +804,7 @@ def load_dot_source(selected_file, base_dir, selected_folder):
 
         # detect the "main" node by fill color
         fill = (attrs.get("fillcolor") or attrs.get("fill_color") or "").lower()
-        if fill == "lightblue" and main_node is None:
+        if fill in ("lightblue", "grey") and main_node is None:
             main_node = [node_id, attrs.get("label", node_id)]
 
     return dot_text, node_attrs, main_node
@@ -989,12 +989,12 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
     # ---- assemble info sections ----
     general_info = html.Div([
         html.B(
-            f"Selected element: {label_selected}",
+            f"Selected element: {label_selected} ({direction or 'none'} dependency)",
             style={"display": "block", "marginTop": "10px", "marginBottom": "10px"},
         ),
         metadata_section,
         html.Hr(),
-        html.B(f"Shortest path relative to {label_selected} ({direction or 'none'} dependency):"),
+        html.B(f"Shortest path relative to {label_selected}:"),
         html.Div(path_text, style={"marginTop": "4px"}),
     ])
 
