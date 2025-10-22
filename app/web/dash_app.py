@@ -801,104 +801,82 @@ def update_network_title(main_node):
 
 @app.callback(
     Output("gv", "dot_source"),
+    Output("gv", "engine"),
+    Output("selected-element-general", "children"),
+    Output("selected-element-calc", "children"),
     Input("dot-store", "data"),
     Input("gv", "selected"),
-    State("main-node-store", "data"),  # add this to know the main node
+    State("main-node-store", "data"),
+    State("attrs-store", "data"),
+    State("df-root-store", "data"),
     prevent_initial_call=True,
 )
-def update_graph(dot_source, selected, main_node):
-    """Render DOT; highlight all nodes along the shortest path to/from the main node."""
+def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
+    """Render DOT graph + info: highlight path and show metadata, dependency chain."""
     if not dot_source or not main_node:
         raise PreventUpdate
 
     new_dot = dot_source
+    engine = "dot"  # fixed engine
+    general_info = html.Div()
+    calc_section = html.Div()
 
-    if selected:
-        if isinstance(selected, list) and selected:
-            selected = selected[0]
-        selected = selected.strip('"')
-        main_id = main_node[0]
-
-        try:
-            # Parse DOT into a networkx graph
-            graphs = pydot.graph_from_dot_data(dot_source)
-            if not graphs:
-                raise PreventUpdate
-
-            G = nx.nx_pydot.from_pydot(graphs[0])
-
-            # Find shortest path in either direction
-            if nx.has_path(G, main_id, selected):
-                path = nx.shortest_path(G, source=main_id, target=selected)
-            elif nx.has_path(G, selected, main_id):
-                path = nx.shortest_path(G, source=selected, target=main_id)
-            else:
-                path = [selected]  # no path, only highlight selected node
-
-            # Bump penwidth for each node in the path
-            for node_id in path:
-                node_escaped = re.escape(node_id)
-                node_pat = rf'("{node_escaped}"\s*\[)(.*?)(\]\s*;)'
-
-                def bump_penwidth(m):
-                    before, attrs, after = m.group(1), m.group(2), m.group(3)
-                    a = attrs
-                    if re.search(r'\bpenwidth\s*=', a):
-                        a = re.sub(r'\bpenwidth\s*=\s*[0-9]+(?:\.[0-9]+)?', 'penwidth=3', a, count=1)
-                    else:
-                        a = a.strip()
-                        if a and not a.endswith(','):
-                            a += ', '
-                        a += 'penwidth=3'
-                    return before + a + after
-
-                new_dot = re.sub(node_pat, bump_penwidth, new_dot, count=1, flags=re.DOTALL)
-
-        except Exception:
-            pass  # silently ignore parse/path issues
-
-    return new_dot
-
-@app.callback(
-    Output("selected-element-general", "children"),
-    Output("selected-element-calc", "children"),
-    Input("gv", "selected"),
-    State("attrs-store", "data"),
-    State("dot-store", "data"),
-    State("main-node-store", "data"),
-    State("df-root-store", "data"),
-)
-def show_selected_attributes(selected, node_attrs, dot_text, main_node, df_root):
-    """
-    When a node is clicked:
-    - Display node info from fields.parquet
-    - Show shortest dependency path (forward/backward)
-    - Display calculation path using node tooltips
-    """
-    if not selected or not node_attrs or not dot_text or not main_node:
+    # ---- no selection ----
+    if not selected or not node_attrs:
         return (
-            html.Div(
-                html.I(
-                    "(no element selected)"),
-                style={"marginTop": "10px"}
-            ),
-            html.Div(
-                html.I(
-                    "(no calculation path available)"),
-                style={"marginTop": "10px"}
-            ),
+            new_dot,
+            engine,
+            html.Div(html.I("(no element selected)"), style={"marginTop": "10px"}),
+            html.Div(html.I("(no calculation path available)"), style={"marginTop": "10px"}),
         )
 
-    # Normalize selection
+    # ---- normalize ----
     if isinstance(selected, list) and selected:
         selected = selected[0]
     selected = selected.strip('"')
-
     main_id = main_node[0]
     attrs = node_attrs.get(selected, {})
     label_selected = attrs.get("label", selected)
 
-    # --- Load metadata from fields.parquet ---
+    # ---- parse DOT + compute path ----
+    path, direction = None, None
+    try:
+        graphs = pydot.graph_from_dot_data(dot_source)
+        if graphs:
+            G = nx.nx_pydot.from_pydot(graphs[0])
+
+            if nx.has_path(G, main_id, selected):
+                path = nx.shortest_path(G, source=main_id, target=selected)
+                direction = "forward"
+            elif nx.has_path(G, selected, main_id):
+                path = nx.shortest_path(G, source=selected, target=main_id)
+                direction = "backward"
+            else:
+                path = [selected]
+    except Exception:
+        pass  # ignore layout/path errors
+
+    # ---- highlight nodes ----
+    if path:
+        for node_id in path:
+            node_escaped = re.escape(node_id)
+            node_pat = rf'("{node_escaped}"\s*\[)(.*?)(\]\s*;)'
+
+            def bump_penwidth(m):
+                before, attrs, after = m.group(1), m.group(2), m.group(3)
+                a = attrs
+                if re.search(r'\bpenwidth\s*=', a):
+                    a = re.sub(r'\bpenwidth\s*=\s*[0-9]+(?:\.[0-9]+)?', 'penwidth=3', a, count=1)
+                else:
+                    a = a.strip()
+                    if a and not a.endswith(','):
+                        a += ', '
+                    a += 'penwidth=3'
+                return before + a + after
+
+            new_dot = re.sub(node_pat, bump_penwidth, new_dot, count=1, flags=re.DOTALL)
+
+    # ---- metadata from fields.parquet ----
     metadata_section = html.Div("Node information not available.")
     try:
         parquet_path = os.path.join(df_root, "fields.parquet")
@@ -936,77 +914,53 @@ def show_selected_attributes(selected, node_attrs, dot_text, main_node, df_root)
     except Exception as e:
         metadata_section = html.Div(f"Error reading fields.parquet: {e}")
 
-    # --- Compute dependency path and calculation chain ---
+    # ---- dependency & calc path text ----
     path_text = "No direct dependency path found."
     calc_text = None
 
-    try:
-        pydot_graphs = pydot.graph_from_dot_data(dot_text)
-        if pydot_graphs:
-            G = nx.nx_pydot.from_pydot(pydot_graphs[0])
-            path, direction = None, None
+    if path:
+        path_labels = [node_attrs.get(n, {}).get("label", n) for n in path]
+        arrow = " → ".join(path_labels)
+        path_text = arrow if direction in ("forward", "backward") else "No direct dependency path."
 
-            # TODO: output is dict so could be put in Store to update graph boldness
-            if nx.has_path(G, main_id, selected):
-                path = nx.shortest_path(G, source=main_id, target=selected)
-                direction = "forward"
-            elif nx.has_path(G, selected, main_id):
-                path = nx.shortest_path(G, source=selected, target=main_id)
-                direction = "backward"
+        calc_chain = []
+        for i, node in enumerate(path):
+            label = node_attrs.get(node, {}).get("label", node)
+            tooltip = node_attrs.get(node, {}).get("tooltip", "").strip()
+            tooltip_display = tooltip if tooltip else "(no calculation)"
+            calc_chain.append(
+                html.Div([
+                    html.B(f"▶ Step {i+1}: {label}"),
+                    html.Pre(
+                        tooltip_display,
+                        style={
+                            "whiteSpace": "pre-wrap",
+                            "margin": "4px 0 12px 12px",
+                            "fontFamily": "monospace",
+                        },
+                    ),
+                ])
+            )
 
-            if path:
-                # Show dependency path
-                path_labels = [node_attrs.get(n, {}).get("label", n) for n in path]
-                arrow = " → ".join(path_labels)
-                path_text = f"{arrow}"
+        if calc_chain:
+            calc_text = html.Div(calc_chain, style={"marginTop": "6px"})
 
-                # Build calculation chain
-                calc_chain = []
-                for i, node in enumerate(path):
-                    label = node_attrs.get(node, {}).get("label", node)
-                    tooltip = node_attrs.get(node, {}).get("tooltip", "").strip()
-                    tooltip_display = tooltip if tooltip else "(no calculation)"
-
-                    calc_chain.append(
-                        html.Div([
-                            html.B(f"▶ Step {i+1}: {label}"),
-                            html.Pre(
-                                tooltip_display,
-                                style={
-                                    "whiteSpace": "pre-wrap",
-                                    "margin": "4px 0 12px 12px",
-                                    "fontFamily": "monospace",
-                                },
-                            ),
-                        ])
-                    )
-
-                if calc_chain:
-                    calc_text = html.Div(
-                        calc_chain, 
-                        style={"marginTop": "6px"}
-                    )
-                    
-    except Exception as e:
-        path_text = f"Error computing path: {e}"
-
-    # --- General Info (everything except calculation path)
+    # ---- assemble info sections ----
     general_info = html.Div([
         html.B(
-            f"Selected element: {label_selected} ({direction} dependency)", 
-            style={"display": "block", 
-                   "marginTop": "10px", "marginBottom": "10px"
-        }),
+            f"Selected element: {label_selected}",
+            style={"display": "block", "marginTop": "10px", "marginBottom": "10px"},
+        ),
         metadata_section,
         html.Hr(),
-        html.B(f"Shortest path relative to {label}:"),
+        html.B(f"Shortest path relative to {label_selected} ({direction or 'none'} dependency):"),
         html.Div(path_text, style={"marginTop": "4px"}),
     ])
 
-    # --- Calculation Path (can be None)
     calc_section = calc_text if calc_text else html.Div("(no calculation path available)")
 
-    return general_info, calc_section
+    return new_dot, engine, general_info, calc_section
+
 
 @app.callback(
     Output("calc-modal", "is_open"),
