@@ -334,51 +334,63 @@ app.layout = dbc.Container(
                         ),
                     ], className="mb-3"),
 
-                    # Control row (folder/file/engine)
+                    # Visualization and control layout
                     dbc.Row(
                         [
+                            # Left part
                             dbc.Col(
                                 [
-                                    html.Label("Folder", className="fw-bold"),
-                                    dcc.Dropdown(
-                                        id="folder-dropdown",
-                                        placeholder="Select folder",
-                                        clearable=False,
+                                    # Control row (folder/file/engine)
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    html.Label("Folder", className="fw-bold"),
+                                                    dcc.Dropdown(
+                                                        id="folder-dropdown",
+                                                        placeholder="Select folder",
+                                                        clearable=False,
+                                                    ),
+                                                ],
+                                                width=4,
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    html.Label("Field", className="fw-bold"),
+                                                    dcc.Dropdown(
+                                                        id="file-dropdown",
+                                                        placeholder="Select file",
+                                                    ),
+                                                ],
+                                                width=4,
+                                            ),
+                                        ],
+                                        className="g-3 mb-3 px-2",
                                     ),
-                                ],
-                                width=4,
-                            ),
-                            dbc.Col(
-                                [
-                                    html.Label("Field", className="fw-bold"),
-                                    dcc.Dropdown(
-                                        id="file-dropdown",
-                                        placeholder="Select file",
-                                    ),
-                                ],
-                                width=4,
-                            ),
-                        ],
-                        className="g-3 mb-3 px-2",
-                    ),
 
-                    # Visualization row
-                    dbc.Row(
-                        [
-                            # Graph container
-                            dbc.Col(
-                                [
-                                    html.H5(
-                                        "Network Visualization",
-                                        id = "network-title",  
-                                        className="card-title mb-3"
-                                    ),
-                                    dash_interactive_graphviz.DashInteractiveGraphviz(
-                                        id="gv",
-                                        style={
-                                            "height": "425px",
-                                            "width": "50%",
-                                        }
+                                    # Visualization row
+                                    dbc.Row(
+                                        [
+                                            # Graph container
+                                            dbc.Col(
+                                                [
+                                                    html.H5(
+                                                        "Network Visualization",
+                                                        id="network-title",
+                                                        className="card-title mb-3"
+                                                    ),
+                                                    dash_interactive_graphviz.DashInteractiveGraphviz(
+                                                        id="gv",
+                                                        style={
+                                                            "height": "425px",
+                                                            "width": "50%",
+                                                        }
+                                                    ),
+                                                ],
+                                                width=12,
+                                            ),
+                                        ],
+                                        className="g-3 px-2",
                                     ),
                                 ],
                                 width=8,
@@ -390,7 +402,7 @@ app.layout = dbc.Container(
                                     dbc.Card(
                                         dbc.CardBody(
                                             [
-                                                html.H5("Node Info", className="card-title"),
+                                                html.H5("Dependency Info", className="card-title"),
                                                 dbc.Tabs(
                                                     id="node-info-tabs",
                                                     active_tab="tab-general",
@@ -403,7 +415,7 @@ app.layout = dbc.Container(
                                                                 id="selected-element-general",
                                                                 className="small",
                                                                 style={
-                                                                    "maxHeight": "400px",
+                                                                    "maxHeight": "475px",
                                                                     "overflowY": "auto",
                                                                     "paddingRight": "8px",
                                                                 },
@@ -424,7 +436,7 @@ app.layout = dbc.Container(
                                                                     id="selected-element-calc",
                                                                     className="small",
                                                                     style={
-                                                                        "maxHeight": "350px",
+                                                                        "maxHeight": "425px",
                                                                         "overflowY": "auto",
                                                                         "paddingRight": "8px",
                                                                     },
@@ -443,6 +455,8 @@ app.layout = dbc.Container(
                         ],
                         className="g-3 px-2",
                     ),
+
+
                     # Modal popup to display the expanded full calculation
                     dbc.Modal(
                         [
@@ -979,13 +993,13 @@ def show_selected_attributes(selected, node_attrs, dot_text, main_node, df_root)
     # --- General Info (everything except calculation path)
     general_info = html.Div([
         html.B(
-            f"Selected element: {label_selected}", 
+            f"Selected element: {label_selected} ({direction} dependency)", 
             style={"display": "block", 
                    "marginTop": "10px", "marginBottom": "10px"
         }),
         metadata_section,
         html.Hr(),
-        html.B(f"Shortest path relative to {label} ({direction} dependency):"),
+        html.B(f"Shortest path relative to {label}:"),
         html.Div(path_text, style={"marginTop": "4px"}),
     ])
 
