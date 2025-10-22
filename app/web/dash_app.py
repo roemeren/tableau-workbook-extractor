@@ -854,12 +854,13 @@ def manage_selected_node(selected, clear_click, dot_data, current_selection):
     State("main-node-store", "data"),
     State("attrs-store", "data"),
     State("df-root-store", "data"),
-    prevent_initial_call=True,
 )
 def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
     """Render DOT graph + info: highlight path and show metadata, dependency chain."""
     if not dot_source or not main_node or not ctx.triggered:
-        raise PreventUpdate
+        msg_none = html.Div(html.I("(no data available)"), style={"marginTop": "10px"})
+        msg_calc = html.Div(html.I("(no data available)"), style={"marginTop": "10px"})
+        return dot_source, msg_none, msg_calc
     
     trigger = ctx.triggered_id
 
@@ -989,7 +990,13 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
     # ---- assemble info sections ----
     general_info = html.Div([
         html.B(
-            f"Selected element: {label_selected} ({direction or 'none'} dependency)",
+            [
+                f"Selected element: {label_selected} ",
+                html.Span(
+                    f"({direction or 'none'} dependency)",
+                    style={"fontStyle": "italic", "fontSize": "0.9em", "fontWeight": "normal"},
+                ),
+            ],
             style={"display": "block", "marginTop": "10px", "marginBottom": "10px"},
         ),
         metadata_section,
