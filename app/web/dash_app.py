@@ -800,17 +800,23 @@ def update_network_title(main_node):
         return "Network Visualization"
     return f"Network Visualization for {main_node[1]}"
 
+import re
+import pydot
+import networkx as nx
+from dash.exceptions import PreventUpdate
+
 @app.callback(
     Output("gv", "dot_source"),
     Output("gv", "engine"),
     Input("dot-store", "data"),
     Input("engine", "value"),
     Input("gv", "selected"),
+    State("main-node-store", "data"),  # add this to know the main node
     prevent_initial_call=True,
 )
-def update_graph(dot_source, engine, selected):
-    """Render DOT; if a node is selected, make its border thicker (penwidth=3)."""
-    if not dot_source:
+def update_graph(dot_source, engine, selected, main_node):
+    """Render DOT; highlight all nodes along the shortest path to/from the main node."""
+    if not dot_source or not main_node:
         raise PreventUpdate
 
     new_dot = dot_source
@@ -818,26 +824,46 @@ def update_graph(dot_source, engine, selected):
     if selected:
         if isinstance(selected, list) and selected:
             selected = selected[0]
+        selected = selected.strip('"')
+        main_id = main_node[0]
 
-        node_escaped = re.escape(selected.strip('"'))
-        node_pat = rf'("{node_escaped}"\s*\[)(.*?)(\]\s*;)'
+        try:
+            # Parse DOT into a networkx graph
+            graphs = pydot.graph_from_dot_data(dot_source)
+            if not graphs:
+                raise PreventUpdate
 
-        def bump_penwidth(m):
-            before, attrs, after = m.group(1), m.group(2), m.group(3)
-            a = attrs
+            G = nx.nx_pydot.from_pydot(graphs[0])
 
-            # --- set or update penwidth ---
-            if re.search(r'\bpenwidth\s*=', a):
-                a = re.sub(r'\bpenwidth\s*=\s*[0-9]+(?:\.[0-9]+)?', 'penwidth=3', a, count=1)
+            # Find shortest path in either direction
+            if nx.has_path(G, main_id, selected):
+                path = nx.shortest_path(G, source=main_id, target=selected)
+            elif nx.has_path(G, selected, main_id):
+                path = nx.shortest_path(G, source=selected, target=main_id)
             else:
-                a = a.strip()
-                if a and not a.endswith(','):
-                    a += ', '
-                a += 'penwidth=3'
+                path = [selected]  # no path, only highlight selected node
 
-            return before + a + after
+            # Bump penwidth for each node in the path
+            for node_id in path:
+                node_escaped = re.escape(node_id)
+                node_pat = rf'("{node_escaped}"\s*\[)(.*?)(\]\s*;)'
 
-        new_dot = re.sub(node_pat, bump_penwidth, new_dot, count=1, flags=re.DOTALL)
+                def bump_penwidth(m):
+                    before, attrs, after = m.group(1), m.group(2), m.group(3)
+                    a = attrs
+                    if re.search(r'\bpenwidth\s*=', a):
+                        a = re.sub(r'\bpenwidth\s*=\s*[0-9]+(?:\.[0-9]+)?', 'penwidth=3', a, count=1)
+                    else:
+                        a = a.strip()
+                        if a and not a.endswith(','):
+                            a += ', '
+                        a += 'penwidth=3'
+                    return before + a + after
+
+                new_dot = re.sub(node_pat, bump_penwidth, new_dot, count=1, flags=re.DOTALL)
+
+        except Exception:
+            pass  # silently ignore parse/path issues
 
     return new_dot, engine
 
@@ -878,7 +904,7 @@ def show_selected_attributes(selected, node_attrs, dot_text, main_node, df_root)
 
     main_id = main_node[0]
     attrs = node_attrs.get(selected, {})
-    label = attrs.get("label", selected)
+    label_selected = attrs.get("label", selected)
 
     # --- Load metadata from fields.parquet ---
     metadata_section = html.Div("Node information not available.")
@@ -928,6 +954,7 @@ def show_selected_attributes(selected, node_attrs, dot_text, main_node, df_root)
             G = nx.nx_pydot.from_pydot(pydot_graphs[0])
             path, direction = None, None
 
+            # TODO: output is dict so could be put in Store to update graph boldness
             if nx.has_path(G, main_id, selected):
                 path = nx.shortest_path(G, source=main_id, target=selected)
                 direction = "forward"
@@ -939,7 +966,7 @@ def show_selected_attributes(selected, node_attrs, dot_text, main_node, df_root)
                 # Show dependency path
                 path_labels = [node_attrs.get(n, {}).get("label", n) for n in path]
                 arrow = " → ".join(path_labels)
-                path_text = f"{direction.capitalize()} dependency: {arrow}"
+                path_text = f"{arrow}"
 
                 # Build calculation chain
                 calc_chain = []
@@ -974,13 +1001,13 @@ def show_selected_attributes(selected, node_attrs, dot_text, main_node, df_root)
     # --- General Info (everything except calculation path)
     general_info = html.Div([
         html.B(
-            f"Selected element: {label}", 
+            f"Selected element: {label_selected}", 
             style={"display": "block", 
                    "marginTop": "10px", "marginBottom": "10px"
         }),
         metadata_section,
         html.Hr(),
-        html.B("Shortest path relative to main node:"),
+        html.B(f"Shortest path relative to {label} ({direction} dependency):"),
         html.Div(path_text, style={"marginTop": "4px"}),
     ])
 
