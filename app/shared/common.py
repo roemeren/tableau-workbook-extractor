@@ -94,7 +94,7 @@ def fieldMappingTable(df, colFrom, colTo):
     dfRes.columns = ["from", "to"]
     arrRes = np.array(dfRes)
     # dict conversion automatically deduplicates mappings
-    dictRes = dict(arrRes[:]) 
+    dictRes = dict(arrRes[:])
     return dictRes
 
 def sheetMappingTable(df, colFrom):
@@ -563,8 +563,8 @@ def addFieldNode(sf, l, cat, shapes, colors, calc):
     """
     if calc == "": c = " "
     else: c = calc
-    node = pydot.Node(name = sf, label = l, shape = shapes[cat],
-        fillcolor = colors[cat], style = "filled", tooltip = c)
+    node = pydot.Node(name=sf, label=l, shape=shapes[cat],
+        fillcolor=colors[cat], style="filled", tooltip=c)
     return [node]
 
 def fieldIDMapping(x, s, d):

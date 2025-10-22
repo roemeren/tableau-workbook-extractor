@@ -180,7 +180,11 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
             fieldCalculationMapping(x.field_calculation, x.data_source_name, 
             dictFieldIDToID, lstFieldID), axis = 1)
 
-        # Map sheet names to sheet IDs
+        # Map standardized sheet names (including square brackets) to sheet IDs
+        df["field_worksheets"] = df["field_worksheets"].apply(
+            lambda lst: [f"[{x}]" for x in lst] \
+                if isinstance(lst, list) and lst else lst
+        )
         dictSheetToID = sheetMappingTable(df, "field_worksheets")
         df["field_worksheets_id"] = df["field_worksheets"].apply(lambda x: 
             sheetMapping(x, dictSheetToID))
@@ -276,8 +280,8 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
 
             # Add sheet nodes
             for x in dictSheetToID:
-                node = pydot.Node(name = dictSheetToID[x], label = x, shape = "box",
-                    fillcolor = "grey", style = "filled", tooltip = " ")
+                node = pydot.Node(name=dictSheetToID[x], label=x, shape="box",
+                    fillcolor="grey", style="filled", tooltip=" ")
                 gMaster.add_node(node)
 
         # Create new data frame with flattened dependencies
