@@ -898,25 +898,47 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
     except Exception:
         pass  # ignore layout/path errors
 
-    # ---- highlight nodes ----
+    # ---- highlight nodes and edges ----
     if path:
+        # --- highlight nodes ---
         for node_id in path:
             node_escaped = re.escape(node_id)
             node_pat = rf'("{node_escaped}"\s*\[)(.*?)(\]\s*;)'
 
-            def bump_penwidth(m):
+            def bump_node_attrs(m):
                 before, attrs, after = m.group(1), m.group(2), m.group(3)
                 a = attrs
                 if re.search(r'\bpenwidth\s*=', a):
-                    a = re.sub(r'\bpenwidth\s*=\s*[0-9]+(?:\.[0-9]+)?', 'penwidth=3', a, count=1)
+                    a = re.sub(r'\bpenwidth\s*=\s*[0-9]+(?:\.[0-9]+)?', 
+                               f'penwidth={SELECTED_NODE_PENWIDTH}', a, count=1)
                 else:
                     a = a.strip()
                     if a and not a.endswith(','):
                         a += ', '
-                    a += 'penwidth=3'
+                    a += f'penwidth={SELECTED_NODE_PENWIDTH}'
                 return before + a + after
 
-            new_dot = re.sub(node_pat, bump_penwidth, new_dot, count=1, flags=re.DOTALL)
+            new_dot = re.sub(node_pat, bump_node_attrs, new_dot, count=1, flags=re.DOTALL)
+
+        # --- highlight edges along the path ---
+        for i in range(len(path) - 1):
+            src, tgt = path[i], path[i + 1]
+            edge_pat = rf'("{re.escape(src)}"\s*->\s*"{re.escape(tgt)}"\s*\[)(.*?)(\]\s*;)'
+
+            def bump_edge_attrs(m):
+                before, attrs, after = m.group(1), m.group(2), m.group(3)
+                a = attrs
+                if re.search(r'\bpenwidth\s*=', a):
+                    a = re.sub(r'\bpenwidth\s*=\s*[0-9]+(?:\.[0-9]+)?', 
+                               f'penwidth={SELECTED_EDGE_PENWIDTH}', a, count=1)
+                else:
+                    a = a.strip()
+                    if a and not a.endswith(','):
+                        a += ', '
+                    a += f'penwidth={SELECTED_EDGE_PENWIDTH}'
+                return before + a + after
+
+            new_dot = re.sub(edge_pat, bump_edge_attrs, new_dot, count=1, flags=re.DOTALL)
 
     # ---- metadata from fields.parquet ----
     metadata_section = html.Div("Node information not available.")
@@ -991,7 +1013,7 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
     general_info = html.Div([
         html.B(
             [
-                f"Selected element: {label_selected} ",
+                f"Selected: {label_selected} ",
                 html.Span(
                     f"({direction or 'none'} dependency)",
                     style={"fontStyle": "italic", "fontSize": "0.9em", "fontWeight": "normal"},

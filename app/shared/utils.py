@@ -16,6 +16,8 @@ ICON_REPO = "assets/repo-icon.png"
 APP_HEADER = "Tableau Workbook Extractor"
 APP_DESCR = "Upload a Tableau workbook to analyze its dependencies."
 DEBUG_MODE = True
+SELECTED_NODE_PENWIDTH = 6
+SELECTED_EDGE_PENWIDTH = 6
 
 def get_app_version():
     """Return the app version from VERSION file"""
