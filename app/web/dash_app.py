@@ -165,6 +165,8 @@ app.layout = dbc.Container(
                     dcc.Store(id="processing-started"),
                     # store selected sample file
                     dcc.Store(id="sample-file-store", data={}),
+                    # store selected node (that can be reset when needed)
+                    dcc.Store(id="selected-node-store")
                 ],
                 
                 className="p-3 rounded",
@@ -360,6 +362,23 @@ app.layout = dbc.Container(
                                                     dcc.Dropdown(
                                                         id="file-dropdown",
                                                         placeholder="Select file",
+                                                    ),
+                                                ],
+                                                width=4,
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    dbc.Button(
+                                                        "Clear selection",
+                                                        id="btn-clear-selection",
+                                                        color="secondary",
+                                                        className="mt-4 ms-2",
+                                                    ),
+                                                    dbc.Tooltip(
+                                                        "Reset the visualization and info panels by \
+                                                            clearing the current dependency selection.",
+                                                        target="btn-clear-selection",
+                                                        placement="bottom",
                                                     ),
                                                 ],
                                                 width=4,
@@ -800,12 +819,38 @@ def update_network_title(main_node):
     return f"Network Visualization for {main_node[1]}"
 
 @app.callback(
+    Output("selected-node-store", "data"),
+    Input("gv", "selected"),
+    Input("btn-clear-selection", "n_clicks"),
+    Input("dot-store", "data"),
+    State("selected-node-store", "data"),
+    prevent_initial_call=True,
+)
+def manage_selected_node(selected, clear_click, dot_data, current_selection):
+    """Central store for node selection — resets when file changes or user clears."""
+    if not ctx.triggered:
+        raise PreventUpdate
+
+    trigger = ctx.triggered_id
+
+    # --- clear on button click or file change ---
+    if trigger in ("btn-clear-selection", "dot-store"):
+        return None
+
+    # --- handle graph click ---
+    if selected:
+        if isinstance(selected, list) and selected:
+            selected = selected[0]
+        return selected.strip('"')
+
+    return current_selection
+
+@app.callback(
     Output("gv", "dot_source"),
-    Output("gv", "engine"),
     Output("selected-element-general", "children"),
     Output("selected-element-calc", "children"),
     Input("dot-store", "data"),
-    Input("gv", "selected"),
+    Input("selected-node-store", "data"),
     State("main-node-store", "data"),
     State("attrs-store", "data"),
     State("df-root-store", "data"),
@@ -813,22 +858,18 @@ def update_network_title(main_node):
 )
 def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
     """Render DOT graph + info: highlight path and show metadata, dependency chain."""
-    if not dot_source or not main_node:
+    if not dot_source or not main_node or not ctx.triggered:
         raise PreventUpdate
+    
+    trigger = ctx.triggered_id
 
+    # ---- check if no selection or selection cleared ----
+    if trigger == "btn-clear-selection" or not selected or not node_attrs:
+        msg_none = html.Div(html.I("(no element selected)"), style={"marginTop": "10px"})
+        msg_calc = html.Div(html.I("(no calculation path available)"), style={"marginTop": "10px"})
+        return dot_source, msg_none, msg_calc
+    
     new_dot = dot_source
-    engine = "dot"  # fixed engine
-    general_info = html.Div()
-    calc_section = html.Div()
-
-    # ---- no selection ----
-    if not selected or not node_attrs:
-        return (
-            new_dot,
-            engine,
-            html.Div(html.I("(no element selected)"), style={"marginTop": "10px"}),
-            html.Div(html.I("(no calculation path available)"), style={"marginTop": "10px"}),
-        )
 
     # ---- normalize ----
     if isinstance(selected, list) and selected:
@@ -959,7 +1000,7 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
 
     calc_section = calc_text if calc_text else html.Div("(no calculation path available)")
 
-    return new_dot, engine, general_info, calc_section
+    return new_dot, general_info, calc_section
 
 
 @app.callback(
