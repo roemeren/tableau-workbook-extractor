@@ -350,25 +350,10 @@ app.layout = dbc.Container(
                             ),
                             dbc.Col(
                                 [
-                                    html.Label(".dot File", className="fw-bold"),
+                                    html.Label("Field", className="fw-bold"),
                                     dcc.Dropdown(
                                         id="file-dropdown",
                                         placeholder="Select file",
-                                    ),
-                                ],
-                                width=4,
-                            ),
-                            dbc.Col(
-                                [
-                                    html.Label("Engine", className="fw-bold"),
-                                    dcc.Dropdown(
-                                        id="engine",
-                                        value="dot",
-                                        options=[
-                                            {"label": e, "value": e}
-                                            for e in ["dot", "neato", "fdp", "sfdp", "twopi", "circo", "osage", "patchwork"]
-                                        ],
-                                        clearable=False,
                                     ),
                                 ],
                                 width=4,
@@ -802,14 +787,12 @@ def update_network_title(main_node):
 
 @app.callback(
     Output("gv", "dot_source"),
-    Output("gv", "engine"),
     Input("dot-store", "data"),
-    Input("engine", "value"),
     Input("gv", "selected"),
     State("main-node-store", "data"),  # add this to know the main node
     prevent_initial_call=True,
 )
-def update_graph(dot_source, engine, selected, main_node):
+def update_graph(dot_source, selected, main_node):
     """Render DOT; highlight all nodes along the shortest path to/from the main node."""
     if not dot_source or not main_node:
         raise PreventUpdate
@@ -860,7 +843,7 @@ def update_graph(dot_source, engine, selected, main_node):
         except Exception:
             pass  # silently ignore parse/path issues
 
-    return new_dot, engine
+    return new_dot
 
 @app.callback(
     Output("selected-element-general", "children"),
