@@ -406,7 +406,7 @@ app.layout = dbc.Container(
                                             ),
                                             dbc.Col(
                                                 [
-                                                    html.Label("Field", className="fw-bold"),
+                                                    html.Label("Item", className="fw-bold"),
                                                     dcc.Dropdown(
                                                         id="file-dropdown",
                                                         placeholder="Select file",
@@ -442,7 +442,7 @@ app.layout = dbc.Container(
                                             dbc.Col(
                                                 [
                                                     html.H5(
-                                                        "Network Visualization",
+                                                        "Dependency Graph",
                                                         id="network-title",
                                                         className="card-title mb-3"
                                                     ),
@@ -476,9 +476,10 @@ app.layout = dbc.Container(
                                                     class_name="mt-2",
                                                     children=[
                                                         dbc.Tab(
-                                                            label="General Info",
+                                                            label="Selection",
                                                             tab_id="tab-general-main",
                                                             children=html.Div(
+                                                                html.Div(html.I(MESSAGE_NO_DATA), style={"marginTop": "10px"}),
                                                                 id="main-element",
                                                                 className="small",
                                                                 style={
@@ -489,9 +490,10 @@ app.layout = dbc.Container(
                                                             ),
                                                         ),
                                                         dbc.Tab(
-                                                            label="Selection",
+                                                            label="Dependency",
                                                             tab_id="tab-general-selection",
                                                             children=html.Div(
+                                                                html.Div(html.I(MESSAGE_NO_DATA), style={"marginTop": "10px"}),
                                                                 id="selected-element",
                                                                 className="small",
                                                                 style={
@@ -513,6 +515,7 @@ app.layout = dbc.Container(
                                                                     className="mt-2 mb-2",
                                                                 ),
                                                                 html.Div(
+                                                                    html.Div(html.I(MESSAGE_NO_DATA), style={"marginTop": "10px"}),
                                                                     id="selected-element-calc",
                                                                     className="small",
                                                                     style={
@@ -878,22 +881,78 @@ def load_dot_source(selected_file, base_dir, selected_folder):
 )
 def update_main_node(main_node, df_root):
     if not main_node:
-        return "Network Visualization", None
+        return "Dependency Graph", None
 
     try:
         parquet_path_field = os.path.join(df_root, "fields.parquet")
-        parquet_path_sheet = os.path.join(df_root, "dependencies.parquet")
         df = pd.read_parquet(parquet_path_field)
-        df_dep = pd.read_parquet(parquet_path_sheet)
 
-        # TODO: populate tab
+        metadata_section = html.Div(MESSAGE_NO_DATA)
         
+        main_node_id, main_node_label = main_node
+        row = df.loc[df["source_field_repl_id"] == main_node_id]
+
+        if len(row) == 1:
+            rec = row.iloc[0]
+
+            html_bw, html_fw = None, None
+
+            # TODO: review aggregates (not always correct)
+            if rec["field_category"] not in ("Field", "Parameter"):
+                html_bw = html.Li([
+                    html.B("Upstream sources: "),
+                      f"{rec['n_backward_dependencies']} (max. level: {abs(rec['field_backward_dependencies_max_level'])})"
+                ])
+            
+            # TODO: review aggregates (not always correct)
+            if rec["field_category"] != "Sheet":
+                html_fw = html.Li([
+                    html.B("Upstream sources: "),
+                      f"{rec['n_forward_dependencies']} (max. level: {rec['field_forward_dependencies_max_level']})"
+                ])
+
+            metadata_section = html.Div(
+                [
+                    html.B("Field Information", style={"display": "block", "marginBottom": "6px"}),
+                    html.Ul(
+                        [
+                            html.Li([html.B("Data source: "), rec["source_label"]]),
+                            html.Li([html.B("Category: "), rec["field_category"]]),
+                            html.Li([html.B("Data type: "), rec["field_datatype"]]),
+                            html.Li([html.B("Role: "), rec["field_role"]]),
+                            html_bw,
+                            html_fw,
+                        ],
+                        style={"marginLeft": "10px"},
+                    ),
+                ],
+                style={
+                    "marginBottom": "12px",
+                    "padding": "8px 10px",
+                    "backgroundColor": "#f9f9f9",
+                    "borderRadius": "6px",
+                    "border": "1px solid #ddd",
+                },
+            )
+        elif len(row) == 0:
+            metadata_section = html.Div(f"No record found for node ID: {main_node_id}")
+        else:
+            metadata_section = html.Div(f"Multiple records found for node ID: {main_node_id}")
     
     except Exception as e:
         print(f"Error processing parquet files: {e}")
         raise PreventUpdate
+    
+    # ---- assemble info sections ----
+    general_info = html.Div([
+        html.B(
+            f"Selected item: {main_node_label}",
+            style={"display": "block", "marginTop": "10px", "marginBottom": "10px"},
+        ),
+        metadata_section,
+    ])
 
-    return f"Dependency Graph for {main_node[1]}", main_node[1]
+    return f"Dependency Graph for {main_node[1]}", general_info
 
 @app.callback(
     Output("gv", "selected"),
@@ -902,6 +961,9 @@ def update_main_node(main_node, df_root):
 )
 def clear_selected_node(*_):
     """Reset selected node when file changes or user clears."""
+    if not ctx.triggered:
+        raise PreventUpdate
+    
     return None
 
 @app.callback(
@@ -920,7 +982,7 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
         msg_none = html.Div(html.I(MESSAGE_NO_DATA), style={"marginTop": "10px"})
         msg_calc = html.Div(html.I(MESSAGE_NO_DATA), style={"marginTop": "10px"})
         return dot_source, msg_none, msg_calc
-    
+
     trigger = ctx.triggered_id
 
     # ---- check if no selection or selection cleared ----
@@ -949,11 +1011,11 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
             if nx.has_path(G, main_id, selected):
                 path = nx.shortest_path(G, source=main_id, target=selected)
                 direction = "forward"
-                direction_label = "downstream consumer"
+                direction_label = "Downstream Consumer"
             elif nx.has_path(G, selected, main_id):
                 path = nx.shortest_path(G, source=selected, target=main_id)
                 direction = "backward"
-                direction_label = "upstream source"
+                direction_label = "Upstream Source"
             else:
                 path = [selected]
     except Exception:
@@ -1073,13 +1135,7 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
     # ---- assemble info sections ----
     general_info = html.Div([
         html.B(
-            [
-                f"Selected: {label_selected} ",
-                html.Span(
-                    f"({direction_label or 'none'})",
-                    style={"fontStyle": "italic", "fontSize": "0.9em", "fontWeight": "normal"},
-                ),
-            ],
+            f"{direction_label}: {label_selected}",
             style={"display": "block", "marginTop": "10px", "marginBottom": "10px"},
         ),
         metadata_section,

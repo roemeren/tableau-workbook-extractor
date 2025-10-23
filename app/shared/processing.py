@@ -230,7 +230,7 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
                 ["child", "parent", "category", "sheets"], 
                 "level"), axis = 1)
 
-        # Get some dependency aggregates
+        # Get some dependency aggregates (INCORRECT)
         df["field_backward_dependencies_max_level"] = \
             df["field_backward_dependencies"].apply(maxDependencyLevel)
         df["field_forward_dependencies_max_level"] = \
