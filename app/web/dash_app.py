@@ -425,17 +425,30 @@ app.layout = dbc.Container(
                                     dbc.Card(
                                         dbc.CardBody(
                                             [
-                                                html.H5("Dependency Info", className="card-title"),
+                                                html.H5("Item Info", className="card-title"),
                                                 dbc.Tabs(
                                                     id="node-info-tabs",
-                                                    active_tab="tab-general",
+                                                    active_tab="tab-general-main",
                                                     class_name="mt-2",
                                                     children=[
                                                         dbc.Tab(
                                                             label="General Info",
-                                                            tab_id="tab-general",
+                                                            tab_id="tab-general-main",
                                                             children=html.Div(
-                                                                id="selected-element-general",
+                                                                id="main-element",
+                                                                className="small",
+                                                                style={
+                                                                    "maxHeight": "475px",
+                                                                    "overflowY": "auto",
+                                                                    "paddingRight": "8px",
+                                                                },
+                                                            ),
+                                                        ),
+                                                        dbc.Tab(
+                                                            label="Selection",
+                                                            tab_id="tab-general-selection",
+                                                            children=html.Div(
+                                                                id="selected-element",
                                                                 className="small",
                                                                 style={
                                                                     "maxHeight": "475px",
@@ -815,12 +828,28 @@ def load_dot_source(selected_file, base_dir, selected_folder):
 
 @app.callback(
     Output("network-title", "children"),
+    Output("main-element", "children"),
     Input("main-node-store", "data"),
+    State("df-root-store", "data"),
 )
-def update_network_title(main_node):
+def update_main_node(main_node, df_root):
     if not main_node:
-        return "Network Visualization"
-    return f"Network Visualization for {main_node[1]}"
+        return "Network Visualization", None
+
+    try:
+        parquet_path_field = os.path.join(df_root, "fields.parquet")
+        parquet_path_sheet = os.path.join(df_root, "dependencies.parquet")
+        df = pd.read_parquet(parquet_path_field)
+        df_dep = pd.read_parquet(parquet_path_sheet)
+
+        # TODO: populate tab
+        
+    
+    except Exception as e:
+        print(f"Error processing parquet files: {e}")
+        raise PreventUpdate
+
+    return f"Dependency Graph for {main_node[1]}", main_node[1]
 
 @app.callback(
     Output("selected-node-store", "data"),
@@ -833,7 +862,7 @@ def update_network_title(main_node):
 def manage_selected_node(selected, clear_click, dot_data, current_selection):
     """Central store for node selection — resets when file changes or user clears."""
     if not ctx.triggered:
-        raise PreventUpdate
+       raise PreventUpdate
 
     trigger = ctx.triggered_id
 
@@ -851,7 +880,7 @@ def manage_selected_node(selected, clear_click, dot_data, current_selection):
 
 @app.callback(
     Output("gv", "dot_source"),
-    Output("selected-element-general", "children"),
+    Output("selected-element", "children"),
     Output("selected-element-calc", "children"),
     Input("dot-store", "data"),
     Input("selected-node-store", "data"),
@@ -894,9 +923,11 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
             if nx.has_path(G, main_id, selected):
                 path = nx.shortest_path(G, source=main_id, target=selected)
                 direction = "forward"
+                direction_label = "downstream consumer"
             elif nx.has_path(G, selected, main_id):
                 path = nx.shortest_path(G, source=selected, target=main_id)
                 direction = "backward"
+                direction_label = "upstream source"
             else:
                 path = [selected]
     except Exception:
@@ -1019,7 +1050,7 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
             [
                 f"Selected: {label_selected} ",
                 html.Span(
-                    f"({direction or 'none'} dependency)",
+                    f"({direction_label or 'none'})",
                     style={"fontStyle": "italic", "fontSize": "0.9em", "fontWeight": "normal"},
                 ),
             ],
