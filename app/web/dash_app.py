@@ -58,7 +58,7 @@ app.layout = dbc.Container(
                                             dcc.Dropdown(
                                                 id="sample-file-dropdown",
                                                 options=[
-                                                    {"label": f.name, "value": str(f)}
+                                                    {"label": f.stem, "value": str(f)}
                                                     for f in SAMPLE_FOLDER.glob("*.twb*")
                                                 ],
                                                 placeholder="Choose sample workbook...",
@@ -142,13 +142,59 @@ app.layout = dbc.Container(
                     # =======================
                     # META INFO
                     # =======================
-                    html.Div([
-                        html.Div(f"App version: {get_app_version()}"),
-                        html.Div([
-                            "Project page: ",
-                            html.A("GitHub", href=REPO_URL, target="_blank"),
-                        ]),
-                    ], style={"fontSize": "12px", "color": "#666", "marginTop": "10px", "lineHeight": "1.4"}),
+                    html.Div(
+                        [
+                            html.Div(f"App version: {get_app_version()}"),
+                            html.Div(
+                                [
+                                    "Project page: ",
+                                    html.A("GitHub", href=REPO_URL, target="_blank"),
+                                ]
+                            ),
+                            html.Div(
+                                [
+                                    html.Div("Sample dashboards:"),
+                                    html.Div(
+                                        html.A(
+                                            "  CH24_BBOD_ChurnTurnover by Steve Wexler",
+                                            href="https://public.tableau.com/app/profile/swexler/viz/CH24_BBOD_ChurnTurnover/SubscriberChurnAnalysis",
+                                            target="_blank",
+                                        ),
+                                        style={"marginLeft": "10px"},
+                                    ),
+                                    html.Div(
+                                        html.A(
+                                            "  #RWFD HR Dashboard by Gandes Goldestan",
+                                            href="https://public.tableau.com/app/profile/gandes.goldestan/viz/HRDashboard_16284874251120/Overview",
+                                            target="_blank",
+                                        ),
+                                        style={"marginLeft": "10px"},
+                                    ),
+                                    html.Div(
+                                        html.A(
+                                            "  Superstore Dashboard by Priya Padham",
+                                            href="https://public.tableau.com/app/profile/p.padham/viz/SuperstoreDashboard_16709573699130/SuperstoreDashboard",
+                                            target="_blank",
+                                        ),
+                                        style={"marginLeft": "10px"},
+                                    ),
+                                ],
+                                style={
+                                    "fontSize": "12px",
+                                    "color": "#666",
+                                    "marginTop": "5px",
+                                    "lineHeight": "1.4",
+                                },
+                            ),
+                        ],
+                        style={
+                            "fontSize": "12px",
+                            "color": "#666",
+                            "marginTop": "10px",
+                            "lineHeight": "1.4",
+                        },
+                    ),
+
                     # =======================
                     # HIDDEN ELEMENTS
                     # =======================
