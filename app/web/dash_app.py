@@ -217,17 +217,17 @@ app.layout = dbc.Container(
                         dbc.Col(
                             dbc.Card(
                                 dbc.CardBody([
-                                    html.H5("KPI 1", className="text-center mb-2"),
+                                    html.H5("No. Fields", className="text-center mb-2"),
 
                                     # KPI row: icon + number
                                     html.Div([
                                         html.Img(
-                                            src="https://img.icons8.com/ios/50/marker--v1.png",
+                                            src="https://img.icons8.com/ios/50/database--v1.png",
                                             width="36",
                                             height="36",
                                             style={"marginRight": "8px"}
                                         ),
-                                        html.H2(id="kpi-totnodes", children="–", className="mb-0"),
+                                        html.H2(id="kpi-fields", children="–", className="mb-0"),
                                     ],
                                     style={
                                         "display": "flex",
@@ -236,9 +236,10 @@ app.layout = dbc.Container(
                                     }),
 
                                     html.Div(
-                                        f"out of ...",
+                                        id="kpi-fields-unused",
                                         className="text-center text-muted",
-                                        style={"fontSize": "12px", "marginTop": "4px"}
+                                        style={"fontSize": "12px", "marginTop": "4px"},
+                                        children=MESSAGE_NO_DATA,
                                     ),
                                 ])
                             ),
@@ -247,17 +248,17 @@ app.layout = dbc.Container(
                         dbc.Col(
                             dbc.Card(
                                 dbc.CardBody([
-                                    html.H5("KPI 2", className="text-center mb-2"),
+                                    html.H5("No. Calculated Fields", className="text-center mb-2"),
 
                                     # KPI row: icon + number
                                     html.Div([
                                         html.Img(
-                                            src="https://img.icons8.com/material-rounded/48/journey.png",
+                                            src="https://img.icons8.com/ios/50/calculator--v1.png",
                                             width="36",
                                             height="36",
                                             style={"marginRight": "8px"}
                                         ),
-                                        html.H2(id="kpi-totsegments", children="–", className="mb-0"),
+                                        html.H2(id="kpi-calcs", children="–", className="mb-0"),
                                     ],
                                     style={
                                         "display": "flex",
@@ -266,9 +267,10 @@ app.layout = dbc.Container(
                                     }),
 
                                     html.Div(
-                                        f"out of ...",
+                                        id="kpi-calcs-lod",
                                         className="text-center text-muted",
-                                        style={"fontSize": "12px", "marginTop": "4px"}
+                                        style={"fontSize": "12px", "marginTop": "4px"},
+                                        children=MESSAGE_NO_DATA,
                                     ),
                                 ])
                             ),
@@ -277,47 +279,17 @@ app.layout = dbc.Container(
                         dbc.Col(
                             dbc.Card(
                                 dbc.CardBody([
-                                    html.H5("KPI 3", className="text-center mb-2"),
-
-                                    # KPI row: icon + number
-                                    html.Div([
-                                        html.Img(
-                                            src="https://img.icons8.com/ios/50/length.png",
-                                            width="36",
-                                            height="36",
-                                            style={"marginRight": "8px"}
-                                        ),
-                                        html.H2(id="kpi-totlength", children="–", className="mb-0"),
-                                    ],
-                                    style={
-                                        "display": "flex",
-                                        "alignItems": "center",
-                                        "justifyContent": "center"
-                                    }),
-
-                                    html.Div(
-                                        f"out of ...",
-                                        className="text-center text-muted",
-                                        style={"fontSize": "12px", "marginTop": "4px"}
-                                    ),
-                                ])
-                            ),
-                            width=3
-                        ),
-                        dbc.Col(
-                            dbc.Card(
-                                dbc.CardBody([
-                                    html.H5("KPI 4", className="text-center mb-2"),
+                                    html.H5("Avg. Upstream Sources", className="text-center mb-2"),
 
                                     # KPI row: icon + value
                                     html.Div([
                                         html.Img(
-                                            src="https://img.icons8.com/ios/50/checked--v1.png",
+                                            src="https://img.icons8.com/ios/50/link--v1.png",
                                             width="36",
                                             height="36",
                                             style={"marginRight": "8px"}
                                         ),
-                                        html.H2(id="kpi-tottracks", children="–", className="mb-0"),
+                                        html.H2(id="kpi-dep", children="–", className="mb-0"),
                                     ],
                                     style={
                                         "display": "flex",
@@ -326,9 +298,41 @@ app.layout = dbc.Container(
                                     }),
 
                                     html.Div(
-                                        f"out of ...",
+                                        id="kpi-dep-range",
                                         className="text-center text-muted",
-                                        style={"fontSize": "12px", "marginTop": "4px"}
+                                        style={"fontSize": "12px", "marginTop": "4px"},
+                                        children=MESSAGE_NO_DATA,
+                                    ),
+                                ])
+                            ),
+                            width=3
+                        ),
+                        dbc.Col(
+                            dbc.Card(
+                                dbc.CardBody([
+                                    html.H5("No. Sheets", className="text-center mb-2"),
+
+                                    # KPI row: icon + value
+                                    html.Div([
+                                        html.Img(
+                                            src="https://img.icons8.com/windows/32/filled-note.png",
+                                            width="36",
+                                            height="36",
+                                            style={"marginRight": "8px"}
+                                        ),
+                                        html.H2(id="kpi-sheets", children="–", className="mb-0"),
+                                    ],
+                                    style={
+                                        "display": "flex",
+                                        "alignItems": "center",
+                                        "justifyContent": "center"
+                                    }),
+
+                                    html.Div(
+                                        id="kpi-sheets-dep",
+                                        className="text-center text-muted",
+                                        style={"fontSize": "12px", "marginTop": "4px"},
+                                        children=MESSAGE_NO_DATA,
                                     ),
                                 ])
                             ),
@@ -858,8 +862,8 @@ def manage_selected_node(selected, clear_click, dot_data, current_selection):
 def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
     """Render DOT graph + info: highlight path and show metadata, dependency chain."""
     if not dot_source or not main_node or not ctx.triggered:
-        msg_none = html.Div(html.I("(no data available)"), style={"marginTop": "10px"})
-        msg_calc = html.Div(html.I("(no data available)"), style={"marginTop": "10px"})
+        msg_none = html.Div(html.I(MESSAGE_NO_DATA), style={"marginTop": "10px"})
+        msg_calc = html.Div(html.I(MESSAGE_NO_DATA), style={"marginTop": "10px"})
         return dot_source, msg_none, msg_calc
     
     trigger = ctx.triggered_id
@@ -1031,6 +1035,76 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
 
     return new_dot, general_info, calc_section
 
+@app.callback(
+    Output("kpi-fields", "children"),
+    Output("kpi-fields-unused", "children"),
+    Output("kpi-calcs", "children"),
+    Output("kpi-calcs-lod", "children"),
+    # Output("kpi-params", "children"),
+    # Output("kpi-params-unused", "children"),
+    Output("kpi-dep", "children"),
+    Output("kpi-dep-range", "children"),
+    Output("kpi-sheets", "children"),
+    Output("kpi-sheets-dep", "children"),
+    Input("btn-download", "disabled"), # only used as trigger
+    State("df-root-store", "data"),
+)
+def update_kpi(disabled, df_root):
+    if not df_root or disabled:
+        raise PreventUpdate
+    
+    try:
+        parquet_path_field = os.path.join(df_root, "fields.parquet")
+        parquet_path_sheet = os.path.join(df_root, "dependencies.parquet")
+        df = pd.read_parquet(parquet_path_field)
+        df_dep = pd.read_parquet(parquet_path_sheet)
+
+        # field stats
+        fields = (df["field_category"] == "Field").sum()
+        fields_unused = ((df["field_category"] == "Field") \
+                                    & (df["flag_unused"] == 1)).sum()
+        calculated_fields = df["field_category"].isin(
+            ["Calculated Field", "Calculated Field (LOD)"]
+        ).sum()
+        calculated_fields_lod = (df["field_category"] == \
+                                 "Calculated Field (LOD)").sum()
+        # parameters = (df["field_category"] == "Parameter").sum()
+        # parameters_unused = ((df["field_category"] == "Parameter") \
+        #                             & (df["flag_unused"] == 1)).sum()
+        df_calcs = df.loc[
+            df["field_category"].isin(["Calculated Field", "Calculated Field (LOD)"])
+        ]
+        # based on calculated fields only
+        avg_dependencies = df_calcs["n_backward_dependencies"].mean().round(2)
+        min_dependencies = df_calcs["n_backward_dependencies"].min()
+        max_dependencies = df_calcs["n_backward_dependencies"].max()
+
+        # sheet stats
+        sheets = df_dep.loc[df_dep["dependency_category"] == "Sheet",
+                             "dependency_to"].nunique()
+        avg_elements_per_sheet = (
+            df_dep.loc[df_dep["dependency_category"] == "Sheet"]
+            .groupby("dependency_to")["dependency_from"]
+            .nunique()
+            .mean()
+        )
+
+    except Exception as e:
+        print(f"Error processing parquet files: {e}")
+        raise PreventUpdate
+    
+    return (
+        fields,
+        f"of which {fields_unused} unused in sheets",
+        calculated_fields,
+        f"of which {calculated_fields_lod} LODs",
+        # parameters,
+        # f"of which {parameters_unused} unused in sheets",
+        avg_dependencies,
+        f"ranging between {min_dependencies} and {max_dependencies}",
+        sheets,
+        f"connected to {avg_elements_per_sheet:.0f} fields & parameters on average"
+    )
 
 @app.callback(
     Output("calc-modal", "is_open"),
