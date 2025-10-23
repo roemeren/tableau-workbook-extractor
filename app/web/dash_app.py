@@ -165,8 +165,6 @@ app.layout = dbc.Container(
                     dcc.Store(id="processing-started"),
                     # store selected sample file
                     dcc.Store(id="sample-file-store", data={}),
-                    # store selected node (that can be reset when needed)
-                    dcc.Store(id="selected-node-store")
                 ],
                 
                 className="p-3 rounded",
@@ -852,38 +850,20 @@ def update_main_node(main_node, df_root):
     return f"Dependency Graph for {main_node[1]}", main_node[1]
 
 @app.callback(
-    Output("selected-node-store", "data"),
-    Input("gv", "selected"),
+    Output("gv", "selected"),
     Input("btn-clear-selection", "n_clicks"),
     Input("dot-store", "data"),
-    State("selected-node-store", "data"),
-    prevent_initial_call=True,
 )
-def manage_selected_node(selected, clear_click, dot_data, current_selection):
-    """Central store for node selection — resets when file changes or user clears."""
-    if not ctx.triggered:
-       raise PreventUpdate
-
-    trigger = ctx.triggered_id
-
-    # --- clear on button click or file change ---
-    if trigger in ("btn-clear-selection", "dot-store"):
-        return None
-
-    # --- handle graph click ---
-    if selected:
-        if isinstance(selected, list) and selected:
-            selected = selected[0]
-        return selected.strip('"')
-
-    return current_selection
+def clear_selected_node(*_):
+    """Reset selected node when file changes or user clears."""
+    return None
 
 @app.callback(
     Output("gv", "dot_source"),
     Output("selected-element", "children"),
     Output("selected-element-calc", "children"),
     Input("dot-store", "data"),
-    Input("selected-node-store", "data"),
+    Input("gv", "selected"),
     State("main-node-store", "data"),
     State("attrs-store", "data"),
     State("df-root-store", "data"),
