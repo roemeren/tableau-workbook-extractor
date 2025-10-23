@@ -18,6 +18,7 @@ APP_DESCR = "Upload a Tableau workbook to analyze its dependencies."
 DEBUG_MODE = True
 SELECTED_NODE_PENWIDTH = 6
 SELECTED_EDGE_PENWIDTH = 6
+MESSAGE_NO_DATA = "(no data available)"
 
 def get_app_version():
     """Return the app version from VERSION file"""
