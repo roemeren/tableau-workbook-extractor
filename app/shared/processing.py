@@ -230,29 +230,6 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
                 ["child", "parent", "category", "sheets"], 
                 "level"), axis = 1)
 
-        # Get some dependency aggregates (INCORRECT)
-        df["field_backward_dependencies_max_level"] = \
-            df["field_backward_dependencies"].apply(maxDependencyLevel)
-        df["field_forward_dependencies_max_level"] = \
-            df["field_forward_dependencies"].apply(maxDependencyLevel)
-        df["source_field_dependencies"] = \
-            df.apply(lambda x: fieldsFromCategory(x.field_backward_dependencies, 
-            "Field", True), axis = 1)
-        df["lod_backward_dependencies"] = \
-            df.apply(lambda x: fieldsFromCategory(x.field_backward_dependencies, 
-            "Calculated Field (LOD)", True), axis = 1)
-        df[["n_backward_dependencies", "n_worksheet_dependencies", 
-            "n_forward_dependencies", "n_backward_dependencies_field", 
-            "n_backward_dependencies_lod"]] = \
-            df[["field_backward_dependencies", "field_worksheets", 
-            "field_forward_dependencies", "source_field_dependencies", 
-            "lod_backward_dependencies"]].apply(lambda x: x.str.len(), axis = 1)
-        df["n_forward_dependencies"] = df["n_forward_dependencies"] - \
-            df["n_worksheet_dependencies"] 
-
-        # Flag unused fields (field and its forward dependencies not used in sheets)
-        df["flag_unused"] = (df["n_worksheet_dependencies"] == 0).astype(int)
-
         # Finalize calculated field expressions
         dictFieldToID = fieldMappingTable(df, "source_field_label", 
             "source_field_repl_id")
@@ -307,22 +284,35 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
                         "source_field_repl_id", "field_category", "dependency_from",
                             "dependency_to", "dependency_level", "dependency_category",
                             "dependency_worksheets_overlap"]
-        
-        outSheetDirectory = os.path.join(outFileDirectory, 'Fields')
-        outFilePath = os.path.join(outSheetDirectory, inpFileName + '.xlsx')
+
+        # Remove redundant sheet dependencies
+        df2 = df2[~((df2["dependency_category"] == "Sheet") \
+                    & (df2["dependency_level"] != "0"))]
+
+        # Calculate number of linked sheet to flag unused fields in the app
+        df[["n_worksheet_dependencies",]] = df[["field_worksheets"]]\
+            .apply(lambda x: x.str.len(), axis = 1)
+
+        # Make copy of original dfs for graph generation
+        df_original = df.copy()
+        df2_original = df2.copy()
+
+        # Apply some conversions to avoid errors
+        df["field_aliases"] = df["field_aliases"].astype(str)
+        df2["dependency_level"] = df2["dependency_level"].astype(int)
 
         progress_data["progress"] = 12
         progress_data["current-task"] = stepLog("Saving table results")
 
+        outSheetDirectory = os.path.join(outFileDirectory, 'Fields')
+        outFilePath = os.path.join(outSheetDirectory, inpFileName + '.xlsx')       
+
         if not os.path.isdir(outSheetDirectory):
             os.makedirs(outSheetDirectory)
-        df_original = df.copy()
-        df2_original = df2.copy()
 
         # Output 1: field info
         lstClean = ["field_calculation_dependencies", 
-        "field_backward_dependencies", "field_forward_dependencies", 
-        "source_field_dependencies"]
+        "field_backward_dependencies", "field_forward_dependencies"]
         for col in lstClean:
             df[col] = df.apply(lambda x: fieldIDMapping(x[col], x.source_label, 
                 dictLabelToID), axis = 1)
@@ -331,12 +321,7 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
             "field_datatype", "field_role", 
             "field_type", "field_aliases", "field_description", 
             "field_hidden", "field_worksheets", "field_category", 
-            "field_calculation_cleaned", "source_field_dependencies", 
-            "field_backward_dependencies_max_level", 
-            "field_forward_dependencies_max_level", 
-            "n_backward_dependencies", "n_forward_dependencies",
-            "n_backward_dependencies_field", "n_backward_dependencies_lod",
-            "n_worksheet_dependencies", "flag_unused"]
+            "field_calculation_cleaned", "n_worksheet_dependencies"]
         df = df[colKeep]
 
         # Output 2: dependencies info
@@ -356,10 +341,10 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
             df2.to_excel(writer, sheet_name = "dependencies", index = False)
 
         outParquetPath = os.path.join(outSheetDirectory, 'fields.parquet')
-        df["field_aliases"] = df["field_aliases"].astype(str) # to avoid errors
+
         df.to_parquet(outParquetPath, engine="pyarrow", index=False)
         outParquetPath = os.path.join(outSheetDirectory, 'dependencies.parquet')
-        df2["dependency_level"] = df2["dependency_level"].astype(int)
+
         df2.to_parquet(outParquetPath, engine="pyarrow", index=False)
 
         # Get list of unique sheets
@@ -389,13 +374,9 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
             iterator = tqdm(df_original.iterrows(), total=nField) if is_executable else df_original.iterrows()
 
             # Create dependency graphs per field
-            
             for _, row in iterator:
-                # Only generate graph if there are dependencies
-                nDependency = row.n_backward_dependencies + row.n_forward_dependencies
-                if nDependency > 0:
-                    visualizeFieldDependencies(df_original, row.source_field_repl_id, 
-                        row.source_field_label, gMaster, outPath, fPNG)
+                visualizeFieldDependencies(df_original, row.source_field_repl_id, 
+                    row.source_field_label, gMaster, outPath, fPNG)
 
                 if not is_executable:
                     current_progress += 1
