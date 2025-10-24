@@ -395,7 +395,7 @@ app.layout = dbc.Container(
                                         [
                                             dbc.Col(
                                                 [
-                                                    html.Label("Folder", className="fw-bold"),
+                                                    html.Label("Source", className="fw-bold"),
                                                     dcc.Dropdown(
                                                         id="folder-dropdown",
                                                         placeholder="Select folder",
@@ -895,21 +895,20 @@ def update_main_node(main_node, df_root):
         if len(row) == 1:
             rec = row.iloc[0]
 
-            html_bw, html_fw = None, None
+            # html_bw, html_fw = None, None
 
-            # TODO: review aggregates (not always correct)
-            if rec["field_category"] not in ("Field", "Parameter"):
-                html_bw = html.Li([
-                    html.B("Upstream sources: "),
-                      f"{rec['n_backward_dependencies']} (max. level: {abs(rec['field_backward_dependencies_max_level'])})"
-                ])
+            # if rec["field_category"] not in ("Field", "Parameter"):
+            #     html_bw = html.Li([
+            #         html.B("Upstream sources: "),
+            #           f"{rec['n_backward_dependencies']} (max. level: {abs(rec['field_backward_dependencies_max_level'])})"
+            #     ])
             
-            # TODO: review aggregates (not always correct)
-            if rec["field_category"] != "Sheet":
-                html_fw = html.Li([
-                    html.B("Upstream sources: "),
-                      f"{rec['n_forward_dependencies']} (max. level: {rec['field_forward_dependencies_max_level']})"
-                ])
+            # # TODO: review aggregates (not always correct)
+            # if rec["field_category"] != "Sheet":
+            #     html_fw = html.Li([
+            #         html.B("Upstream sources: "),
+            #           f"{rec['n_forward_dependencies']} (max. level: {rec['field_forward_dependencies_max_level']})"
+            #     ])
 
             metadata_section = html.Div(
                 [
@@ -920,8 +919,8 @@ def update_main_node(main_node, df_root):
                             html.Li([html.B("Category: "), rec["field_category"]]),
                             html.Li([html.B("Data type: "), rec["field_datatype"]]),
                             html.Li([html.B("Role: "), rec["field_role"]]),
-                            html_bw,
-                            html_fw,
+                            # html_bw,
+                            # html_fw,
                         ],
                         style={"marginLeft": "10px"},
                     ),
@@ -1175,7 +1174,7 @@ def update_kpi(disabled, df_root):
         # field stats
         fields = (df["field_category"] == "Field").sum()
         fields_unused = ((df["field_category"] == "Field") \
-                                    & (df["flag_unused"] == 1)).sum()
+                                    & (df["n_worksheet_dependencies"] == 0)).sum()
         calculated_fields = df["field_category"].isin(
             ["Calculated Field", "Calculated Field (LOD)"]
         ).sum()
@@ -1183,14 +1182,17 @@ def update_kpi(disabled, df_root):
                                  "Calculated Field (LOD)").sum()
         # parameters = (df["field_category"] == "Parameter").sum()
         # parameters_unused = ((df["field_category"] == "Parameter") \
-        #                             & (df["flag_unused"] == 1)).sum()
-        df_calcs = df.loc[
-            df["field_category"].isin(["Calculated Field", "Calculated Field (LOD)"])
-        ]
+        #                             & (df["n_worksheet_dependencies"] == 0)).sum()
+        # df_calcs = df.loc[
+        #     df["field_category"].isin(["Calculated Field", "Calculated Field (LOD)"])
+        # ]
         # based on calculated fields only
-        avg_dependencies = df_calcs["n_backward_dependencies"].mean().round(2)
-        min_dependencies = df_calcs["n_backward_dependencies"].min()
-        max_dependencies = df_calcs["n_backward_dependencies"].max()
+        #avg_dependencies = df_calcs["n_backward_dependencies"].mean().round(2)
+        #min_dependencies = df_calcs["n_backward_dependencies"].min()
+        #max_dependencies = df_calcs["n_backward_dependencies"].max()
+        avg_dependencies = 0
+        min_dependencies = 0
+        max_dependencies = 0
 
         # sheet stats
         sheets = df_dep.loc[df_dep["dependency_category"] == "Sheet",

@@ -439,8 +439,12 @@ def forwardDependencies(df, f, w, level=0, p=None, _cache=None):
 
     lst = []
 
-    # Add all sheet dependencies just like any other (leveled)
+    # 'worksheet overlap': no. sheets in dependency sheet list that are also 
+    # in root (main node) sheet list. Mainly useful for non-sheet dependencies
+    # (for sheet dependencies at level 0 it is always = len(field_worksheets))
     nSheet = len([x for x in w if x in ws])
+
+    # Add all sheet dependencies just like any other (leveled)
     for sh in ws:
         lst.append({
             "parent":   f,
@@ -501,46 +505,6 @@ def uniqueDependencies(d, g, f):
         df = df.groupby(g)[f].min().reset_index()
         # convert result back to dictionary
         res = df.to_dict("records")
-    return res
-
-def maxDependencyLevel(l):
-    """ 
-    Return maximum forward or backward dependency level of a given input list.
-
-    Args:
-        l (list): Input list of dependency dictionaries.
-
-    Returns:
-        int: Maximum dependency level for the given dictionary list.
-    """
-    res = 0
-    # note: values are formatted as text -> max('-1', '-4') = -4
-    if len(l) > 0: res = max([d.get("level") for d in l])
-    return int(res)
-
-def fieldsFromCategory(l, c, f):
-    """
-    Return a list of fields of a given category from a list of 
-    dependency dictionaries.
-
-    Args:
-        l (list): Input list of dependency dictionaries.
-        c (str): Category type to filter fields.
-        f (bool): Flag indicating backward (True) or forward (False) 
-        dependencies.
-
-    Returns: 
-        list: List of unique field names corresponding to the specified 
-            category.
-    """
-    res = []
-    if len(l) > 0:
-        if f == True:
-            res = [d.get("parent") for d in l if d.get("category") == c]
-        else:
-            res = [d.get("child") for d in l if d.get("category") == c]
-    # only keep unique values
-    res = list(set(res))
     return res
 
 def addFieldNode(sf, l, cat, shapes, colors, calc):
@@ -752,11 +716,10 @@ def visualizeSheetDependencies(df, sh, g, dout, png=False):
         "<workbook path> Files\Graphs\Sheets\<sheet name>.svg" and an 
         additional PNG file (with extra attributes) if png is True.
     """
-    # --- get field -> sheet edges (only level == "0") ---
+    # --- get field -> sheet edges ---
     depSheet = df[
         (df.dependency_category == "Sheet")
         & (df.dependency_to == sh)
-        & (df.dependency_level.astype(str) == "0")
     ][[
         "dependency_from",
         "dependency_to",
