@@ -1189,19 +1189,15 @@ def update_kpi(disabled, df_root):
         ).sum()
         calculated_fields_lod = (df["field_category"] == \
                                  "Calculated Field (LOD)").sum()
-        # parameters = (df["field_category"] == "Parameter").sum()
-        # parameters_unused = ((df["field_category"] == "Parameter") \
-        #                             & (df["n_worksheet_dependencies"] == 0)).sum()
-        # df_calcs = df.loc[
-        #     df["field_category"].isin(["Calculated Field", "Calculated Field (LOD)"])
-        # ]
-        # based on calculated fields only
-        #avg_dependencies = df_calcs["n_backward_dependencies"].mean().round(2)
-        #min_dependencies = df_calcs["n_backward_dependencies"].min()
-        #max_dependencies = df_calcs["n_backward_dependencies"].max()
-        avg_dependencies = 0
-        min_dependencies = 0
-        max_dependencies = 0
+
+        # dependency stats
+        avg_dependencies, min_dependencies, max_dependencies = (
+            df_dep.loc[df_dep["dependency_category"] != "Sheet"]
+            .groupby("source_field_repl_id")
+            .size()
+            .agg(["mean", "min", "max"])
+            .round(0)
+        )        
 
         # sheet stats
         sheets = df_dep.loc[df_dep["dependency_category"] == "Sheet",
@@ -1211,6 +1207,7 @@ def update_kpi(disabled, df_root):
             .groupby("dependency_to")["dependency_from"]
             .nunique()
             .mean()
+            .round(0)
         )
 
     except Exception as e:
@@ -1227,7 +1224,7 @@ def update_kpi(disabled, df_root):
         avg_dependencies,
         f"ranging between {min_dependencies} and {max_dependencies}",
         sheets,
-        f"connected to {avg_elements_per_sheet:.0f} fields & parameters on average"
+        f"connected to {avg_elements_per_sheet} fields & parameters on average"
     )
 
 @app.callback(
