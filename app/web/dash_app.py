@@ -101,6 +101,13 @@ app.layout = dbc.Container(
                         style={"marginBottom": "5px"},
                     ),
 
+                    dbc.Checkbox(
+                        id="include-png-checkbox",
+                        label="Include PNG files (default is SVG)",
+                        value=False,
+                        className="ms-3 mt-2",
+                    ),
+
                     dbc.Button(
                         "Process Workbook", 
                         id="btn-process", 
@@ -627,9 +634,11 @@ def show_info(_, f):
     State("sample-file-store", "data"),
     State("file-ready", "data"),
     State("file-tabs", "active_tab"),
+    State("include-png-checkbox", "value"),
     prevent_initial_call=True
 )
-def start_processing(_, upload_filename, sample_filename, file_ready, active_tab):
+def start_processing(_, upload_filename, sample_filename, 
+                     file_ready, active_tab, include_png):
     """
     Triggered by the 'Process ZIP' button.
     Decides which file (uploaded or sample) to process based on the active tab.
@@ -665,7 +674,7 @@ def start_processing(_, upload_filename, sample_filename, file_ready, active_tab
             filepath=filepath, 
             output_folder=OUTPUT_FOLDER, 
             is_executable=False,
-            fPNG=True
+            fPNG=include_png
         )
 
         progress_data["show-dots"] = False
@@ -996,7 +1005,7 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
     if isinstance(selected, list) and selected:
         selected = selected[0]
     selected = selected.strip('"')
-    main_id = main_node[0]
+    main_id, main_label = main_node
     attrs = node_attrs.get(selected, {})
     label_selected = attrs.get("label", selected)
 
@@ -1139,7 +1148,7 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
         ),
         metadata_section,
         html.Hr(),
-        html.B(f"Shortest path relative to {label_selected}:"),
+        html.B(f"Shortest path relative to {main_label}:"),
         html.Div(path_text, style={"marginTop": "4px"}),
     ])
 
