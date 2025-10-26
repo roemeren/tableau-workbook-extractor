@@ -17,6 +17,7 @@ The `process_twb` function serves as the main entry point, taking a
 file path and optional parameters for output handling and execution context.
 """
 import warnings
+import shutil
 from tqdm import tqdm
 from shared.logging import setup_logging, stepLog, logger
 from shared.common import *
@@ -73,6 +74,10 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
             outFileDirectory =f"{filepath} Files"
         else:
             outFileDirectory = os.path.join(output_folder, f"{inpFileName} Files")
+
+        # Recreate output folder
+        shutil.rmtree(outFileDirectory, ignore_errors=True)
+        os.makedirs(outFileDirectory, exist_ok=True)
 
         # Initialize logging for app
         if not is_executable: setup_logging(is_executable, outFileDirectory)
