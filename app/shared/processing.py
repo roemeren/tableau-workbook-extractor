@@ -44,7 +44,8 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
-def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
+def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True, 
+                stop_event=None):
     """
     Process a Tableau Workbook (TWB/TWBX) file to extract and analyze data sources,
     fields, and their dependencies.
@@ -55,18 +56,26 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
     output files to the specified upload folder.
 
     Args:
-        filepath (str): The path to the Tableau workbook (TWB*) file to be processed.
-        output_folder (str, optional): The directory where output files will be saved
+        filepath (str): Path to the Tableau workbook (TWB*) file to be processed.
+        output_folder (str, optional): Directory where output files will be saved
             if not running as an executable. Defaults to None.
-        is_executable (bool, optional): Flag indicating if the function is being run
-            as an executable script. Defaults to True.
-        fPNG (bool, optional): Flag indicating if the function also has to 
-            generate PNG images next to SVG images
+        is_executable (bool, optional): Whether the function is being run as an
+            executable script. Defaults to True.
+        fPNG (bool, optional): Whether to generate PNG images in addition to SVGs.
+        stop_event (threading.Event, optional): Signal used for cooperative 
+            cancellation. When set, processing stops gracefully. Defaults to None.
 
     Returns:
-        None: This function does not return a value but generates output files
+        None: Generates output files and updates progress tracking variables.
     """
     try:
+        # Helper to exit early if user pressed Cancel
+        def check_cancel():
+            if stop_event and stop_event.is_set():
+                logger.info("Processing cancelled by user.")
+                return True
+            return False
+
         # Extract file/directory names from twb file
         inpFileName = os.path.splitext(os.path.basename(filepath))[0]
 
@@ -88,6 +97,7 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
         # Get initial data frame with nested data source and field objects
         progress_data["progress"] = 3
         progress_data['task'] = stepLog("Extract data sources and fields from workbook")
+        if check_cancel(): return "Cancelled"
 
         with suppress_stdout():
             inpTwb = Workbook(filepath)
@@ -116,6 +126,7 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
 
         progress_data["progress"] = 6
         progress_data["current-task"] = stepLog("Processing fields")
+        if check_cancel(): return "Cancelled"
 
         # Additional transformations
         df["field_hidden"] = df["field_hidden"].apply(lambda x: \
@@ -206,6 +217,7 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
 
         progress_data["progress"] = 9
         progress_data["current-task"] = stepLog("Processing dependencies")
+        if check_cancel(): return "Cancelled"
 
         # Get full list of backward dependencies
         shared_cache = {}
@@ -308,6 +320,7 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
 
         progress_data["progress"] = 12
         progress_data["current-task"] = stepLog("Saving table results")
+        if check_cancel(): return "Cancelled"
 
         outSheetDirectory = os.path.join(outFileDirectory, 'Fields')
         outFilePath = os.path.join(outSheetDirectory, inpFileName + '.xlsx')       
@@ -380,6 +393,7 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
 
             # Create dependency graphs per field
             for _, row in iterator:
+                if check_cancel(): return "Cancelled"
                 visualizeFieldDependencies(df_original, row.source_field_repl_id, 
                     row.source_field_label, gMaster, outPath, fPNG)
 
@@ -401,6 +415,7 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True):
 
             # Create dependency graphs per sheet
             for sh in iterator:
+                if check_cancel(): return "Cancelled"
                 visualizeSheetDependencies(df2_original, sh, gMaster, outPath, fPNG)
                 if not is_executable:
                     current_progress += 1
