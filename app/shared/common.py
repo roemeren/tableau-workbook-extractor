@@ -32,6 +32,8 @@ progress_data = {'progress': 0, 'filename': None}
 
 # Constants
 MAXPATHSIZE = 260
+COL_MAIN_FIELD = 'lightblue'
+COL_SHEET = 'grey'
 
 def show_exception_and_exit(exc_type, exc_value, tb):
     """
@@ -622,7 +624,7 @@ def visualizeFieldDependencies(df, sf, l, g, dout_root, svg = False):
     G = pydot.Dot(graph_type = "digraph", tooltip = " ")
     subject = '"' + sf + '"'
     root = MGCopy.get_node(subject)[0]
-    root.set("fillcolor", "lightblue")
+    root.set("fillcolor", COL_MAIN_FIELD)
     root.set("label", f)
     G.add_node(root)
 
@@ -755,6 +757,7 @@ def visualizeSheetDependencies(df, sh, g, dout, png=False):
     subject = '"' + sh + '"'
     root = MGCopy.get_node(subject)[0]
     l = root.get("label")
+    root.set("fillcolor", COL_SHEET)
     G.add_node(root)
     
     # add (parent -> child) edges to graph

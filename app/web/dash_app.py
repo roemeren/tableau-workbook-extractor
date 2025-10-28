@@ -10,7 +10,7 @@ import time
 import re
 from shared.utils import *
 from shared.processing import process_twb
-from shared.common import progress_data, pd
+from shared.common import progress_data, pd, COL_MAIN_FIELD, COL_SHEET
 import networkx as nx
 import pydot
 
@@ -877,8 +877,8 @@ def load_dot_source(selected_file, base_dir, selected_folder):
 
         # detect the "main" node by fill color
         fill = (attrs.get("fillcolor") or attrs.get("fill_color") or "").lower()
-        if fill in ("lightblue", "grey") and main_node is None:
-            main_node = [node_id, attrs.get("label", node_id)]
+        if fill in (COL_MAIN_FIELD, COL_SHEET) and main_node is None:
+            main_node = [node_id, attrs.get("label", node_id), fill]
 
     return dot_text, node_attrs, main_node
 
@@ -893,43 +893,71 @@ def update_main_node(main_node, df_root):
         return "Dependency Graph", None
 
     try:
-        parquet_path_field = os.path.join(df_root, "fields.parquet")
-        df = pd.read_parquet(parquet_path_field)
+        # --- Load data ---
+        df = pd.read_parquet(os.path.join(df_root, "fields.parquet"))
+        df_dep = pd.read_parquet(os.path.join(df_root, "dependencies.parquet"))
 
-        metadata_section = html.Div(MESSAGE_NO_DATA)
-        
-        main_node_id, main_node_label = main_node
-        row = df.loc[df["source_field_repl_id"] == main_node_id]
+        # --- Identify main field/sheet ---
+        main_id, main_label, _ = main_node
+        row_field = df.loc[df["source_field_repl_id"] == main_id]
 
-        if len(row) == 1:
-            rec = row.iloc[0]
+        # Determine category
+        if len(row_field) == 1:
+            # field or parameter
+            rec = row_field.iloc[0]
+            cat = rec["field_category"]
+            rows_dep = df_dep.loc[df_dep["source_field_repl_id"] == main_id]
+        elif len(row_field) == 0:
+            # sheet
+            rec = None
+            rows_dep = df_dep.loc[df_dep["dependency_to"] == main_label]
+            cat = "Sheet"
 
-            # html_bw, html_fw = None, None
+        html_bw, html_fw = None, None
 
-            # if rec["field_category"] not in ("Field", "Parameter"):
-            #     html_bw = html.Li([
-            #         html.B("Upstream sources: "),
-            #           f"{rec['n_backward_dependencies']} (max. level: {abs(rec['field_backward_dependencies_max_level'])})"
-            #     ])
-            
-            # # TODO: review aggregates (not always correct)
-            # if rec["field_category"] != "Sheet":
-            #     html_fw = html.Li([
-            #         html.B("Upstream sources: "),
-            #           f"{rec['n_forward_dependencies']} (max. level: {rec['field_forward_dependencies_max_level']})"
-            #     ])
+        # --- Dependency statistics ---
+        if cat not in ("Field", "Parameter") and not rows_dep.empty:
+            mask = rows_dep["dependency_level"] < 0 if cat != "Sheet" \
+                else pd.Series(True, index=rows_dep.index)
+            rows_filtered = rows_dep.loc[mask]
 
+            row_count = len(rows_filtered)
+            min_level_abs = abs(rows_filtered["dependency_level"].min()) \
+                if not rows_filtered.empty else 0
+
+            html_bw = html.Li([
+                html.B("Upstream sources: "),
+                f"{row_count} (max. level: {min_level_abs})" \
+                    if cat != "Sheet" else f"{row_count}"
+            ])
+
+        if cat != "Sheet":
+            rows_filtered = rows_dep.loc[
+                (rows_dep["dependency_level"] > 0) & 
+                (rows_dep["dependency_category"] != "Sheet")
+            ]
+            row_count = len(rows_filtered)
+            max_level_abs = rows_filtered["dependency_level"].max() \
+                if not rows_filtered.empty else 0
+
+            html_fw = html.Li([
+                html.B("Upstream sources: "),
+                  f"{row_count} (max. level: {max_level_abs})"
+            ])
+
+        if cat:
             metadata_section = html.Div(
                 [
                     html.B("Field Information", style={"display": "block", "marginBottom": "6px"}),
+
                     html.Ul(
                         [
-                            html.Li([html.B("Data source: "), rec["source_label"]]),
-                            html.Li([html.B("Category: "), rec["field_category"]]),
-                            html.Li([html.B("Data type: "), rec["field_datatype"]]),
-                            html.Li([html.B("Role: "), rec["field_role"]]),
-                            # html_bw,
-                            # html_fw,
+                            html.Li([html.B("Data source: "), "Sheets" if cat == "Sheet" else rec["source_label"]]),
+                            html.Li([html.B("Category: "), "Sheet" if cat == "Sheet" else rec["field_category"]]),
+                            html.Li([html.B("Data type: "), "(not applicable)" if cat == "Sheet" else rec["field_datatype"]]),
+                            html.Li([html.B("Role: "), "(not applicable)" if cat == "Sheet" else rec["field_role"]]),
+                            html_bw,
+                            html_fw,
                         ],
                         style={"marginLeft": "10px"},
                     ),
@@ -942,19 +970,17 @@ def update_main_node(main_node, df_root):
                     "border": "1px solid #ddd",
                 },
             )
-        elif len(row) == 0:
-            metadata_section = html.Div(f"No record found for node ID: {main_node_id}")
         else:
-            metadata_section = html.Div(f"Multiple records found for node ID: {main_node_id}")
-    
+            metadata_section = html.Div(MESSAGE_NO_DATA)
+
     except Exception as e:
-        print(f"Error processing parquet files: {e}")
+        print(f"Error processing parquet files in update_main_node: {e}")
         raise PreventUpdate
     
     # ---- assemble info sections ----
     general_info = html.Div([
         html.B(
-            f"Selected item: {main_node_label}",
+            f"Selected item: {main_label}",
             style={"display": "block", "marginTop": "10px", "marginBottom": "10px"},
         ),
         metadata_section,
@@ -1005,7 +1031,7 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
     if isinstance(selected, list) and selected:
         selected = selected[0]
     selected = selected.strip('"')
-    main_id, main_label = main_node
+    main_id, main_label, _ = main_node
     attrs = node_attrs.get(selected, {})
     label_selected = attrs.get("label", selected)
 
@@ -1196,7 +1222,7 @@ def update_kpi(disabled, df_root):
             .groupby("source_field_repl_id")
             .size()
             .agg(["mean", "min", "max"])
-            .round(0)
+            .round(2)
         )        
 
         # sheet stats
@@ -1207,7 +1233,6 @@ def update_kpi(disabled, df_root):
             .groupby("dependency_to")["dependency_from"]
             .nunique()
             .mean()
-            .round(0)
         )
 
     except Exception as e:
@@ -1222,7 +1247,7 @@ def update_kpi(disabled, df_root):
         # parameters,
         # f"of which {parameters_unused} unused in sheets",
         avg_dependencies,
-        f"ranging between {min_dependencies} and {max_dependencies}",
+        f"ranging between {min_dependencies:.0f} and {max_dependencies:.0f}",
         sheets,
         f"connected to {avg_elements_per_sheet} fields & parameters on average"
     )
