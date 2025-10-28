@@ -21,6 +21,7 @@ os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
 # --- module-level state ---
 _processing_thread = None
+_stop_event = threading.Event()
 
 # --- initialize app ---
 # Themes: see https://www.dash-bootstrap-components.com/docs/themes/explorer/
@@ -108,11 +109,29 @@ app.layout = dbc.Container(
                         className="ms-3 mt-2",
                     ),
 
-                    dbc.Button(
-                        "Process Workbook", 
-                        id="btn-process", 
-                        color="primary",
-                        className="mb-3"
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                dbc.Button(
+                                    "Process Workbook",
+                                    id="btn-process",
+                                    color="primary",
+                                    className="mb-3",
+                                ),
+                                width="auto",
+                            ),
+                            dbc.Col(
+                                dbc.Button(
+                                    "Cancel",
+                                    id="btn-cancel",
+                                    color="secondary",
+                                    className="mb-3 ms-2",
+                                    style={"visibility": "hidden"},
+                                ),
+                                width="auto",
+                            ),
+                        ],
+                        className="g-0",  # no gutter spacing
                     ),
 
                     dbc.Progress(
@@ -670,20 +689,25 @@ def start_processing(_, upload_filename, sample_filename,
     def worker():
         progress_data["status"] = "running"
 
-        error_msg = process_twb(
+        msg = process_twb(
             filepath=filepath, 
             output_folder=OUTPUT_FOLDER, 
             is_executable=False,
-            fPNG=include_png
+            fPNG=include_png,
+            stop_event=_stop_event,
         )
 
         progress_data["show-dots"] = False
 
-        # early exit if an error was returned
-        if error_msg:
-            progress_data['output_file'] = None
-            progress_data["current-task"] = f"Processing failed for {filename}: {error_msg}"
-            progress_data["status"] = "exited"
+        # early exit in case of an error or cancellation
+        if msg:
+            progress_data["output_file"] = None
+            if msg == "Cancelled":
+                progress_data["current-task"] = f"Processing cancelled for {filename}"
+                progress_data["status"] = "cancelled"
+            else:
+                progress_data["current-task"] = f"Processing failed for {filename}: {msg}"
+                progress_data["status"] = "exited"
             progress_data["progress"] = 100
             return
 
@@ -694,7 +718,8 @@ def start_processing(_, upload_filename, sample_filename,
         progress_data["progress"] = 100
 
     # assign to the module-level variable, not a new local variable
-    global _processing_thread
+    global _processing_thread, _stop_event
+    _stop_event.clear()
     _processing_thread = threading.Thread(target=worker)
     _processing_thread.start()
 
@@ -716,8 +741,12 @@ def start_processing(_, upload_filename, sample_filename,
     Output("tab-sample-content", "disabled"),
     Output("dot-root-store", "data"),
     Output("df-root-store", "data"),
+    Output("btn-cancel", "style"),
+    Output("btn-cancel", "disabled"),
+    Output("include-png-checkbox", "disabled"),
     Input("progress-poller", "n_intervals"), # initially None
     Input("processing-started", "data"), # will (re)activate the poller
+    Input("btn-cancel", "n_clicks"),
     State("file-tabs", "active_tab"),
     prevent_initial_call=True
 )
@@ -747,12 +776,37 @@ def update_progress(*args):
     style = {"width": "40%", "visibility": "hidden"}
     finished_at = progress_data.get("finished_at")
     status = progress_data.get("status")
+    style_cancel = {"visibility": "visible"}
     poller_disabled = False
+    cancel_disabled = False
     upload_tab_disabled = (active_tab == "tab-sample")
     sample_tab_disabled = not upload_tab_disabled
 
+    # Handle cancel button click
+    trigger_ids = [t["prop_id"].split(".")[0] for t in ctx.triggered]
+    if "btn-cancel" in trigger_ids:
+        global _processing_thread, _stop_event
+
+        # Signal the worker thread to stop and wait briefly for it to exit
+        if _processing_thread and _processing_thread.is_alive():
+            _stop_event.set()
+            _processing_thread.join(timeout=3)
+            if _processing_thread.is_alive():
+                print("Warning: background thread still running after timeout.")
+                # only persist progress state if still running
+                progress_data["status"] = "cancelling"
+                progress_data["show_dots"] = True
+            else:
+                print("Background thread stopped cleanly after cancel request.")
+        else:
+            print("No active background thread to cancel.")
+
+        # display a temporary 'cancelling' status
+        current_task = "Cancelling..."
+        cancel_disabled = True
+  
     # Handle completion
-    if status == "exited":
+    if status in ("exited", "cancelled"):
         # Early exit → reset immediately
         pct = 0
         label = ""
@@ -760,6 +814,11 @@ def update_progress(*args):
         btn_disabled = False
         upload_tab_disabled = False
         sample_tab_disabled = False
+        style_cancel = {"visibility": "hidden"}
+    elif status == "cancelling":
+        # persist cancelling status until worker stops (for slow environments)
+        current_task = "Cancelling" + dots
+        cancel_disabled = True
     elif status == "finished":
         # Normal completion: wait 3s before progress bar reset
         if time.time() - finished_at >= 3:
@@ -770,7 +829,7 @@ def update_progress(*args):
             style["visibility"] = "visible"
             upload_tab_disabled = False
             sample_tab_disabled = False
-
+            style_cancel = {"visibility": "hidden"}
     return (
         pct,
         label,
@@ -786,6 +845,9 @@ def update_progress(*args):
         sample_tab_disabled,
         graphs_folder,
         tables_folder,
+        style_cancel,
+        cancel_disabled,
+        btn_disabled,
     )
 
 # Output data -> Folder dropdown
