@@ -1311,7 +1311,7 @@ def update_kpi(disabled, df_root):
         avg_dependencies,
         f"ranging between {min_dependencies:.0f} and {max_dependencies:.0f}",
         sheets,
-        f"connected to {avg_elements_per_sheet} fields & parameters on average"
+        f"connected to {avg_elements_per_sheet:.0f} fields & parameters on average"
     )
 
 @app.callback(
