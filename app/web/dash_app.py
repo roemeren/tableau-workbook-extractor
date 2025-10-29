@@ -820,6 +820,7 @@ def update_progress(*args):
         current_task = "Cancelling" + dots
         cancel_disabled = True
     elif status == "finished":
+        style_cancel = {"visibility": "hidden"}
         # Normal completion: wait 3s before progress bar reset
         if time.time() - finished_at >= 3:
             pct = 0
@@ -829,7 +830,6 @@ def update_progress(*args):
             style["visibility"] = "visible"
             upload_tab_disabled = False
             sample_tab_disabled = False
-            style_cancel = {"visibility": "hidden"}
     return (
         pct,
         label,
