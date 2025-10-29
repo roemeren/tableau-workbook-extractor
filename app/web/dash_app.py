@@ -23,6 +23,9 @@ os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 _processing_thread = None
 _stop_event = threading.Event()
 
+# --- other initializations ---
+sample_files = sorted(SAMPLE_FOLDER.glob("*.twb*"), key=lambda f: f.name.casefold())
+
 # --- initialize app ---
 # Themes: see https://www.dash-bootstrap-components.com/docs/themes/explorer/
 app = Dash(__name__, external_stylesheets=[dbc.themes.ZEPHYR])
@@ -58,13 +61,10 @@ app.layout = dbc.Container(
                                             dbc.Label("Select a sample Tableau workbook"),
                                             dcc.Dropdown(
                                                 id="sample-file-dropdown",
-                                                options=[
-                                                    {"label": f.stem, "value": str(f)}
-                                                    for f in SAMPLE_FOLDER.glob("*.twb*")
-                                                ],
+                                                options=[{"label": f.stem, "value": str(f)} for f in sample_files],
                                                 placeholder="Choose sample workbook...",
                                                 style={"width": "100%", "marginBottom": "33px"},
-                                            ),
+                                            )
                                         ],
                                         className="p-2",
                                     ),
