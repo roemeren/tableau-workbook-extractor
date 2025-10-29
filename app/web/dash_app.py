@@ -864,7 +864,7 @@ def update_folder_dropdown(download_disabled, base_dir):
     folders = list_subfolders(base_dir)
 
     # Sort alphabetically, but push "Sheets" and "Parameters" to the end
-    folders.sort(key=lambda x: (x in ["Sheets", "Parameters"], x.lower()))
+    folders.sort(key=lambda x: (x in ["Sheets", "Parameters"], x.casefold()))
 
     options = [{"label": f, "value": f} for f in folders]
     first_value = folders[0] if folders else None
@@ -884,6 +884,8 @@ def update_file_dropdown(base_dir, selected_folder):
         return [], None
 
     files = list_dot_files(base_dir, selected_folder)
+    files.sort(key=str.casefold)
+
     options = [{"label": f, "value": f} for f in files]
 
     # Auto-select first file if available
