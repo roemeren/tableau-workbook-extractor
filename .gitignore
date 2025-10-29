@@ -6,7 +6,6 @@ __pycache__
 build
 dist
 *.spec
-# Ignore all of data except data/sample
 data/
 app/web/static/**
 !app/web/static/sample/
