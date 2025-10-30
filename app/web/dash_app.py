@@ -1206,7 +1206,7 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
                                 html.Li([html.B("Category: "), rec["field_category"]]),
                                 html.Li([html.B("Data type: "), rec["field_datatype"]]),
                                 html.Li([html.B("Role: "), rec["field_role"]]),
-                                html.Li([html.B(f"{direction} Level: "), len(path)-1]),
+                                html.Li([html.B(f"{direction} level: "), len(path)-1]),
                             ],
                             style={"marginLeft": "10px"},
                         ),
