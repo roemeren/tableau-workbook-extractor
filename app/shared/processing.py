@@ -257,15 +257,19 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True,
                 fieldIDMapping(x.field_calculation_cleaned, x.source_label, 
                     dictLabelToID), axis = 1)
             # Create master node graph
-            colors = {"Parameter": "#cbc3e3",
-                "Field": "green", "Calculated Field (LOD)": "red", 
-                "Calculated Field": "orange"}
-            shapes = {"Parameter": "parallelogram", 
-                "Field": "box", "Calculated Field (LOD)": "oval", 
-                "Calculated Field": "oval"}
+            fillcolors = {"Parameter": "#E6D9F7",
+                "Field": "#E6EEF5", "Calculated Field (LOD)": "#FFF2CC", 
+                "Calculated Field": "#D9EAD3"}
+            colors = {"Parameter": "#8E7CC3",
+                "Field": "#5B7FA3", "Calculated Field (LOD)": "#E0B000", 
+                "Calculated Field": "#6AA84F"}
+            shapes = {"Parameter": "hexagon", 
+                "Field": "oval", "Calculated Field (LOD)": "diamond", 
+                "Calculated Field": "box"}
             nodes = df.apply(lambda x: \
                 addFieldNode(x.source_field_repl_id, x.source_field_label, 
-                    x.field_category, shapes, colors, x.field_calculation_cleaned), 
+                    x.field_category, shapes, fillcolors, colors, 
+                    x.field_calculation_cleaned), 
                     axis = 1)
             lstNodes = []
             for node in nodes: lstNodes += node
@@ -275,7 +279,7 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True,
             # Add sheet nodes
             for x in dictSheetToID:
                 node = pydot.Node(name=dictSheetToID[x], label=x, shape="box",
-                    fillcolor="grey", style="filled", tooltip=" ")
+                    fillcolor=COL_FILL_SHEET, color=COL_BORDER_SHEET, tooltip=" ")
                 gMaster.add_node(node)
 
         # Create new data frame with flattened dependencies

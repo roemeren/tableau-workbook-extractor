@@ -10,7 +10,7 @@ import time
 import re
 from shared.utils import *
 from shared.processing import process_twb
-from shared.common import progress_data, pd, COL_MAIN_FIELD, COL_SHEET
+from shared.common import progress_data, pd, COL_FILL_MAIN_FIELD, COL_FILL_SHEET
 import networkx as nx
 import pydot
 
@@ -940,8 +940,8 @@ def load_dot_source(selected_file, base_dir, selected_folder):
         node_attrs[node_id] = attrs
 
         # detect the "main" node by fill color
-        fill = (attrs.get("fillcolor") or attrs.get("fill_color") or "").lower()
-        if fill in (COL_MAIN_FIELD, COL_SHEET) and main_node is None:
+        fill = (attrs.get("fillcolor") or "")
+        if fill in (COL_FILL_MAIN_FIELD, COL_FILL_SHEET) and main_node is None:
             main_node = [node_id, attrs.get("label", node_id), fill]
 
     return dot_text, node_attrs, main_node
@@ -1108,11 +1108,11 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
 
             if nx.has_path(G, main_id, selected):
                 path = nx.shortest_path(G, source=main_id, target=selected)
-                direction = "forward"
+                direction = "Downstream"
                 direction_label = "Downstream Consumer"
             elif nx.has_path(G, selected, main_id):
                 path = nx.shortest_path(G, source=selected, target=main_id)
-                direction = "backward"
+                direction = "Upstream"
                 direction_label = "Upstream Source"
             else:
                 path = [selected]
@@ -1157,6 +1157,7 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
                     if a and not a.endswith(','):
                         a += ', '
                     a += f'penwidth={SELECTED_EDGE_PENWIDTH}'
+                    
                 return before + a + after
 
             new_dot = re.sub(edge_pat, bump_edge_attrs, new_dot, count=1, flags=re.DOTALL)
@@ -1180,6 +1181,7 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
                                 html.Li([html.B("Category: "), rec["field_category"]]),
                                 html.Li([html.B("Data type: "), rec["field_datatype"]]),
                                 html.Li([html.B("Role: "), rec["field_role"]]),
+                                html.Li([html.B(f"{direction} Level: "), len(path)-1]),
                             ],
                             style={"marginLeft": "10px"},
                         ),
@@ -1206,7 +1208,7 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
     if path:
         path_labels = [node_attrs.get(n, {}).get("label", n) for n in path]
         arrow = " → ".join(path_labels)
-        path_text = arrow if direction in ("forward", "backward") else "No direct dependency path."
+        path_text = arrow if direction in ("Downstream", "Upstream") else "No direct dependency path."
 
         calc_chain = []
         for i, node in enumerate(path):

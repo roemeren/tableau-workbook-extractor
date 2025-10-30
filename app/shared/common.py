@@ -32,8 +32,13 @@ progress_data = {'progress': 0, 'filename': None}
 
 # Constants
 MAXPATHSIZE = 260
-COL_MAIN_FIELD = 'lightblue'
-COL_SHEET = 'grey'
+COL_FILL_MAIN_FIELD = '#CCE5FF'
+COL_BORDER_MAIN_FIELD = '#0055CC'
+COL_FILL_SHEET = '#EAD1DC'
+COL_BORDER_SHEET = "#A64D79"
+GRAPH_FONT_MAIN = "Segoe UI"
+GRAPH_RANK_DIR = "TB"
+GRAPH_ARROWHEAD = "normal" # "open" is better but not when bumped in app
 
 def show_exception_and_exit(exc_type, exc_value, tb):
     """
@@ -509,7 +514,7 @@ def uniqueDependencies(d, g, f):
         res = df.to_dict("records")
     return res
 
-def addFieldNode(sf, l, cat, shapes, colors, calc):
+def addFieldNode(sf, l, cat, shapes, fillcolors, colors, calc):
     """
     Creates graph node objects for an input source field.
 
@@ -518,7 +523,8 @@ def addFieldNode(sf, l, cat, shapes, colors, calc):
         l (str): Input source field label.
         cat (str): Input source field category.
         shapes (dict): List of shapes per source field category.
-        colors (dict): List of colors per source field category.
+        fillcolors (dict): List of fill colors per source field category.
+        colors (dict): List of border colors per source field category.
         calc (str): Input source field calculation expression.
 
     Returns:
@@ -530,7 +536,7 @@ def addFieldNode(sf, l, cat, shapes, colors, calc):
     if calc == "": c = " "
     else: c = calc
     node = pydot.Node(name=sf, label=l, shape=shapes[cat],
-        fillcolor=colors[cat], style="filled", tooltip=c)
+        color=colors[cat], fillcolor=fillcolors[cat], tooltip=c)
     return [node]
 
 def fieldIDMapping(x, s, d):
@@ -621,10 +627,22 @@ def visualizeFieldDependencies(df, sf, l, g, dout_root, svg = False):
     MGCopy = copy.deepcopy(g)
 
     # set properties for main node
-    G = pydot.Dot(graph_type = "digraph", tooltip = " ")
+    G = pydot.Dot(
+        graph_type="digraph",
+        rankdir=GRAPH_RANK_DIR,
+        tooltip=" ",
+    )
+    G.set_node_defaults(
+        fontname=GRAPH_FONT_MAIN,
+        style="filled",
+    )
+    G.set_edge_defaults(
+        arrowhead=GRAPH_ARROWHEAD,
+    )
     subject = '"' + sf + '"'
     root = MGCopy.get_node(subject)[0]
-    root.set("fillcolor", COL_MAIN_FIELD)
+    root.set("fillcolor", COL_FILL_MAIN_FIELD)
+    root.set("color", COL_BORDER_MAIN_FIELD)
     root.set("label", f)
     G.add_node(root)
 
@@ -753,11 +771,23 @@ def visualizeSheetDependencies(df, sh, g, dout, png=False):
     MGCopy = copy.deepcopy(g)
 
     # set properties for main node
-    G = pydot.Dot(graph_type = "digraph", tooltip = " ")
+    G = pydot.Dot(
+        graph_type="digraph",
+        rankdir=GRAPH_RANK_DIR,
+        tooltip=" ",
+    )
+    G.set_node_defaults(
+        fontname=GRAPH_FONT_MAIN,
+        style="filled",
+    )
+    G.set_edge_defaults(
+        arrowhead=GRAPH_ARROWHEAD,
+    )
     subject = '"' + sh + '"'
     root = MGCopy.get_node(subject)[0]
     l = root.get("label")
-    root.set("fillcolor", COL_SHEET)
+    root.set("fillcolor", COL_FILL_SHEET)
+    root.set("color", COL_BORDER_SHEET)
     G.add_node(root)
     
     # add (parent -> child) edges to graph
