@@ -258,7 +258,7 @@ app.layout = dbc.Container(
                                 html.Div([
                                     html.Img(
                                         src=ICON_REPO,
-                                        height="110px",
+                                        height="90px",
                                         style={"marginRight": "15px"}
                                     ),
                                     html.Div([
@@ -428,7 +428,7 @@ app.layout = dbc.Container(
                                                         clearable=False,
                                                     ),
                                                 ],
-                                                width=4,
+                                                width=3,
                                             ),
                                             dbc.Col(
                                                 [
@@ -438,7 +438,22 @@ app.layout = dbc.Container(
                                                         placeholder="Select file",
                                                     ),
                                                 ],
-                                                width=4,
+                                                width=3,
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    html.Label("Layout", className="fw-bold"),
+                                                    dcc.Dropdown(
+                                                        id="layout-dropdown",
+                                                        options=[
+                                                            {"label": "Left to right", "value": "LR"},
+                                                            {"label": "Top to bottom", "value": "TB"},
+                                                        ],
+                                                        value="LR",
+                                                        clearable=False,
+                                                    ),
+                                                ],
+                                                width=3,
                                             ),
                                             dbc.Col(
                                                 [
@@ -455,7 +470,7 @@ app.layout = dbc.Container(
                                                         placement="bottom",
                                                     ),
                                                 ],
-                                                width=4,
+                                                width=3,
                                             ),
                                         ],
                                         className="g-3 mb-3 px-2",
@@ -897,10 +912,11 @@ def update_file_dropdown(base_dir, selected_folder):
     Output("attrs-store", "data"),
     Output("main-node-store", "data"),
     Input("file-dropdown", "value"),
+    Input("layout-dropdown", "value"),
     State("dot-root-store", "data"),
     State("folder-dropdown", "value"),
 )
-def load_dot_source(selected_file, base_dir, selected_folder):
+def load_dot_source(selected_file, layout, base_dir, selected_folder):
     """Load the selected .dot file, parse its node attributes, and identify the main node as [id, label]."""
     if not selected_file or not selected_folder:
         raise PreventUpdate
@@ -943,6 +959,15 @@ def load_dot_source(selected_file, base_dir, selected_folder):
         fill = (attrs.get("fillcolor") or "")
         if fill in (COL_FILL_MAIN_FIELD, COL_FILL_SHEET) and main_node is None:
             main_node = [node_id, attrs.get("label", node_id), fill]
+
+	# ---- apply layout direction (TB or LR) ----
+    try:
+        lines = dot_text.splitlines()
+        if len(lines) > 1 and lines[1].strip().startswith("rankdir="):
+            lines[1] = f"rankdir={layout};"
+            dot_text = "\n".join(lines)
+    except Exception:
+        pass
 
     return dot_text, node_attrs, main_node
 
