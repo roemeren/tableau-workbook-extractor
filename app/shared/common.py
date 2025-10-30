@@ -37,7 +37,7 @@ COL_BORDER_MAIN_FIELD = '#0055CC'
 COL_FILL_SHEET = '#EAD1DC'
 COL_BORDER_SHEET = "#A64D79"
 GRAPH_FONT_MAIN = "Segoe UI"
-GRAPH_RANK_DIR = "TB"
+GRAPH_RANK_DIR = "LR" # alternative: TB (default)
 GRAPH_ARROWHEAD = "normal" # "open" is better but not when bumped in app
 
 def show_exception_and_exit(exc_type, exc_value, tb):
@@ -644,6 +644,7 @@ def visualizeFieldDependencies(df, sf, l, g, dout_root, svg = False):
     root.set("fillcolor", COL_FILL_MAIN_FIELD)
     root.set("color", COL_BORDER_MAIN_FIELD)
     root.set("label", f)
+    root.set("penwidth", 3)
     G.add_node(root)
 
     # add (parent -> child) edges to graph
