@@ -21,7 +21,6 @@ import pydot
 import random
 import string
 import zipfile
-from functools import lru_cache
 
 # Script parameters
 fDepFields = True # create field dependency graphs?
