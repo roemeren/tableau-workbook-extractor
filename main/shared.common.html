@@ -284,7 +284,7 @@ used across the Flask application for processing uploaded files.</p>
 the shared <cite>progress_data</cite>.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="shared.common.addFieldNode">
-<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">addFieldNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.addFieldNode" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">addFieldNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillcolors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.addFieldNode" title="Link to this definition">¶</a></dt>
 <dd><p>Creates graph node objects for an input source field.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -293,7 +293,8 @@ the shared <cite>progress_data</cite>.</p>
 <li><p><strong>l</strong> (<em>str</em>) – Input source field label.</p></li>
 <li><p><strong>cat</strong> (<em>str</em>) – Input source field category.</p></li>
 <li><p><strong>shapes</strong> (<em>dict</em>) – List of shapes per source field category.</p></li>
-<li><p><strong>colors</strong> (<em>dict</em>) – List of colors per source field category.</p></li>
+<li><p><strong>fillcolors</strong> (<em>dict</em>) – List of fill colors per source field category.</p></li>
+<li><p><strong>colors</strong> (<em>dict</em>) – List of border colors per source field category.</p></li>
 <li><p><strong>calc</strong> (<em>str</em>) – Input source field calculation expression.</p></li>
 </ul>
 </dd>
@@ -358,6 +359,12 @@ canonical caching (cache stores subtree as if called with level=0).</p>
 <dd class="field-odd"><p>list[dict]</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.deduplicate_graph">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">deduplicate_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dot</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dot</span></span></span><a class="headerlink" href="#shared.common.deduplicate_graph" title="Link to this definition">¶</a></dt>
+<dd><p>Return a new graph with duplicate nodes and edges removed.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -498,33 +505,6 @@ is its corresponding mapped value.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="shared.common.fieldsFromCategory">
-<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">fieldsFromCategory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.fieldsFromCategory" title="Link to this definition">¶</a></dt>
-<dd><p>Return a list of fields of a given category from a list of
-dependency dictionaries.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>l</strong> (<em>list</em>) – Input list of dependency dictionaries.</p></li>
-<li><p><strong>c</strong> (<em>str</em>) – Category type to filter fields.</p></li>
-<li><p><strong>f</strong> (<em>bool</em>) – Flag indicating backward (True) or forward (False)</p></li>
-<li><p><strong>dependencies.</strong></p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>List of unique field names corresponding to the specified</dt><dd><p>category.</p>
-</dd>
-</dl>
-</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="shared.common.forwardDependencies">
 <span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">forwardDependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.forwardDependencies" title="Link to this definition">¶</a></dt>
 <dd><p>Recursively get all forward dependencies of a field with memoization
@@ -574,6 +554,15 @@ specified column.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="shared.common.init_progress">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">init_progress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.init_progress" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize progress_data entry and return a live reference to it.</p>
+<p>Creates or resets progress_data[user_id] (Dash) or progress_data (Flask)
+with default fields for a new run. The returned dict is the actual
+entry inside progress_data, not a copy.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="shared.common.isParamDuplicate">
 <span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">isParamDuplicate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.isParamDuplicate" title="Link to this definition">¶</a></dt>
 <dd><p>Checks if a field is a parameter duplicate.</p>
@@ -591,23 +580,6 @@ removed; False otherwise.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="shared.common.maxDependencyLevel">
-<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">maxDependencyLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.maxDependencyLevel" title="Link to this definition">¶</a></dt>
-<dd><p>Return maximum forward or backward dependency level of a given input list.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>l</strong> (<em>list</em>) – Input list of dependency dictionaries.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Maximum dependency level for the given dictionary list.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
@@ -781,7 +753,7 @@ with their minimum dependency level.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="shared.common.visualizeFieldDependencies">
-<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">visualizeFieldDependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">din</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">svg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.visualizeFieldDependencies" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">visualizeFieldDependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dout_root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">svg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.visualizeFieldDependencies" title="Link to this definition">¶</a></dt>
 <dd><p>Creates output PNG/SVG files containing all dependencies for a
 given source field.</p>
 <dl class="field-list simple">
@@ -793,7 +765,7 @@ given source field.</p>
 <li><p><strong>l</strong> (<em>str</em>) – Input source field label.</p></li>
 <li><p><strong>g</strong> (<em>Graph</em>) – Master graph containing all source field and field node</p></li>
 <li><p><strong>objects.</strong></p></li>
-<li><p><strong>din</strong> (<em>str</em>) – Full path to root directory where graphs will be saved.</p></li>
+<li><p><strong>dout_root</strong> (<em>str</em>) – Full path to root directory where graphs will be saved.</p></li>
 <li><p><strong>png</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicator (True/False) whether or not to</p></li>
 <li><p><strong>False.</strong> (<em>generate PNG as well. Defaults to</em>)</p></li>
 </ul>
@@ -811,7 +783,7 @@ additional PNG file (with extra attributes) if png is True.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="shared.common.visualizeSheetDependencies">
-<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">visualizeSheetDependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">din</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">png</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.visualizeSheetDependencies" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">visualizeSheetDependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">png</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.visualizeSheetDependencies" title="Link to this definition">¶</a></dt>
 <dd><p>Create output PNG/SVG files containing all dependencies for a given
 source field.</p>
 <dl class="field-list simple">
@@ -822,7 +794,7 @@ source field.</p>
 <li><p><strong>sh</strong> (<em>str</em>) – Input sheet ID for which dependencies are visualized.</p></li>
 <li><p><strong>g</strong> (<em>Graph</em>) – Master graph containing all source field and field node</p></li>
 <li><p><strong>objects.</strong></p></li>
-<li><p><strong>din</strong> (<em>str</em>) – Full path to the root directory where graphs will be saved.</p></li>
+<li><p><strong>dout</strong> (<em>str</em>) – Full path to the root directory where graphs will be saved.</p></li>
 <li><p><strong>png</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicator (True/False) to generate PNG as well.</p></li>
 <li><p><strong>False.</strong> (<em>Defaults to</em>)</p></li>
 </ul>
@@ -840,21 +812,23 @@ additional PNG file (with extra attributes) if png is True.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="shared.common.zip_folder">
-<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">zip_folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_zip_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.zip_folder" title="Link to this definition">¶</a></dt>
-<dd><p>Zip the contents of a folder, preserving the folder structure.</p>
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">zip_folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_zip_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_exts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['parquet']</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.zip_folder" title="Link to this definition">¶</a></dt>
+<dd><p>Zip the contents of a folder, preserving its structure.</p>
+<dl class="simple">
+<dt>Skips:</dt><dd><ul class="simple">
+<li><p>The output zip file itself if it’s inside the folder.</p></li>
+<li><p>Any files with extensions listed in <cite>skip_exts</cite>.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>folder_path</strong> (<em>str</em>) – The path to the folder to zip.</p></li>
-<li><p><strong>output_zip_path</strong> (<em>str</em>) – The path where the output zip file will be
-created.</p></li>
+<li><p><strong>folder_path</strong> (<em>str</em>) – Folder to zip.</p></li>
+<li><p><strong>output_zip_path</strong> (<em>str</em>) – Path of the zip file to create.</p></li>
+<li><p><strong>skip_exts</strong> (<em>list</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – File extensions to skip (without dots).
+Defaults to [“parquet”].</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The function creates a zip file at the specified output path.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -920,16 +894,16 @@ created.</p></li>
 <li><a class="reference internal" href="#shared.common.addFieldNode"><code class="docutils literal notranslate"><span class="pre">addFieldNode()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.appendFieldsToDicts"><code class="docutils literal notranslate"><span class="pre">appendFieldsToDicts()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.backwardDependencies"><code class="docutils literal notranslate"><span class="pre">backwardDependencies()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.deduplicate_graph"><code class="docutils literal notranslate"><span class="pre">deduplicate_graph()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.fieldCalculationDependencies"><code class="docutils literal notranslate"><span class="pre">fieldCalculationDependencies()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.fieldCalculationMapping"><code class="docutils literal notranslate"><span class="pre">fieldCalculationMapping()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.fieldCategory"><code class="docutils literal notranslate"><span class="pre">fieldCategory()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.fieldIDMapping"><code class="docutils literal notranslate"><span class="pre">fieldIDMapping()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.fieldMappingTable"><code class="docutils literal notranslate"><span class="pre">fieldMappingTable()</span></code></a></li>
-<li><a class="reference internal" href="#shared.common.fieldsFromCategory"><code class="docutils literal notranslate"><span class="pre">fieldsFromCategory()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.forwardDependencies"><code class="docutils literal notranslate"><span class="pre">forwardDependencies()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.getRandomReplacementBaseID"><code class="docutils literal notranslate"><span class="pre">getRandomReplacementBaseID()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.init_progress"><code class="docutils literal notranslate"><span class="pre">init_progress()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.isParamDuplicate"><code class="docutils literal notranslate"><span class="pre">isParamDuplicate()</span></code></a></li>
-<li><a class="reference internal" href="#shared.common.maxDependencyLevel"><code class="docutils literal notranslate"><span class="pre">maxDependencyLevel()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.processCaptions"><code class="docutils literal notranslate"><span class="pre">processCaptions()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.processSheetNames"><code class="docutils literal notranslate"><span class="pre">processSheetNames()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.removeDuplicatesByRowLength"><code class="docutils literal notranslate"><span class="pre">removeDuplicatesByRowLength()</span></code></a></li>

@@ -289,7 +289,7 @@ output file organization and logging.</p>
 file path and optional parameters for output handling and execution context.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="shared.processing.process_twb">
-<span class="sig-prename descclassname"><span class="pre">shared.processing.</span></span><span class="sig-name descname"><span class="pre">process_twb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uploadfolder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_executable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fPNG</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.processing.process_twb" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">shared.processing.</span></span><span class="sig-name descname"><span class="pre">process_twb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_executable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fPNG</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.processing.process_twb" title="Link to this definition">¶</a></dt>
 <dd><p>Process a Tableau Workbook (TWB/TWBX) file to extract and analyze data sources,
 fields, and their dependencies.</p>
 <p>This function reads a TWB file, extracts data sources and field information,
@@ -299,17 +299,18 @@ output files to the specified upload folder.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filepath</strong> (<em>str</em>) – The path to the Tableau workbook (TWB*) file to be processed.</p></li>
-<li><p><strong>uploadfolder</strong> (<em>str</em><em>, </em><em>optional</em>) – The directory where output files will be saved
+<li><p><strong>filepath</strong> (<em>str</em>) – Path to the Tableau workbook (TWB*) file to be processed.</p></li>
+<li><p><strong>output_folder</strong> (<em>str</em><em>, </em><em>optional</em>) – Directory where output files will be saved
 if not running as an executable. Defaults to None.</p></li>
-<li><p><strong>is_executable</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag indicating if the function is being run
-as an executable script. Defaults to True.</p></li>
-<li><p><strong>fPNG</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag indicating if the function also has to
-generate PNG images next to SVG images</p></li>
+<li><p><strong>is_executable</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the function is being run as an
+executable script. Defaults to True.</p></li>
+<li><p><strong>fPNG</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to generate PNG images in addition to SVGs.</p></li>
+<li><p><strong>stop_event</strong> (<em>threading.Event</em><em>, </em><em>optional</em>) – Signal used for cooperative
+cancellation. When set, processing stops gracefully. Defaults to None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>This function does not return a value but generates output files.</p>
+<dd class="field-even"><p>Generates output files and updates progress tracking variables.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
