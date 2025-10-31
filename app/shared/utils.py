@@ -1,5 +1,6 @@
 # import fixes
 import os
+import re
 from pathlib import Path
 
 STATIC_FOLDER = os.path.join('web', 'static')
@@ -55,3 +56,11 @@ def read_dot_file(base_dir, subfolder, filename):
         return ""
     with open(path, "r", encoding="utf-8") as f:
         return f.read()
+    
+def sanitize_filename(filename: str) -> str:
+    """Remove potentially unsafe characters like '#' from filenames."""
+    # Replace unsafe characters with underscores
+    sanitized = re.sub(r'[^A-Za-z0-9._ -]', '_', filename)
+    # Prevent consecutive underscores
+    sanitized = re.sub(r'_+', '_', sanitized)
+    return sanitized.strip('_ ').strip()

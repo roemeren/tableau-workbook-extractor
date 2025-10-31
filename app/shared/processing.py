@@ -21,6 +21,7 @@ import shutil
 from tqdm import tqdm
 from shared.logging import setup_logging, stepLog, logger
 from shared.common import *
+from shared.utils import sanitize_filename
 from contextlib import contextmanager
 from tableaudocumentapi import Workbook
 
@@ -426,7 +427,7 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True,
                     progress_data["progress"] = \
                         int(start_progress + (current_progress / nTot) * progress_range)
         
-        zip_filename = inpFileName + ' Files.zip'
+        zip_filename = sanitize_filename(inpFileName + ' Files.zip')
         # Set the filename for download once processing is complete
         progress_data['foldername'] = outFileDirectory
         progress_data['filename'] = zip_filename
