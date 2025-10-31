@@ -4,7 +4,8 @@ logging.py
 This module sets up logging for different environments based on whether
 the application is executed as a standalone program or as a Flask app. 
 """
-from shared.common import os, sys
+import os
+import sys
 import logging
 
 logger = logging.getLogger("TWE_LOGGER")
