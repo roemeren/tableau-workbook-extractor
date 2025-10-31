@@ -45,8 +45,9 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
+
 def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True, 
-                stop_event=None):
+                stop_event=None, user_id=None):
     """
     Process a Tableau Workbook (TWB/TWBX) file to extract and analyze data sources,
     fields, and their dependencies.
@@ -80,10 +81,14 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True,
         # Extract file/directory names from twb file
         inpFileName = os.path.splitext(os.path.basename(filepath))[0]
 
+        # Initialize progress data
+        pdict = init_progress(user_id, inpFileName)
+
         if is_executable:
             outFileDirectory =f"{filepath} Files"
         else:
-            outFileDirectory = os.path.join(output_folder, f"{inpFileName} Files")
+            inpFileName = sanitize_filename(inpFileName)
+            outFileDirectory = os.path.join(output_folder, user_id, f"{inpFileName} Files")
 
         # Recreate output folder
         shutil.rmtree(outFileDirectory, ignore_errors=True)
@@ -96,8 +101,8 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True,
         warnings.simplefilter(action='ignore', category=FutureWarning)
 
         # Get initial data frame with nested data source and field objects
-        progress_data["progress"] = 3
-        progress_data['task'] = stepLog("Extract data sources and fields from workbook")
+        pdict["progress"] = 3
+        pdict['task'] = stepLog("Extract data sources and fields from workbook")
         if check_cancel(): return "Cancelled"
 
         with suppress_stdout():
@@ -125,8 +130,8 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True,
         for attr in fieldAttr:
             df["field_" + attr] = df.apply(lambda x: getattr(x.value, attr), axis = 1)
 
-        progress_data["progress"] = 6
-        progress_data["current-task"] = stepLog("Processing fields")
+        pdict["progress"] = 6
+        pdict["current_task"] = stepLog("Processing fields")
         if check_cancel(): return "Cancelled"
 
         # Additional transformations
@@ -216,8 +221,8 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True,
         df["field_category"] = df.apply(lambda x: \
             fieldCategory(x.source_field_label, x.field_calculation_cleaned), axis = 1)
 
-        progress_data["progress"] = 9
-        progress_data["current-task"] = stepLog("Processing dependencies")
+        pdict["progress"] = 9
+        pdict["current_task"] = stepLog("Processing dependencies")
         if check_cancel(): return "Cancelled"
 
         # Get full list of backward dependencies
@@ -323,8 +328,8 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True,
         df["field_aliases"] = df["field_aliases"].astype(str)
         df2["dependency_level"] = df2["dependency_level"].astype(int)
 
-        progress_data["progress"] = 12
-        progress_data["current-task"] = stepLog("Saving table results")
+        pdict["progress"] = 12
+        pdict["current_task"] = stepLog("Saving table results")
         if check_cancel(): return "Cancelled"
 
         outSheetDirectory = os.path.join(outFileDirectory, 'Fields')
@@ -389,8 +394,8 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True,
         if fDepFields:
             outPath = os.path.join(outFileDirectory, 'Graphs')
 
-            progress_data["progress"] = start_progress
-            progress_data["current-task"] = \
+            pdict["progress"] = start_progress
+            pdict["current_task"] = \
                 stepLog(f"Creating field dependency graphs per source")
 
             # Use tqdm for progress bar if executable, else simple progress
@@ -404,7 +409,7 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True,
 
                 if not is_executable:
                     current_progress += 1
-                    progress_data["progress"] = \
+                    pdict["progress"] = \
                         int(start_progress + (current_progress / nTot) * progress_range)
 
         if fDepSheets:
@@ -412,7 +417,7 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True,
             outPath = os.path.join(outFileDirectory, 'Graphs', 'Sheets')
             if not os.path.isdir(outPath): os.makedirs(outPath)
 
-            progress_data["current-task"] = \
+            pdict["current-task"] = \
                 stepLog(f"Creating sheet dependency graphs")
 
             # Use tqdm for progress bar if executable, else simple progress
@@ -424,20 +429,20 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True,
                 visualizeSheetDependencies(df2_original, sh, gMaster, outPath, fPNG)
                 if not is_executable:
                     current_progress += 1
-                    progress_data["progress"] = \
+                    pdict["progress"] = \
                         int(start_progress + (current_progress / nTot) * progress_range)
         
-        zip_filename = sanitize_filename(inpFileName + ' Files.zip')
+        zip_filename = sanitize_filename(inpFileName) + ' Files.zip'
         # Set the filename for download once processing is complete
-        progress_data['foldername'] = outFileDirectory
-        progress_data['filename'] = zip_filename
-        progress_data['progress'] = 90
+        pdict['foldername'] = outFileDirectory
+        pdict['filename'] = zip_filename
+        pdict['progress'] = 90
 
         if is_executable: 
             input("Done! Press Enter to exit...")
         else:
             # Zip the output files
-            zip_path = os.path.join(output_folder, zip_filename)
+            zip_path = os.path.join(outFileDirectory, zip_filename)
             zip_folder(folder_path=outFileDirectory, output_zip_path=zip_path)
 
             # Clean up and close the logger
@@ -446,9 +451,10 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True,
                 logger.removeHandler(handler)
 
             # Ensure progress is 100%
-            progress_data['progress'] = 100
+            pdict['progress'] = 100
 
         # Return success indicator
+        stepLog(f"Processing finished succesfully!")
         return None
     
     except Exception as e:

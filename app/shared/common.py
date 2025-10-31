@@ -21,13 +21,14 @@ import pydot
 import random
 import string
 import zipfile
+from shared.logging import logger
 
 # Script parameters
 fDepFields = True # create field dependency graphs?
 fDepSheets = True # create sheet dependency graphs?
 
-# Keep track of progress and filename
-progress_data = {'progress': 0, 'filename': None}
+# Keep track of progress and file name
+progress_data = {}
 
 # Constants
 MAXPATHSIZE = 260
@@ -48,6 +49,27 @@ def show_exception_and_exit(exc_type, exc_value, tb):
     traceback.print_exception(exc_type, exc_value, tb)
     input("Error encountered. Press Enter to exit...")
     sys.exit(-1)
+
+def init_progress(user_id, file_name):
+    """Initialize progress_data entry and return a live reference to it.
+
+    Creates or resets progress_data[user_id] (Dash) or progress_data (Flask)
+    with default fields for a new run. The returned dict is the actual
+    entry inside progress_data, not a copy.
+    """
+    base = {'progress': 0, 'filename': None}
+
+    # Dash case: dict of dicts
+    if user_id is not None:
+        progress_data[user_id] = base.copy()
+        progress_data[user_id]["progress"] = 0 # ensures correct progress bar behavior
+        progress_data[user_id]["current_task"] = f"Preparing to process {file_name}"
+        progress_data[user_id]["show_dots"] = True
+        progress_data[user_id]["status"] = "running"
+        return progress_data[user_id]
+
+    # Flask or CLI tool
+    return progress_data.update(base)
 
 def getRandomReplacementBaseID(df, c, suffix = ""):
     """
@@ -679,13 +701,37 @@ def visualizeFieldDependencies(df, sf, l, g, dout_root, svg = False):
     # write output files with forced UTF-8 encoding to avoid errors
     # see https://github.com/pydot/pydot/issues/142
     outFile = os.path.join(dout, f"{fout}.svg")
-    if len(outFile) > MAXPATHSIZE:
-        raise Exception(("Output graph path size for source {0} and " + 
-        "field {1} ({2}) exceeds the path size " +
-        "limit ({3}). Try shortening the path to the workbook, " + 
-        "workbook name and/or field/parameter names. \n" + 
-        "Output graph path: {4}")
-            .format(s, f, len(outFile), MAXPATHSIZE, outFile))
+    outFile_full = os.path.abspath(outFile)
+
+    if os.name == "nt" and len(outFile_full) > MAXPATHSIZE:
+        # Calculate how many characters we can keep from fout
+        over_by = len(outFile_full) - MAXPATHSIZE
+        allowed_len = max(len(fout) - over_by - 8, 1)  # small buffer
+
+        # Shorten fout if possible
+        if allowed_len < len(fout):
+            fout_old = fout
+            outFile_full_old = outFile_full
+            fout = fout[:allowed_len] + "_trunc"
+            outFile = os.path.join(dout, f"{fout}.svg")
+            outFile_full = os.path.abspath(outFile)
+            # Use ASCII arrow for Windows-safe logging
+            logger.warning(
+                f"Filename truncated due to path length limit "
+                f"({len(outFile_full_old)} > {MAXPATHSIZE}): "
+                f"'{fout_old}' -> '{fout}'"
+            )
+
+        # Check again after shortening
+        if len(outFile_full) > MAXPATHSIZE:
+            raise Exception(
+                f"Output graph path for source '{s}' and field '{f}' "
+                f"still exceeds the Windows path size limit ({MAXPATHSIZE}).\n"
+                f"Full path length: {len(outFile_full)}\n"
+                f"Path: {outFile_full}\n"
+                "Try shortening the workbook path, workbook name, "
+                "or field/parameter names."
+            )
     
     # deduplicate before saving
     G = deduplicate_graph(G)
@@ -829,23 +875,36 @@ def visualizeSheetDependencies(df, sh, g, dout, png=False):
         outFile = os.path.join(dout, f"{fout}.png")
         G.write_png(outFile, encoding = "utf-8")
 
-def zip_folder(folder_path, output_zip_path):
+def zip_folder(folder_path, output_zip_path, skip_exts=["parquet"]):
     """
-    Zip the contents of a folder, preserving the folder structure.
+    Zip the contents of a folder, preserving its structure.
+
+    Skips:
+      - The output zip file itself if it's inside the folder.
+      - Any files with extensions listed in `skip_exts`.
 
     Args:
-        folder_path (str): The path to the folder to zip.
-        output_zip_path (str): The path where the output zip file will be 
-            created.
-
-    Returns:
-        None: The function creates a zip file at the specified output path.
+        folder_path (str): Folder to zip.
+        output_zip_path (str): Path of the zip file to create.
+        skip_exts (list[str], optional): File extensions to skip (without dots).
+            Defaults to ["parquet"].
     """
-    with zipfile.ZipFile(output_zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-        # Walk through the folder
+    output_zip_path = os.path.abspath(output_zip_path)
+
+    with zipfile.ZipFile(output_zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
         for root, _, files in os.walk(folder_path):
             for file in files:
-                # Create the full path to the file
-                file_path = os.path.join(root, file)
-                # Add the file to the zip file with the correct folder structure
-                zipf.write(file_path, os.path.relpath(file_path, folder_path))
+                # Skip by extension (case-insensitive, dot ignored)
+                ext = os.path.splitext(file)[1].lower().lstrip(".")
+                if ext in skip_exts:
+                    continue
+
+                file_path = os.path.abspath(os.path.join(root, file))
+
+                # Skip the zip file itself if it's inside the folder
+                if file_path == output_zip_path:
+                    continue
+
+                arcname = os.path.relpath(file_path, folder_path)
+                zipf.write(file_path, arcname)
+
