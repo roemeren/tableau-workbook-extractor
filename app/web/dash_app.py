@@ -861,7 +861,6 @@ def update_progress(*args):
         upload_tab_disabled = False
         sample_tab_disabled = False
         style_cancel = {"visibility": "hidden"}
-
         # Clean up finished or cancelled threads/events
         _processing_threads.pop(user_id, None)
         _stop_events.pop(user_id, None)

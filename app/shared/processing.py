@@ -66,9 +66,12 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True,
         fPNG (bool, optional): Whether to generate PNG images in addition to SVGs.
         stop_event (threading.Event, optional): Signal used for cooperative 
             cancellation. When set, processing stops gracefully. Defaults to None.
+        user_id (str, optional): Unique session or user identifier used to isolate
+            per-user processing state, progress tracking, and output paths when 
+            running in a multi-user environment. Defaults to None.
 
     Returns:
-        None: Generates output files and updates progress tracking variables.
+        None: Generates output files and updates per-user progress tracking data.
     """
     try:
         # Helper to exit early if user pressed Cancel
