@@ -14,7 +14,7 @@ To get started with the Tableau Workbook Extractor, you can:
 - **Download the latest Windows executable**: 
 [Download Executable](https://github.com/roemeren/tableau-workbook-extractor/releases/latest) 
 *([Graphviz](https://graphviz.org/download/) must be installed and included in your PATH variable.)*
-- **Run the application on Render**: [Access the Deployed Application](https://tableau-workbook-extractor.onrender.com/) *(May take a while to load)*
+- **Run the demo application on Render**: [Access the Deployed Application](https://tableau-workbook-extractor.onrender.com/) *(May take a while to load)*. ⚠️ For demonstration only — please **do not upload sensitive or proprietary workbooks.**
 - **View the documentation**: [Documentation](https://roemeren.github.io/tableau-workbook-extractor/main)
 
 ## Description
@@ -56,6 +56,10 @@ Workflow steps:
 ### Option 2: Access the Web App
 
 Access the deployed Flask application hosted on [Render](https://tableau-workbook-extractor.onrender.com/). Note that it may take a while to load.
+
+> ⚠️ **Important**: This hosted app is intended for **demonstration and testing only**.
+It does not include authentication or data protection features, so please **do not upload any sensitive or proprietary Tableau workbooks**. 
+For confidential use, run the application locally.
 
 Workflow steps:
 
