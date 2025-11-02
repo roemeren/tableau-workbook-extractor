@@ -307,10 +307,13 @@ executable script. Defaults to True.</p></li>
 <li><p><strong>fPNG</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to generate PNG images in addition to SVGs.</p></li>
 <li><p><strong>stop_event</strong> (<em>threading.Event</em><em>, </em><em>optional</em>) – Signal used for cooperative
 cancellation. When set, processing stops gracefully. Defaults to None.</p></li>
+<li><p><strong>user_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Unique session or user identifier used to isolate
+per-user processing state, progress tracking, and output paths when
+running in a multi-user environment. Defaults to None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Generates output files and updates progress tracking variables.</p>
+<dd class="field-even"><p>Generates output files and updates per-user progress tracking data.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
