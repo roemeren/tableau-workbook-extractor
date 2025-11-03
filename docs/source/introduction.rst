@@ -56,7 +56,7 @@ For more detailed information about the tool and its features, refer to the foll
 * :doc:`usage`: A guide on the different ways to run the tool, 
   including local options such as a pre-created executable or web app, 
   as well as running a Python script or setting up the executable or 
-  the Flask app yourself.
+  the Dash/Flask app yourself.
 * :doc:`example`: A practical example to demonstrate the tool's capabilities.
 * :doc:`deployment`: Notes regarding the deployment of the tool.
 * :doc:`scripts_reference`: Detailed information on the scripts included with the tool.

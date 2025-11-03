@@ -5,8 +5,8 @@ This section presents a practical example of using the tool to extract data
 from a Tableau workbook. 
 
 For this example the 
-`deployed Flask application <https://tableau-workbook-extractor.onrender.com/>`_ 
-will be used to extract fields and their dependencies from the
+`Flask application <https://tableau-workbook-extractor.onrender.com/>`_ 
+— now replaced by an interactive Dash dashboard — was used to extract fields and their dependencies from the
 `Super Sample Superstore Dashboard <https://public.tableau.com/app/profile/technical.product.marketing/viz/VGContest_SuperSampleSuperstore_RyanSleeper/SuperDescriptive>`_
 (original source: `Real-World Examples of Business Intelligence (BI) Dashboards <https://www.tableau.com/learn/articles/business-intelligence-dashboards-examples>`_).
 

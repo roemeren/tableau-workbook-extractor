@@ -7,7 +7,7 @@ the application, as well as known issues that are being tracked.
 New Features
 ------------
 
-- **Simplify the extraction of unique dependencies**: Currently, there is no 
+- **Simplify the extraction of unique dependencies (DONE v2.0.0 [Dash app])**: Currently, there is no 
   efficient method to quickly extract unique forward and backward dependencies, 
   along with their minimum dependency levels, for a given field, parameter, or 
   sheet, as demonstrated on the :doc:`example` page. By expanding the output 
@@ -22,8 +22,8 @@ New Features
 - **Provide Linux and macOS executables**: Develop and distribute executables 
   for the tool compatible with Linux and macOS, expanding accessibility 
   for users on different operating systems.
-- **Improve Flask app error handling**: Enhance the user experience by 
-  implementing robust error handling in the Flask app. Users should receive 
+- **Improve web app error handling (DONE v2.0.0)**: Enhance the user experience by 
+  implementing robust error handling in the web app. Users should receive 
   clear feedback when selecting incorrect files or when processing errors 
   occur, ensuring a smoother interaction with the application.
 
@@ -54,7 +54,7 @@ Tableau workbooks.
 Enhancements
 ------------
 
-- **Optimization of recursive dependency analysis functions**: Enhance the 
+- **Optimization of recursive dependency analysis functions (DONE v2.0.0)**: Enhance the 
   performance of the recursive functions that analyze backward and 
   forward field dependencies by implementing memoization to cache 
   previously computed results. This enhancement may significantly 
@@ -63,10 +63,10 @@ Enhancements
 - **Centralization of configuration settings**: Centralizing configurations 
   such as colors, output file names, and shapes will streamline management 
   and improve consistency across the tool.
-- **Improve the quality and readability of output graphs**: Enhance the 
-  aesthetics of the output network graphs by refining colors, fonts, and 
-  node arrangements in the PNG/SVG images for better visual appeal and clarity.
-- **Prettify the Flask app**: Improve the user interface and overall design of 
+- **Improve the quality and readability of output graphs (DONE v2.0.0)**: Enhance the 
+  aesthetics of the output network graphs by refining colors, fonts and layout 
+  orientation in the PNG/SVG images for better visual appeal and clarity.
+- **Prettify the web app (DONE v2.0.0 [Dash app])**: Improve the user interface and overall design of 
   the Flask application to enhance user experience and make it visually appealing.
 - **Refactor the main processing routine**: The ``process_twb`` function in the 
   ``shared\processing.py`` script is quite large. It could be divided into smaller, 
