@@ -390,34 +390,67 @@ To execute the script (run as a module to ):
     the Flask app needs to be run as a module from the root directory as 
     shown in the code block above, not as a script
 
-Option 6: Running the Dockerized Flask Application
----------------------------------------------------
+Option 6: Running the Dash Application
+--------------------------------------
+
+.. _run-dash:
+
+The Dash app is the **recommended** version to run locally, as it replaces the 
+earlier Flask interface and provides a more complete, interactive experience 
+with additional features such as workbook statistics, dependency graphs, and 
+field-level exploration.
+
+Running the Dash app locally is nearly identical to running the Flask app.  
+The only difference is the Python file that needs to be executed.
+
+To start the app, navigate to the repo's ``app`` subfolder:
+
+.. code-block:: console
+
+   $ cd C:\Users\jdoe\Documents\Repositories\tableau-workbook-extractor\app
+
+Then run the Dash application module:
+
+.. code-block:: console
+
+   $ python -m web.dash_app
+
+The dashboard will typically be available at ``http://127.0.0.1:8050``.
+
+.. note::
+
+   The Dash app supersedes the earlier Flask version, which is no longer 
+   expanded or maintained. It is therefore recommended to use the Dash app 
+   for all new analyses.
+
+Option 7: Running the Dockerized Dash Application
+-------------------------------------------------
 
 .. _run-docker:
 
-This section explains how to run a dockerized version of the Flask app locally, 
-providing an alternative to using the deployed version on Render. 
+This section explains how to run a dockerized version of the Dash app locally, 
+providing an alternative to using the deployed version on Render.  
 Running the tool locally in Docker ensures that all dependencies, 
 including Graphviz, are preconfigured and removes the wait time associated 
 with the free-tier deployment on Render.
 
-To proceed, you'll need to install Docker Desktop locally. Docker offers free
-plans, but check their website for the most up-to-date details on pricing and 
-availability.
+Compared to the earlier Flask version, the Dash app offers a richer, 
+interactive dashboard with workbook statistics, dependency graphs, and 
+field-level exploration. It is the **recommended version** to use going forward.
 
 Prerequisite: Install Docker
 """"""""""""""""""""""""""""
 
-To install Docker on Windows, visit the official 
-`Docker Desktop for Windows <https://www.docker.com/products/docker-desktop/>`_ 
-page and follow the instructions for downloading and setting it up.
+To install Docker on Windows, visit the official  
+`Docker Desktop for Windows <https://www.docker.com/products/docker-desktop/>`_  
+page and follow the installation instructions.
 
 Step 1: Build the Image
 """"""""""""""""""""""""
 
-The ``app`` folder of the repository has a file ``Dockerfile`` that contains 
-the instructions on how to build the image, including all of its 
-dependencies and exposed ports (in this case 5000). 
+The ``app`` folder of the repository contains a ``Dockerfile`` that defines how 
+to build the image, including all dependencies and exposed ports 
+(in this case **8050**). 
 
 Set the working directory to the repo's ``app`` subfolder. For example:
 
@@ -425,27 +458,24 @@ Set the working directory to the repo's ``app`` subfolder. For example:
 
    $ cd C:\Users\jdoe\Documents\Repositories\tableau-workbook-extractor\app
 
-In case you are already inside the repo's root directory it suffice to run 
-the command ``cd app``.
+If you are already inside the repo's root directory, it suffices to run 
+``cd app``.
 
-Next, build the Docker image (named ``tableau-workbook-extractor``) 
-by running the following command (make sure that Docker Desktop is running):
+Next, build the Docker image (named ``tableau-workbook-extractor``)  
+by running the following command (ensure that Docker Desktop is running):
 
 .. code-block:: console
 
    $ docker build -t tableau-workbook-extractor .
 
-
 Step 2: Run the Container
 """"""""""""""""""""""""""
 
-Now that the image has been built, you can run an instance of it as a container.
-
-This can be done by running this command:
+Once the image is built, start a container from it using:
 
 .. code-block:: console
 
-   $ docker run -p 5000:5000 tableau-workbook-extractor
+   $ docker run -p 8050:8050 tableau-workbook-extractor
 
-Similar to :ref:`running the Flask app locally<flask-local>`, 
-the application will be accessible in your browser at ``http://localhost:5000``.
+Similar to :ref:`running the Dash app locally<run-dash>`,  
+the dashboard will be accessible in your browser at ``http://localhost:8050``.

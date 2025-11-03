@@ -210,6 +210,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="scripts_reference.html">Scripts Reference</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Scripts Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="cli_main.html">cli_main</a></li>
 <li class="toctree-l2"><a class="reference internal" href="web.flask_app.html">web.flask_app</a></li>
+<li class="toctree-l2"><a class="reference internal" href="web.dash_app.html">web.dash_app</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shared.common.html">shared.common</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shared.logging.html">shared.logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shared.processing.html">shared.processing</a></li>
@@ -558,48 +559,71 @@ shown in the code block above, not as a script</p>
 </div>
 </section>
 </section>
-<section id="option-6-running-the-dockerized-flask-application">
-<h2>Option 6: Running the Dockerized Flask Application<a class="headerlink" href="#option-6-running-the-dockerized-flask-application" title="Link to this heading">¶</a></h2>
-<p id="run-docker">This section explains how to run a dockerized version of the Flask app locally,
+<section id="option-6-running-the-dash-application">
+<h2>Option 6: Running the Dash Application<a class="headerlink" href="#option-6-running-the-dash-application" title="Link to this heading">¶</a></h2>
+<p id="run-dash">The Dash app is the <strong>recommended</strong> version to run locally, as it replaces the
+earlier Flask interface and provides a more complete, interactive experience
+with additional features such as workbook statistics, dependency graphs, and
+field-level exploration.</p>
+<p>Running the Dash app locally is nearly identical to running the Flask app.
+The only difference is the Python file that needs to be executed.</p>
+<p>To start the app, navigate to the repo’s <code class="docutils literal notranslate"><span class="pre">app</span></code> subfolder:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>C:<span class="se">\U</span>sers<span class="se">\j</span>doe<span class="se">\D</span>ocuments<span class="se">\R</span>epositories<span class="se">\t</span>ableau-workbook-extractor<span class="se">\a</span>pp
+</pre></div>
+</div>
+<p>Then run the Dash application module:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>-m<span class="w"> </span>web.dash_app
+</pre></div>
+</div>
+<p>The dashboard will typically be available at <code class="docutils literal notranslate"><span class="pre">http://127.0.0.1:8050</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The Dash app supersedes the earlier Flask version, which is no longer
+expanded or maintained. It is therefore recommended to use the Dash app
+for all new analyses.</p>
+</div>
+</section>
+<section id="option-7-running-the-dockerized-dash-application">
+<h2>Option 7: Running the Dockerized Dash Application<a class="headerlink" href="#option-7-running-the-dockerized-dash-application" title="Link to this heading">¶</a></h2>
+<p id="run-docker">This section explains how to run a dockerized version of the Dash app locally,
 providing an alternative to using the deployed version on Render.
 Running the tool locally in Docker ensures that all dependencies,
 including Graphviz, are preconfigured and removes the wait time associated
 with the free-tier deployment on Render.</p>
-<p>To proceed, you’ll need to install Docker Desktop locally. Docker offers free
-plans, but check their website for the most up-to-date details on pricing and
-availability.</p>
+<p>Compared to the earlier Flask version, the Dash app offers a richer,
+interactive dashboard with workbook statistics, dependency graphs, and
+field-level exploration. It is the <strong>recommended version</strong> to use going forward.</p>
 <section id="prerequisite-install-docker">
 <h3>Prerequisite: Install Docker<a class="headerlink" href="#prerequisite-install-docker" title="Link to this heading">¶</a></h3>
 <p>To install Docker on Windows, visit the official
 <a class="reference external" href="https://www.docker.com/products/docker-desktop/">Docker Desktop for Windows</a>
-page and follow the instructions for downloading and setting it up.</p>
+page and follow the installation instructions.</p>
 </section>
 <section id="step-1-build-the-image">
 <h3>Step 1: Build the Image<a class="headerlink" href="#step-1-build-the-image" title="Link to this heading">¶</a></h3>
-<p>The <code class="docutils literal notranslate"><span class="pre">app</span></code> folder of the repository has a file <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code> that contains
-the instructions on how to build the image, including all of its
-dependencies and exposed ports (in this case 5000).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">app</span></code> folder of the repository contains a <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code> that defines how
+to build the image, including all dependencies and exposed ports
+(in this case <strong>8050</strong>).</p>
 <p>Set the working directory to the repo’s <code class="docutils literal notranslate"><span class="pre">app</span></code> subfolder. For example:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>C:<span class="se">\U</span>sers<span class="se">\j</span>doe<span class="se">\D</span>ocuments<span class="se">\R</span>epositories<span class="se">\t</span>ableau-workbook-extractor<span class="se">\a</span>pp
 </pre></div>
 </div>
-<p>In case you are already inside the repo’s root directory it suffice to run
-the command <code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">app</span></code>.</p>
+<p>If you are already inside the repo’s root directory, it suffices to run
+<code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">app</span></code>.</p>
 <p>Next, build the Docker image (named <code class="docutils literal notranslate"><span class="pre">tableau-workbook-extractor</span></code>)
-by running the following command (make sure that Docker Desktop is running):</p>
+by running the following command (ensure that Docker Desktop is running):</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>tableau-workbook-extractor<span class="w"> </span>.
 </pre></div>
 </div>
 </section>
 <section id="step-2-run-the-container">
 <h3>Step 2: Run the Container<a class="headerlink" href="#step-2-run-the-container" title="Link to this heading">¶</a></h3>
-<p>Now that the image has been built, you can run an instance of it as a container.</p>
-<p>This can be done by running this command:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>docker<span class="w"> </span>run<span class="w"> </span>-p<span class="w"> </span><span class="m">5000</span>:5000<span class="w"> </span>tableau-workbook-extractor
+<p>Once the image is built, start a container from it using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>docker<span class="w"> </span>run<span class="w"> </span>-p<span class="w"> </span><span class="m">8050</span>:8050<span class="w"> </span>tableau-workbook-extractor
 </pre></div>
 </div>
-<p>Similar to <a class="reference internal" href="#flask-local"><span class="std std-ref">running the Flask app locally</span></a>,
-the application will be accessible in your browser at <code class="docutils literal notranslate"><span class="pre">http://localhost:5000</span></code>.</p>
+<p>Similar to <a class="reference internal" href="#run-dash"><span class="std std-ref">running the Dash app locally</span></a>,
+the dashboard will be accessible in your browser at <code class="docutils literal notranslate"><span class="pre">http://localhost:8050</span></code>.</p>
 </section>
 </section>
 </section>
@@ -686,7 +710,8 @@ the application will be accessible in your browser at <code class="docutils lite
 <li><a class="reference internal" href="#step-2-run-the-app">Step 2: Run the App</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#option-6-running-the-dockerized-flask-application">Option 6: Running the Dockerized Flask Application</a><ul>
+<li><a class="reference internal" href="#option-6-running-the-dash-application">Option 6: Running the Dash Application</a></li>
+<li><a class="reference internal" href="#option-7-running-the-dockerized-dash-application">Option 7: Running the Dockerized Dash Application</a><ul>
 <li><a class="reference internal" href="#prerequisite-install-docker">Prerequisite: Install Docker</a></li>
 <li><a class="reference internal" href="#step-1-build-the-image">Step 1: Build the Image</a></li>
 <li><a class="reference internal" href="#step-2-run-the-container">Step 2: Run the Container</a></li>

@@ -36,7 +36,7 @@ The output files are structured as follows:
     │   │   ├── <Sheet Name 2>.png
     │   │   ├── <Sheet Name 2>.svg
     │   │   └── ...
-    └── log_file.log (Optional, only for Flask app)
+    └── log_file.log (Optional, only for Dash & Flask apps)
 
 Clarifications w.r.t. this folder structure:
 
@@ -49,7 +49,7 @@ Clarifications w.r.t. this folder structure:
   source used in the workbook
 * For parameter and sheet dependency graphs 2 separate subfolders ``Parameters`` 
   and ``Sheets`` are used
-* ``log_file.log`` is generated only when the tool is run via the Flask app. 
+* ``log_file.log`` is generated only when the tool is run via the Dash/Flask app. 
   In other cases, the output is displayed directly in the command line instead 
   of being written to a log file.
 
@@ -96,7 +96,7 @@ SVG files compared to the PNG files is the ability to show the field calculation
 in the node tooltips, which is not possible for the PNG file.
 
 ⚙️ Note: PNG file generation is optional and can be enabled or disabled
-from the Flask web application before starting the processing.
+from the web applications before starting the processing.
 
 Field Metadata
 ---------------

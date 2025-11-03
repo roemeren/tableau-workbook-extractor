@@ -210,6 +210,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="scripts_reference.html">Scripts Reference</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Scripts Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="cli_main.html">cli_main</a></li>
 <li class="toctree-l2"><a class="reference internal" href="web.flask_app.html">web.flask_app</a></li>
+<li class="toctree-l2"><a class="reference internal" href="web.dash_app.html">web.dash_app</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shared.common.html">shared.common</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shared.logging.html">shared.logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shared.processing.html">shared.processing</a></li>
@@ -281,7 +282,7 @@ the application, as well as known issues that are being tracked.</p>
 <section id="new-features">
 <h2>New Features<a class="headerlink" href="#new-features" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Simplify the extraction of unique dependencies</strong>: Currently, there is no
+<li><p><strong>Simplify the extraction of unique dependencies (DONE v2.0.0 [Dash app])</strong>: Currently, there is no
 efficient method to quickly extract unique forward and backward dependencies,
 along with their minimum dependency levels, for a given field, parameter, or
 sheet, as demonstrated on the <a class="reference internal" href="example.html"><span class="doc">Example</span></a> page. By expanding the output
@@ -296,8 +297,8 @@ and multi-line comments from the original calculation expressions.</p></li>
 <li><p><strong>Provide Linux and macOS executables</strong>: Develop and distribute executables
 for the tool compatible with Linux and macOS, expanding accessibility
 for users on different operating systems.</p></li>
-<li><p><strong>Improve Flask app error handling</strong>: Enhance the user experience by
-implementing robust error handling in the Flask app. Users should receive
+<li><p><strong>Improve web app error handling (DONE v2.0.0)</strong>: Enhance the user experience by
+implementing robust error handling in the web app. Users should receive
 clear feedback when selecting incorrect files or when processing errors
 occur, ensuring a smoother interaction with the application.</p></li>
 </ul>
@@ -329,7 +330,7 @@ which may relate to hidden fields and dependencies.</p></li>
 <section id="enhancements">
 <h2>Enhancements<a class="headerlink" href="#enhancements" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Optimization of recursive dependency analysis functions</strong>: Enhance the
+<li><p><strong>Optimization of recursive dependency analysis functions (DONE v2.0.0)</strong>: Enhance the
 performance of the recursive functions that analyze backward and
 forward field dependencies by implementing memoization to cache
 previously computed results. This enhancement may significantly
@@ -338,10 +339,10 @@ for complex Tableau workbooks.</p></li>
 <li><p><strong>Centralization of configuration settings</strong>: Centralizing configurations
 such as colors, output file names, and shapes will streamline management
 and improve consistency across the tool.</p></li>
-<li><p><strong>Improve the quality and readability of output graphs</strong>: Enhance the
-aesthetics of the output network graphs by refining colors, fonts, and
-node arrangements in the PNG/SVG images for better visual appeal and clarity.</p></li>
-<li><p><strong>Prettify the Flask app</strong>: Improve the user interface and overall design of
+<li><p><strong>Improve the quality and readability of output graphs (DONE v2.0.0)</strong>: Enhance the
+aesthetics of the output network graphs by refining colors, fonts and layout
+orientation in the PNG/SVG images for better visual appeal and clarity.</p></li>
+<li><p><strong>Prettify the web app (DONE v2.0.0 [Dash app])</strong>: Improve the user interface and overall design of
 the Flask application to enhance user experience and make it visually appealing.</p></li>
 <li><p><strong>Refactor the main processing routine</strong>: The <code class="docutils literal notranslate"><span class="pre">process_twb</span></code> function in the
 <code class="docutils literal notranslate"><span class="pre">shared\processing.py</span></code> script is quite large. It could be divided into smaller,

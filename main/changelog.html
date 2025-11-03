@@ -210,6 +210,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="scripts_reference.html">Scripts Reference</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Scripts Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="cli_main.html">cli_main</a></li>
 <li class="toctree-l2"><a class="reference internal" href="web.flask_app.html">web.flask_app</a></li>
+<li class="toctree-l2"><a class="reference internal" href="web.dash_app.html">web.dash_app</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shared.common.html">shared.common</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shared.logging.html">shared.logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shared.processing.html">shared.processing</a></li>
@@ -276,6 +277,20 @@
         <article role="main" id="furo-main-content">
           <section id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
+<section id="v2-0-0-2025-11-03">
+<h2>v2.0.0 (2025-11-03)<a class="headerlink" href="#v2-0-0-2025-11-03" title="Link to this heading">¶</a></h2>
+<p>The original Flask-based deployment with a more full-featured Dash app
+offering the same core functionality plus direct, interactive visualization.</p>
+<p>Highlights:</p>
+<ul class="simple">
+<li><p>Immediate visualization of generated dependency graphs, overview statistics, and field details</p></li>
+<li><p>Shortest calculation path exploration between Tableau fields</p></li>
+<li><p>Limited multi-user support by isolating session data and threading state in user-specific dictionaries instead of global variables</p></li>
+<li><p>Safe cooperative cancellation via a Cancel button that gracefully stops background processing</p></li>
+<li><p>Unified progress tracking for both the Dash and legacy Flask contexts</p></li>
+<li><p>General code cleanup, bug fixes and improved structure for maintainability</p></li>
+</ul>
+</section>
 <section id="v1-2-1-2025-10-15">
 <h2>v1.2.1 (2025-10-15)<a class="headerlink" href="#v1-2-1-2025-10-15" title="Link to this heading">¶</a></h2>
 <p>Add PNG generation toggle and optimize dependency resolution</p>
@@ -412,6 +427,7 @@ in a Dockerized environment.</p></li>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
+<li><a class="reference internal" href="#v2-0-0-2025-11-03">v2.0.0 (2025-11-03)</a></li>
 <li><a class="reference internal" href="#v1-2-1-2025-10-15">v1.2.1 (2025-10-15)</a></li>
 <li><a class="reference internal" href="#v1-1-8-2024-10-10">v1.1.8 (2024-10-10)</a></li>
 <li><a class="reference internal" href="#v1-1-7-2024-10-08">v1.1.7 (2024-10-08)</a></li>

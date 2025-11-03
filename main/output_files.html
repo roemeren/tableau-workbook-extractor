@@ -210,6 +210,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="scripts_reference.html">Scripts Reference</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Scripts Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="cli_main.html">cli_main</a></li>
 <li class="toctree-l2"><a class="reference internal" href="web.flask_app.html">web.flask_app</a></li>
+<li class="toctree-l2"><a class="reference internal" href="web.dash_app.html">web.dash_app</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shared.common.html">shared.common</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shared.logging.html">shared.logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shared.processing.html">shared.processing</a></li>
@@ -307,7 +308,7 @@
 │   │   ├── &lt;Sheet Name 2&gt;.png
 │   │   ├── &lt;Sheet Name 2&gt;.svg
 │   │   └── ...
-└── log_file.log (Optional, only for Flask app)
+└── log_file.log (Optional, only for Dash &amp; Flask apps)
 </pre></div>
 </div>
 <p>Clarifications w.r.t. this folder structure:</p>
@@ -326,7 +327,7 @@
 source used in the workbook</p></li>
 <li><p>For parameter and sheet dependency graphs 2 separate subfolders <code class="docutils literal notranslate"><span class="pre">Parameters</span></code>
 and <code class="docutils literal notranslate"><span class="pre">Sheets</span></code> are used</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">log_file.log</span></code> is generated only when the tool is run via the Flask app.
+<li><p><code class="docutils literal notranslate"><span class="pre">log_file.log</span></code> is generated only when the tool is run via the Dash/Flask app.
 In other cases, the output is displayed directly in the command line instead
 of being written to a log file.</p></li>
 </ul>
@@ -365,7 +366,7 @@ different elements. (NOTE: NOT TRUE, PLEASE REWRITE)
 SVG files compared to the PNG files is the ability to show the field calculations
 in the node tooltips, which is not possible for the PNG file.</p>
 <p>⚙️ Note: PNG file generation is optional and can be enabled or disabled
-from the Flask web application before starting the processing.</p>
+from the web applications before starting the processing.</p>
 </section>
 <section id="field-metadata">
 <h2>Field Metadata<a class="headerlink" href="#field-metadata" title="Link to this heading">¶</a></h2>

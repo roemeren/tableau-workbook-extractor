@@ -210,6 +210,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="scripts_reference.html">Scripts Reference</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Scripts Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="cli_main.html">cli_main</a></li>
 <li class="toctree-l2"><a class="reference internal" href="web.flask_app.html">web.flask_app</a></li>
+<li class="toctree-l2"><a class="reference internal" href="web.dash_app.html">web.dash_app</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shared.common.html">shared.common</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shared.logging.html">shared.logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shared.processing.html">shared.processing</a></li>
@@ -285,15 +286,15 @@ executable version of the application from the
 Please note that in order to run the downloaded executable file,
 Graphviz must be installed on your local machine.
 <a class="reference internal" href="usage.html#install-graphviz"><span class="std std-ref">Graphviz must be installed</span></a>.</p>
-<p>2. <strong>As a deployed Flask application on Render</strong>: This option allows users to
+<p>2. <strong>As a deployed Dash (Flask) application on Render</strong>: This option allows users to
 run the application in a cloud environment without the need for local setup.
 The deployed application can be accessed <a class="reference external" href="https://tableau-workbook-extractor.onrender.com/">on this link</a>.</p>
 <p>Both deployment methods are automated through a <strong>GitHub workflow</strong> that is
 triggered each time a new version tag is pushed to the repository.
 This ensures that the latest updates are consistently available to users.</p>
-<p>For the Render Flask app deployment to work, the following steps
+<p>For the Render app deployment to work, the following steps
 are required:</p>
-<p>1. <strong>Create a web app on Render</strong>: First, create the Flask web app on the
+<p>1. <strong>Create a web app on Render</strong>: First, create the web app on the
 Render platform. After creating the app, you will receive a Service ID.</p>
 <p>2. <strong>Generate an API key</strong>: On Render, generate an API key to allow programmatic
 access to your app.</p>
@@ -314,7 +315,7 @@ testing phases..</p>
 <p>These workflows are automated versions of some of the use cases explained in
 the <a class="reference internal" href="usage.html"><span class="doc">Usage</span></a> page, specifically the creation of an
 executable file using PyInstaller (see <a class="reference internal" href="usage.html#create-run-exe"><span class="std std-ref">Create and Run the Executable File</span></a>)
-and the creation of a Dockerized Flask app (see <a class="reference internal" href="usage.html#run-docker"><span class="std std-ref">Running the Dockerized Flask Application</span></a>).</p>
+and the creation of a Dockerized Dash app (see <a class="reference internal" href="usage.html#run-docker"><span class="std std-ref">Running the Dockerized Dash Application</span></a>).</p>
 </section>
 <section id="documentation-build-process">
 <h2>Documentation Build Process<a class="headerlink" href="#documentation-build-process" title="Link to this heading">¶</a></h2>

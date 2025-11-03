@@ -1,6 +1,20 @@
 Changelog
 =========
 
+v2.0.0 (2025-11-03)
+-------------------
+The original Flask-based deployment with a more full-featured Dash app 
+offering the same core functionality plus direct, interactive visualization.
+
+Highlights:
+
+- Immediate visualization of generated dependency graphs, overview statistics, and field details
+- Shortest calculation path exploration between Tableau fields
+- Limited multi-user support by isolating session data and threading state in user-specific dictionaries instead of global variables
+- Safe cooperative cancellation via a Cancel button that gracefully stops background processing
+- Unified progress tracking for both the Dash and legacy Flask contexts
+- General code cleanup, bug fixes and improved structure for maintainability
+
 v1.2.1 (2025-10-15)
 -------------------
 Add PNG generation toggle and optimize dependency resolution
@@ -12,7 +26,6 @@ Add PNG generation toggle and optimize dependency resolution
   logic in both forward and backward 
   dependency functions with a memoized implementation. This significantly 
   reduces redundant calculations and improves performance (~3× faster).
-
 
 v1.1.8 (2024-10-10)
 -------------------
