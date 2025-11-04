@@ -1,6 +1,15 @@
 Changelog
 =========
 
+v2.0.2 (2025-11-04)
+-------------------
+
+Fix output directory handling and initialization for legacy CLI and Flask compatibility
+
+- Refactor progress initialization to support Dash, Flask, and CLI contexts via prepare_progress_entry()
+- Ensure consistent output folder structure and file naming across app types
+- Adjust ZIP creation logic to correctly handle per-user (Dash) and shared (Flask/CLI) directories
+
 v2.0.1 (2025-11-04)
 -------------------
 

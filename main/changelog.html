@@ -279,6 +279,15 @@
         <article role="main" id="furo-main-content">
           <section id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
+<section id="v2-0-2-2025-11-04">
+<h2>v2.0.2 (2025-11-04)<a class="headerlink" href="#v2-0-2-2025-11-04" title="Link to this heading">¶</a></h2>
+<p>Fix output directory handling and initialization for legacy CLI and Flask compatibility</p>
+<ul class="simple">
+<li><p>Refactor progress initialization to support Dash, Flask, and CLI contexts via prepare_progress_entry()</p></li>
+<li><p>Ensure consistent output folder structure and file naming across app types</p></li>
+<li><p>Adjust ZIP creation logic to correctly handle per-user (Dash) and shared (Flask/CLI) directories</p></li>
+</ul>
+</section>
 <section id="v2-0-1-2025-11-04">
 <h2>v2.0.1 (2025-11-04)<a class="headerlink" href="#v2-0-1-2025-11-04" title="Link to this heading">¶</a></h2>
 <p>Update README and documentation to reflect Dash app as main mode of operation.</p>
@@ -433,6 +442,7 @@ in a Dockerized environment.</p></li>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
+<li><a class="reference internal" href="#v2-0-2-2025-11-04">v2.0.2 (2025-11-04)</a></li>
 <li><a class="reference internal" href="#v2-0-1-2025-11-04">v2.0.1 (2025-11-04)</a></li>
 <li><a class="reference internal" href="#v2-0-0-2025-11-03">v2.0.0 (2025-11-03)</a></li>
 <li><a class="reference internal" href="#v1-2-1-2025-10-15">v1.2.1 (2025-10-15)</a></li>

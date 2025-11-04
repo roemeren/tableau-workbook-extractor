@@ -557,15 +557,6 @@ specified column.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="shared.common.init_progress">
-<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">init_progress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.init_progress" title="Link to this definition">¶</a></dt>
-<dd><p>Initialize progress_data entry and return a live reference to it.</p>
-<p>Creates or resets progress_data[user_id] (Dash) or progress_data (Flask)
-with default fields for a new run. The returned dict is the actual
-entry inside progress_data, not a copy.</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="shared.common.isParamDuplicate">
 <span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">isParamDuplicate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.isParamDuplicate" title="Link to this definition">¶</a></dt>
 <dd><p>Checks if a field is a parameter duplicate.</p>
@@ -583,6 +574,39 @@ removed; False otherwise.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shared.common.prepare_progress_entry">
+<span class="sig-prename descclassname"><span class="pre">shared.common.</span></span><span class="sig-name descname"><span class="pre">prepare_progress_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag_exe</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shared.common.prepare_progress_entry" title="Link to this definition">¶</a></dt>
+<dd><p>Prepare and initialize a progress_data entry for any app context.</p>
+<p>Creates or resets a progress tracking entry for the given user or process:
+- For Dash: uses progress_data[user_id] (dict of dicts)
+- For Flask/CLI: uses a single shared progress_data dict</p>
+<p>Determines and returns both the sanitized file name and output folder path.
+The returned dict is the live reference inside progress_data, not a copy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>str</em><em> | </em><em>None</em>) – Unique user/session ID for Dash; None for Flask/CLI.</p></li>
+<li><p><strong>file_path</strong> (<em>str</em>) – Path to the input file being processed.</p></li>
+<li><p><strong>out_folder</strong> (<em>str</em>) – Base output directory.</p></li>
+<li><p><strong>flag_exe</strong> (<em>bool</em>) – Whether the call originates from an executable (CLI) context.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>(progress_entry, file_name, out_dir)</dt><dd><p>progress_entry (dict): Live reference to the progress_data entry.
+file_name (str): Sanitized file name derived from the input path.
+out_dir (str): Path to the corresponding output folder.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
 </dd>
 </dl>
 </dd></dl>
@@ -905,8 +929,8 @@ Defaults to [“parquet”].</p></li>
 <li><a class="reference internal" href="#shared.common.fieldMappingTable"><code class="docutils literal notranslate"><span class="pre">fieldMappingTable()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.forwardDependencies"><code class="docutils literal notranslate"><span class="pre">forwardDependencies()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.getRandomReplacementBaseID"><code class="docutils literal notranslate"><span class="pre">getRandomReplacementBaseID()</span></code></a></li>
-<li><a class="reference internal" href="#shared.common.init_progress"><code class="docutils literal notranslate"><span class="pre">init_progress()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.isParamDuplicate"><code class="docutils literal notranslate"><span class="pre">isParamDuplicate()</span></code></a></li>
+<li><a class="reference internal" href="#shared.common.prepare_progress_entry"><code class="docutils literal notranslate"><span class="pre">prepare_progress_entry()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.processCaptions"><code class="docutils literal notranslate"><span class="pre">processCaptions()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.processSheetNames"><code class="docutils literal notranslate"><span class="pre">processSheetNames()</span></code></a></li>
 <li><a class="reference internal" href="#shared.common.removeDuplicatesByRowLength"><code class="docutils literal notranslate"><span class="pre">removeDuplicatesByRowLength()</span></code></a></li>
