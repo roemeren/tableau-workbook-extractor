@@ -6,15 +6,14 @@
 ![Last Commit](https://img.shields.io/github/last-commit/roemeren/tableau-workbook-extractor)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-
 ## Quickstart
 
 To get started with the Tableau Workbook Extractor, you can:
 
+- **Try out the demo application on Render**: [Access the Deployed Application](https://tableau-workbook-extractor.onrender.com/) *(May take a while to load)*. ⚠️ For demonstration only — please **do not upload sensitive or proprietary workbooks.**
 - **Download the latest Windows executable**: 
 [Download Executable](https://github.com/roemeren/tableau-workbook-extractor/releases/latest) 
 *([Graphviz](https://graphviz.org/download/) must be installed and included in your PATH variable.)*
-- **Run the demo application on Render**: [Access the Deployed Application](https://tableau-workbook-extractor.onrender.com/) *(May take a while to load)*. ⚠️ For demonstration only — please **do not upload sensitive or proprietary workbooks.**
 - **View the documentation**: [Documentation](https://roemeren.github.io/tableau-workbook-extractor/main)
 
 ## Description
@@ -39,21 +38,7 @@ straight to the insights.
 
 You can use the tool in two main ways.
 
-### Option 1: Download and Run the Windows Executable
-
-Download the latest executable from the [GitHub Releases page](https://github.com/roemeren/tableau-workbook-extractor/releases/latest). 
-Note that Graphviz must be installed on your local machine to run the executable.
-
-Workflow steps:
-
-1. **Select Input File**: Choose the Tableau workbook file you want to analyze using the file selection dialog.
-2. **Process the File**: The tool will automatically analyze the workbook after selecting the file.
-3. **Obtain Output**: The output files will be saved automatically on your local machine.
-
-![Workflow Executable](docs/source/_static/images/22-usage-cli.png)
-*Workflow of the Tableau Workbook Extractor Windows executable.*
-
-### Option 2: Access the Web App
+### Option 1: Access the Web App
 
 Access the deployed Dash application hosted on [Render](https://tableau-workbook-extractor.onrender.com/). Note that it may take a while to load.
 
@@ -70,9 +55,9 @@ workbook. The tool will extract field dependencies and generate the output.
 3. **Obtain Output**: Download and unpack the generated ZIP file containing the output files.
 
 ![Workflow Web App](docs/source/_static/images/24-usage-dash.png)
-*Workflow of the Tableau Workbook Extractor web app.*
+*Select and process a Tableau workbook.*
 
-The new Dash-based interface provides a more visual and exploratory way to analyze the Tableau workbook dependencies.
+The Dash-based interface provides a more visual and exploratory way to analyze the Tableau workbook dependencies.
 
 After uploading a workbook, the dashboard displays a summary of key statistics and allows interactive graph exploration.
 
@@ -99,29 +84,80 @@ Once selected, the app renders an **interactive dependency graph** built from th
 - View the **shortest calculation path** for a selected element.
 
 ![Workflow Web App](docs/source/_static/images/25-usage-dash.png)
-*Interactive dashboard with workbook stats and dependency graph.*
+*Interactive dashboard with workbook stats and dependency graph (I).*
 
-### More Ways to Use the Tool
+![Workflow Web App](docs/source/_static/images/27-usage-dash.png)
+*Interactive dashboard with workbook stats and dependency graph (II).*
 
-For advanced users or developers, additional ways to run the tool locally or 
-customize the workflow are available. You can find detailed instructions in the 
-[documentation](https://roemeren.github.io/tableau-workbook-extractor/main/usage.html).
+### Option 2: Run the App Locally
+
+To run the interactive Dash app locally:
+
+- **Install prerequisites**:
+
+    Make sure you have Git, Python, and Graphviz installed, and that your Python environment includes all required packages from requirements.txt.
+    (See the [docs](https://roemeren.github.io/tableau-workbook-extractor/main/usage.html) for more detailed installation instructions.)
+
+- **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/<your-username>/tableau-workbook-extractor.git
+    cd tableau-workbook-extractor/app
+    ```
+
+- **Run the Dash app:**
+
+    ```bash
+    python -m web.dash_app
+    ```
+
+- **Access the app:**
+
+    Open your browser and go to http://localhost:8050
+
+### Legacy Usage Options
+
+The following methods represent earlier ways to run the tool locally.  
+They are still available but have been superseded by the Dash web application.
+
+- **Windows Executable:**  
+  Download and run the latest legacy build from the [GitHub Releases page](https://github.com/roemeren/tableau-workbook-extractor/releases/latest).
+
+- **Flask App:**  
+  Clone this repository and start the legacy Flask version from the `app` folder:  
+  ```bash
+  python -m web.flask_app
+  ```
+- **CLI Tool:**
+  Clone this repository and run the command-line version from the app folder:
+  ```bash
+  python cli_main.py
+  ```
+
+⚠️ **Note**: Graphviz must be installed locally to run the executable or any of the Python scripts.
 
 ## Screenshots
 
-### Sample Dependency Graph
+### Sample Output Dependency Graph
 
 The image below shows the overview of upstream sources and downstream consumers for the calculated field `[CP Profit Ratio]`. These elements can include data source fields (ellipses), parameters (hexagons), and other calculated fields (rectangles).
 
 ![Sample Dependency Graph](docs/source/_static/images/26-example-graph.png)
 *Sample dependency graph generated by the tool.*
 
+The output package also includes the underlying DOT files used to generate these graphs.
+
 ### Sample Output Excel Table: Field Metadata
+
+The output Excel file includes a sheet with detailed metadata for all extracted fields,  such as field names, types, roles, and usage information.  
+It provides a structured view of the data shown in the dashboard, useful for quick inspection or ad hoc analysis.
 
 ![Sample Output Excel Table](docs/source/_static/images/06-output-file-2.png)
 *Sample output Excel table containing field metadata.*
 
 ### Sample Output Excel Table: Tabular Representation of Dependency Graph
+
+A second sheet in the same Excel file lists all dependencies in tabular form,  representing the relationships between fields, parameters, and calculated fields as node–edge pairs.  This provides an alternative, table-based view of the dependency graph for further analysis.
 
 ![Sample Output Excel Table](docs/source/_static/images/20-example-excel-dependencies.png)
 *Sample output Excel table containing tabular representation of nodes and edges.*
