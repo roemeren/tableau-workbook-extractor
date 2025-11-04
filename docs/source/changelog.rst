@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v2.0.1 (2025-11-04)
+-------------------
+
+Update README and documentation to reflect Dash app as main mode of operation.
+
 v2.0.0 (2025-11-03)
 -------------------
 The original Flask-based deployment with a more full-featured Dash app 

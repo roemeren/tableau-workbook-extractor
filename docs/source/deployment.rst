@@ -13,7 +13,7 @@ Please note that in order to run the downloaded executable file,
 Graphviz must be installed on your local machine.
 :ref:`Graphviz must be installed<install-graphviz>`.
 
-2. **As a deployed Dash (Flask) application on Render**: This option allows users to 
+2. **As a deployed Dash application on Render**: This option allows users to 
 run the application in a cloud environment without the need for local setup. 
 The deployed application can be accessed `on this link <https://tableau-workbook-extractor.onrender.com/>`_. 
 

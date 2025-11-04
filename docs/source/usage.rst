@@ -1,18 +1,19 @@
 Usage
 =====
 
-This tool can be run in a variety of ways, depending on your needs. 
+This tool can be run in several ways, depending on your needs.
 
-The first two options—:ref:`downloading and running the prebuilt executable<download-run-exe>`, 
-or :ref:`using the deployed Flask app on Render<run-render>`—are the easiest 
-and most user-friendly choices, designed for general end users. 
+The **recommended and primary option** is to use the :ref:`Dash web application<run-render>`,  
+available either as a deployed version on Render or by running it locally.  
+The Dash app replaces the earlier Flask version and provides the same core 
+functionality along with additional interactive dashboard features.
 
-The remaining four options—running the :ref:`Python script<run-python>` or 
-:ref:`Flask app<run-flask>` locally, 
-:ref:`creating a custom executable with PyInstaller<create-run-exe>`, or 
-using a :ref:`dockerized version of the Flask app<run-docker>`—are 
-more suited for developers or advanced users who need to test, debug, 
-or customize the tool in a local environment.
+For users who prefer alternative setups, legacy and advanced options remain available.  
+These include running the :ref:`Python script<run-python>`, 
+creating or running a :ref:`standalone executable<create-run-exe>`, 
+or using a :ref:`dockerized version of the Dash app<run-docker>`.  
+Older options such as the :ref:`Flask app<run-flask>` and CLI tool are still documented 
+for reference but are no longer maintained.
 
 .. :hidden: option makes the toctree hidden in the page
 .. toctree::
