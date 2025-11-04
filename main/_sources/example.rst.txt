@@ -34,16 +34,15 @@ The file will be saved as ``VG Contest_Super Sample Superstore_Ryan Sleeper.twbx
 Step 2: Open the Application
 """""""""""""""""""""""""""""
 
-For this example, we will use the deployed Flask application, which can be 
-accessed in a browser at the following URL:
+This example originally used the deployed **Flask application**, which was 
+accessible at the following URL:
 
 `<https://tableau-workbook-extractor.onrender.com>`_
 
-.. note::
-
-    **Please be patient**: since the app is hosted on the free tier of Render, 
-    it will take some time to load the application as the Docker container 
-    needs to be started up first.
+That app has since been replaced by a **Dash application** available at the same URL,  
+offering the same core functionality along with additional interactive dashboard features.  
+You can still follow along conceptually by using the new Dash app or by reviewing the 
+equivalent output files it generates.
 
 Step 3: Select the Tableau Workbook
 """"""""""""""""""""""""""""""""""""""
