@@ -21,7 +21,7 @@ import shutil
 from tqdm import tqdm
 from shared.logging import setup_logging, stepLog, logger
 from shared.common import *
-from shared.utils import sanitize_filename
+from shared.utils import UPLOAD_FOLDER
 from contextlib import contextmanager
 from tableaudocumentapi import Workbook
 
@@ -81,17 +81,9 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True,
                 return True
             return False
 
-        # Extract file/directory names from twb file
-        inpFileName = os.path.splitext(os.path.basename(filepath))[0]
-
-        # Initialize progress data
-        pdict = init_progress(user_id, inpFileName)
-
-        if is_executable:
-            outFileDirectory =f"{filepath} Files"
-        else:
-            inpFileName = sanitize_filename(inpFileName)
-            outFileDirectory = os.path.join(output_folder, user_id, f"{inpFileName} Files")
+        # Initialize per-user or global progress state and output folder
+        pdict, inpFileName, outFileDirectory = \
+            prepare_progress_entry(user_id, filepath, output_folder, is_executable)
 
         # Recreate output folder
         shutil.rmtree(outFileDirectory, ignore_errors=True)
@@ -444,8 +436,9 @@ def process_twb(filepath, output_folder=None, is_executable=True, fPNG=True,
         if is_executable: 
             input("Done! Press Enter to exit...")
         else:
-            # Zip the output files
-            zip_path = os.path.join(outFileDirectory, zip_filename)
+            # Zip the output files (per-user for Dash, shared for Flask)
+            zip_base = outFileDirectory if user_id else UPLOAD_FOLDER
+            zip_path = os.path.join(zip_base, zip_filename)
             zip_folder(folder_path=outFileDirectory, output_zip_path=zip_path)
 
             # Clean up and close the logger

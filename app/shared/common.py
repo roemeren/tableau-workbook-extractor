@@ -22,6 +22,7 @@ import random
 import string
 import zipfile
 from shared.logging import logger
+from shared.utils import sanitize_filename
 
 # Script parameters
 fDepFields = True # create field dependency graphs?
@@ -50,26 +51,54 @@ def show_exception_and_exit(exc_type, exc_value, tb):
     input("Error encountered. Press Enter to exit...")
     sys.exit(-1)
 
-def init_progress(user_id, file_name):
-    """Initialize progress_data entry and return a live reference to it.
+def prepare_progress_entry(user_id, file_path, out_folder, flag_exe):
+    """Prepare and initialize a progress_data entry for any app context.
 
-    Creates or resets progress_data[user_id] (Dash) or progress_data (Flask)
-    with default fields for a new run. The returned dict is the actual
-    entry inside progress_data, not a copy.
+    Creates or resets a progress tracking entry for the given user or process:
+    - For Dash: uses progress_data[user_id] (dict of dicts)
+    - For Flask/CLI: uses a single shared progress_data dict
+
+    Determines and returns both the sanitized file name and output folder path.
+    The returned dict is the live reference inside progress_data, not a copy.
+
+    Args:
+        user_id (str | None): Unique user/session ID for Dash; None for Flask/CLI.
+        file_path (str): Path to the input file being processed.
+        out_folder (str): Base output directory.
+        flag_exe (bool): Whether the call originates from an executable (CLI) context.
+
+    Returns:
+        tuple: (progress_entry, file_name, out_dir)
+            progress_entry (dict): Live reference to the progress_data entry.
+            file_name (str): Sanitized file name derived from the input path.
+            out_dir (str): Path to the corresponding output folder.
     """
-    base = {'progress': 0, 'filename': None}
+    base = {"progress": 0, "filename": None}
 
-    # Dash case: dict of dicts
+    # Extract file/directory names from input file
+    file_name = os.path.splitext(os.path.basename(file_path))[0]
+
+    if flag_exe:
+        file_name = sanitize_filename(file_name)
+
     if user_id is not None:
+        # Dash case: per-user progress
         progress_data[user_id] = base.copy()
-        progress_data[user_id]["progress"] = 0 # ensures correct progress bar behavior
+        progress_data[user_id]["progress"] = 0  # ensures correct progress bar behavior
         progress_data[user_id]["current_task"] = f"Preparing to process {file_name}"
         progress_data[user_id]["show_dots"] = True
         progress_data[user_id]["status"] = "running"
-        return progress_data[user_id]
+        out_dir = os.path.join(out_folder, user_id, f"{file_name} Files")
+        return progress_data[user_id], file_name, out_dir
 
-    # Flask or CLI tool
-    return progress_data.update(base)
+    # CLI or Flask case (single shared progress)
+    if flag_exe:
+        out_dir = f"{file_path} Files"
+    else:
+        out_dir = os.path.join(out_folder, f"{file_name} Files")
+
+    progress_data.update(base)
+    return progress_data, file_name, out_dir
 
 def getRandomReplacementBaseID(df, c, suffix = ""):
     """
