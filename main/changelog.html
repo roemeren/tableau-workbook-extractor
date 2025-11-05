@@ -226,7 +226,6 @@
     <h6 style="font-family: 'Segoe UI', sans-serif; color: #74777E; font-size: 0.75em; font-weight: bold;">VERSIONS</h6>
     <ul>
         <li><a href="changelog.html" style="font-family: 'Georgia', sans-serif;">main</a></li>
-        <li><a href="../v2.0.2/changelog.html" style="font-family: 'Georgia', sans-serif;">v2.0.2</a></li>
         <li><a href="../v2.0.1/changelog.html" style="font-family: 'Georgia', sans-serif;">v2.0.1</a></li>
         <li><a href="../v2.0.0/changelog.html" style="font-family: 'Georgia', sans-serif;">v2.0.0</a></li>
         <li><a href="../v1.2.1/changelog.html" style="font-family: 'Georgia', sans-serif;">v1.2.1</a></li>
@@ -280,13 +279,14 @@
         <article role="main" id="furo-main-content">
           <section id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
-<section id="v2-0-2-2025-11-04">
-<h2>v2.0.2 (2025-11-04)<a class="headerlink" href="#v2-0-2-2025-11-04" title="Link to this heading">¶</a></h2>
-<p>Fix output directory handling and initialization for legacy CLI and Flask compatibility</p>
+<section id="v2-0-2-2025-11-05">
+<h2>v2.0.2 (2025-11-05)<a class="headerlink" href="#v2-0-2-2025-11-05" title="Link to this heading">¶</a></h2>
+<p>Improve output handling and prevent redundant callbacks</p>
 <ul class="simple">
 <li><p>Refactor progress initialization to support Dash, Flask, and CLI contexts via prepare_progress_entry()</p></li>
 <li><p>Ensure consistent output folder structure and file naming across app types</p></li>
 <li><p>Adjust ZIP creation logic to correctly handle per-user (Dash) and shared (Flask/CLI) directories</p></li>
+<li><p>Use <cite>no_update</cite> to keep outputs stable during processing, preventing linked callbacks from firing unnecessarily</p></li>
 </ul>
 </section>
 <section id="v2-0-1-2025-11-04">
@@ -443,7 +443,7 @@ in a Dockerized environment.</p></li>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
-<li><a class="reference internal" href="#v2-0-2-2025-11-04">v2.0.2 (2025-11-04)</a></li>
+<li><a class="reference internal" href="#v2-0-2-2025-11-05">v2.0.2 (2025-11-05)</a></li>
 <li><a class="reference internal" href="#v2-0-1-2025-11-04">v2.0.1 (2025-11-04)</a></li>
 <li><a class="reference internal" href="#v2-0-0-2025-11-03">v2.0.0 (2025-11-03)</a></li>
 <li><a class="reference internal" href="#v1-2-1-2025-10-15">v1.2.1 (2025-10-15)</a></li>
