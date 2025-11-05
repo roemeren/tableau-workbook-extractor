@@ -1,7 +1,7 @@
 import base64
 import threading
 import psutil
-from dash import no_update, Dash, html, dcc, Output, Input, State, dash_table
+from dash import no_update, Dash, html, dcc, Output, Input, State
 import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
 from dash import callback_context as ctx
@@ -818,8 +818,9 @@ def update_progress(*args):
     output_folder_url = out_folder and os.path.relpath(out_folder, start="web")
     # Build href only if output file and folder exist
     href = out_file and output_folder_url and os.path.join(output_folder_url, out_file)
-    graphs_folder = out_folder and os.path.join(out_folder, "Graphs")
-    tables_folder = out_folder and os.path.join(out_folder, "Fields")
+    # keep outputs unchanged during processing (None would still trigger callbacks)
+    graphs_folder = no_update
+    tables_folder = no_update
     style = {"width": "40%", "visibility": "hidden"}
     finished_at = progress_data[user_id].get("finished_at")
     status = progress_data[user_id].get("status")
@@ -879,6 +880,8 @@ def update_progress(*args):
             style["visibility"] = "visible"
             upload_tab_disabled = False
             sample_tab_disabled = False
+            graphs_folder = os.path.join(out_folder, "Graphs")
+            tables_folder = os.path.join(out_folder, "Fields")
             # Clean up after successful completion
             _processing_threads.pop(user_id, None)
             _stop_events.pop(user_id, None)
@@ -906,11 +909,10 @@ def update_progress(*args):
 @app.callback(
     Output("folder-dropdown", "options"),
     Output("folder-dropdown", "value"),
-    Input("btn-download", "disabled"),
-    State("dot-root-store", "data")
+    Input("dot-root-store", "data")
 )
-def update_folder_dropdown(download_disabled, base_dir):
-    if not base_dir or download_disabled:
+def update_folder_dropdown(base_dir):
+    if not base_dir:
         raise PreventUpdate
 
     folders = list_subfolders(base_dir)
@@ -1321,11 +1323,10 @@ def update_graph_and_info(dot_source, selected, main_node, node_attrs, df_root):
     Output("kpi-dep-range", "children"),
     Output("kpi-sheets", "children"),
     Output("kpi-sheets-dep", "children"),
-    Input("btn-download", "disabled"), # only used as trigger
-    State("df-root-store", "data"),
+    Input("df-root-store", "data"),
 )
-def update_kpi(disabled, df_root):
-    if not df_root or disabled:
+def update_kpi(df_root):
+    if not df_root:
         raise PreventUpdate
     
     try:
@@ -1389,7 +1390,6 @@ def update_kpi(disabled, df_root):
     State("selected-element-calc", "children"),
 )
 def toggle_calc_modal(open_click, close_click, is_open, calc_content):
-
     if not ctx.triggered:
         raise PreventUpdate
 
