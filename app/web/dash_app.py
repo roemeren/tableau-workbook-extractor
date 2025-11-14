@@ -1,3 +1,41 @@
+"""
+dash_app.py
+
+Dash web application for analyzing Tableau workbooks and visualizing field
+dependencies.
+
+This application allows users to upload or select sample Tableau workbooks,
+which are then processed in the background. The resulting metadata is
+visualized as interactive dependency graphs, KPI summaries, and detailed
+information panels. The UI is fully reactive and supports multi-user,
+per-session processing through isolated task threads.
+
+Key Features:
+
+- Upload local Tableau workbooks or choose from bundled sample workbooks.
+- Background processing of TWB/TWBX files with per-session progress tracking.
+- Optional PNG generation in addition to the default SVG output.
+- Interactive dependency graph viewer with node selection, highlighting,
+  shortest-path tracing, and calculation-chain inspection.
+- KPI cards summarizing the workbook’s structure (fields, calcs, sheets, LODs).
+- Downloadable output folder containing cleaned DOT graphs, metadata tables,
+  and optional PNG exports.
+- Session-aware cancel functionality that cleanly interrupts long-running tasks.
+
+Configuration:
+
+The application organizes files into dedicated folders:
+- Uploaded files → `static/uploads/<session-id>/`
+- Processed output → `static/output/<session-id>/`
+- Sample workbooks → `static/sample/`
+
+These folders are created automatically if they do not exist.
+
+Usage:
+
+Run this module to start the Dash development server.
+"""
+
 import base64
 import threading
 import psutil
