@@ -281,8 +281,8 @@
           <section id="usage">
 <h1>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h1>
 <p>This tool can be run in several ways, depending on your needs.</p>
-<p>The <strong>recommended and primary option</strong> is to use the <a class="reference internal" href="#run-render"><span class="std std-ref">Dash web application</span></a>,
-available either as a deployed version on Render or by running it locally.
+<p>The <strong>recommended and primary option</strong> is to use the <strong>Dash app</strong>,
+available either as a <a class="reference internal" href="#run-render"><span class="std std-ref">deployed version on Render</span></a> or by <a class="reference internal" href="#dash-local"><span class="std std-ref">running it locally</span></a>.
 The Dash app replaces the earlier Flask version and provides the same core
 functionality along with additional interactive dashboard features.</p>
 <p>For users who prefer alternative setups, legacy and advanced options remain available.
@@ -293,8 +293,8 @@ Older options such as the <a class="reference internal" href="#run-flask"><span 
 for reference but are no longer maintained.</p>
 <div class="toctree-wrapper compound">
 </div>
-<section id="option-1-downloading-the-executable-file">
-<h2>Option 1: Downloading the Executable File<a class="headerlink" href="#option-1-downloading-the-executable-file" title="Link to this heading">¶</a></h2>
+<section id="option-1-downloading-the-executable-file-legacy">
+<h2>Option 1: Downloading the Executable File (Legacy)<a class="headerlink" href="#option-1-downloading-the-executable-file-legacy" title="Link to this heading">¶</a></h2>
 <section id="prerequisite-1-install-graphviz">
 <span id="download-run-exe"></span><h3>Prerequisite 1: Install Graphviz<a class="headerlink" href="#prerequisite-1-install-graphviz" title="Link to this heading">¶</a></h3>
 <p id="install-graphviz">To install Graphviz on Windows, download the latest installer from the
@@ -355,26 +355,25 @@ and configured correctly for the executable to function properly.</p>
 </div>
 </section>
 </section>
-<section id="option-2-accessing-the-application-on-render">
-<h2>Option 2: Accessing the Application on Render<a class="headerlink" href="#option-2-accessing-the-application-on-render" title="Link to this heading">¶</a></h2>
-<p id="run-render">A <a class="reference external" href="https://flask.palletsprojects.com/">Flask</a> app version of the tool has
+<section id="option-2-accessing-the-application-on-render-recommended">
+<h2>Option 2: Accessing the Application on Render (<strong>Recommended</strong>)<a class="headerlink" href="#option-2-accessing-the-application-on-render-recommended" title="Link to this heading">¶</a></h2>
+<p id="run-render">A <a class="reference external" href="https://dash.plotly.com/">Dash</a> app version of the tool has
 been dockerized and deployed as a
 web application using <a class="reference external" href="https://render.com/">Render</a>, accessible at
 <a class="reference external" href="https://tableau-workbook-extractor.onrender.com/">https://tableau-workbook-extractor.onrender.com/</a>.</p>
-<p>Running the Flask application is an alternative way to use the
+<p>Running the Dash application is an alternative way to use the
 tool, offering similar functionality to running an executable:</p>
-<a class="reference internal image-reference" href="_images/09-flask-init.png"><img alt="Flask Output Download Button" src="_images/09-flask-init.png" style="width: 350px;" />
-</a>
 <ul class="simple">
-<li><p>First, the user needs to upload a local Tableau workbook
-(<code class="docutils literal notranslate"><span class="pre">.twb</span></code> or <code class="docutils literal notranslate"><span class="pre">.twbx</span></code> file) using a browse button in the Flask app</p></li>
+<li><p>First, the user needs to either select one of the sample workbooks or
+upload a local Tableau workbook (<code class="docutils literal notranslate"><span class="pre">.twb</span></code> or <code class="docutils literal notranslate"><span class="pre">.twbx</span></code> file) using a browse
+button in the app</p></li>
 <li><p>Once the file is selected a button can be clicked to execute the processing.
 Progress is tracked and checked through the web interface and an output log
 file instead of printed logs on the command line.</p></li>
 <li><p>Upon completion, the generated output are zipped which can be downloaded
 by the user (see image below).</p></li>
 </ul>
-<a class="reference internal image-reference" href="_images/10-flask-done.png"><img alt="Flask Output Download Button" src="_images/10-flask-done.png" style="width: 350px;" />
+<a class="reference internal image-reference" href="_images/24-usage-dash.png"><img alt="Dash Output Download Button" src="_images/24-usage-dash.png" style="width: 350px;" />
 </a>
 <p>By default, the application generates only SVG dependency graphs, but users can
 optionally enable PNG generation through a checkbox on the upload page before
@@ -390,8 +389,8 @@ which can result in longer loading times as the Docker container
 needs to be started up first.</p>
 </div>
 </section>
-<section id="option-3-executing-the-python-script-in-the-command-line">
-<h2>Option 3: Executing the Python Script in the Command Line<a class="headerlink" href="#option-3-executing-the-python-script-in-the-command-line" title="Link to this heading">¶</a></h2>
+<section id="option-3-executing-the-python-script-in-the-command-line-legacy">
+<h2>Option 3: Executing the Python Script in the Command Line (Legacy)<a class="headerlink" href="#option-3-executing-the-python-script-in-the-command-line-legacy" title="Link to this heading">¶</a></h2>
 <p id="run-python">This section explains how to run the Python script <code class="docutils literal notranslate"><span class="pre">cli_main.py</span></code> directly on
 your local machine, bypassing the need for the executable.
 Running the script locally provides more flexibility, allowing you to
@@ -479,8 +478,8 @@ progress is displayed through printed log lines and progress bars for certain st
 </div>
 </section>
 </section>
-<section id="option-4-create-and-run-the-executable-file">
-<h2>Option 4: Create and Run the Executable File<a class="headerlink" href="#option-4-create-and-run-the-executable-file" title="Link to this heading">¶</a></h2>
+<section id="option-4-create-and-run-the-executable-file-legacy">
+<h2>Option 4: Create and Run the Executable File (Legacy)<a class="headerlink" href="#option-4-create-and-run-the-executable-file-legacy" title="Link to this heading">¶</a></h2>
 <p id="create-run-exe">Creating an executable with <code class="docutils literal notranslate"><span class="pre">PyInstaller</span></code> allows you to package your Python
 tool into a standalone application that can be run without requiring a
 Python environment or external dependencies on the user’s machine.</p>
@@ -520,8 +519,8 @@ double-clicking it, allowing you to browse to a file and view progress and
 logs directly in the command line window.</p>
 </section>
 </section>
-<section id="option-5-running-the-flask-application">
-<h2>Option 5: Running the Flask Application<a class="headerlink" href="#option-5-running-the-flask-application" title="Link to this heading">¶</a></h2>
+<section id="option-5-running-the-flask-application-legacy">
+<h2>Option 5: Running the Flask Application (Legacy)<a class="headerlink" href="#option-5-running-the-flask-application-legacy" title="Link to this heading">¶</a></h2>
 <p id="run-flask">In this section, you’ll find instructions on how to run the Flask app version
 of the tool locally on your machine.</p>
 <p>This provides the same functionality as the web version, allowing you to
@@ -563,9 +562,9 @@ shown in the code block above, not as a script</p>
 </div>
 </section>
 </section>
-<section id="option-6-running-the-dash-application">
-<h2>Option 6: Running the Dash Application<a class="headerlink" href="#option-6-running-the-dash-application" title="Link to this heading">¶</a></h2>
-<p id="run-dash">The Dash app is the <strong>recommended</strong> version to run locally, as it replaces the
+<section id="option-6-running-the-dash-application-recommended">
+<h2>Option 6: Running the Dash Application (<strong>Recommended</strong>)<a class="headerlink" href="#option-6-running-the-dash-application-recommended" title="Link to this heading">¶</a></h2>
+<p id="dash-local">The Dash app is the recommended version to run locally, as it replaces the
 earlier Flask interface and provides a more complete, interactive experience
 with additional features such as workbook statistics, dependency graphs, and
 field-level exploration.</p>
@@ -626,7 +625,7 @@ by running the following command (ensure that Docker Desktop is running):</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>docker<span class="w"> </span>run<span class="w"> </span>-p<span class="w"> </span><span class="m">8050</span>:8050<span class="w"> </span>tableau-workbook-extractor
 </pre></div>
 </div>
-<p>Similar to <a class="reference internal" href="#run-dash"><span class="std std-ref">running the Dash app locally</span></a>,
+<p>Similar to <a class="reference internal" href="#dash-local"><span class="std std-ref">running the Dash app locally</span></a>,
 the dashboard will be accessible in your browser at <code class="docutils literal notranslate"><span class="pre">http://localhost:8050</span></code>.</p>
 </section>
 </section>
@@ -688,13 +687,13 @@ the dashboard will be accessible in your browser at <code class="docutils litera
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Usage</a><ul>
-<li><a class="reference internal" href="#option-1-downloading-the-executable-file">Option 1: Downloading the Executable File</a><ul>
+<li><a class="reference internal" href="#option-1-downloading-the-executable-file-legacy">Option 1: Downloading the Executable File (Legacy)</a><ul>
 <li><a class="reference internal" href="#prerequisite-1-install-graphviz">Prerequisite 1: Install Graphviz</a></li>
 <li><a class="reference internal" href="#step-1-download-and-run-the-executable-file">Step 1: Download and Run the Executable File</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#option-2-accessing-the-application-on-render">Option 2: Accessing the Application on Render</a></li>
-<li><a class="reference internal" href="#option-3-executing-the-python-script-in-the-command-line">Option 3: Executing the Python Script in the Command Line</a><ul>
+<li><a class="reference internal" href="#option-2-accessing-the-application-on-render-recommended">Option 2: Accessing the Application on Render (<strong>Recommended</strong>)</a></li>
+<li><a class="reference internal" href="#option-3-executing-the-python-script-in-the-command-line-legacy">Option 3: Executing the Python Script in the Command Line (Legacy)</a><ul>
 <li><a class="reference internal" href="#prerequisite-1-install-git">Prerequisite 1: Install Git</a></li>
 <li><a class="reference internal" href="#prerequisite-2-install-graphviz">Prerequisite 2: Install Graphviz</a></li>
 <li><a class="reference internal" href="#step-1-clone-the-repository">Step 1: Clone the Repository</a></li>
@@ -702,19 +701,19 @@ the dashboard will be accessible in your browser at <code class="docutils litera
 <li><a class="reference internal" href="#step-3-execute-the-python-script">Step 3: Execute the Python Script</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#option-4-create-and-run-the-executable-file">Option 4: Create and Run the Executable File</a><ul>
+<li><a class="reference internal" href="#option-4-create-and-run-the-executable-file-legacy">Option 4: Create and Run the Executable File (Legacy)</a><ul>
 <li><a class="reference internal" href="#prerequisites-install-git-and-graphviz">Prerequisites: Install Git and Graphviz</a></li>
 <li><a class="reference internal" href="#step-1-clone-the-repository-and-create-an-environment">Step 1: Clone the Repository and Create an Environment</a></li>
 <li><a class="reference internal" href="#step-2-create-the-executable-file">Step 2: Create the Executable File</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#option-5-running-the-flask-application">Option 5: Running the Flask Application</a><ul>
+<li><a class="reference internal" href="#option-5-running-the-flask-application-legacy">Option 5: Running the Flask Application (Legacy)</a><ul>
 <li><a class="reference internal" href="#id1">Prerequisites: Install Git and Graphviz</a></li>
 <li><a class="reference internal" href="#id2">Step 1: Clone the Repository and Create an Environment</a></li>
 <li><a class="reference internal" href="#step-2-run-the-app">Step 2: Run the App</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#option-6-running-the-dash-application">Option 6: Running the Dash Application</a></li>
+<li><a class="reference internal" href="#option-6-running-the-dash-application-recommended">Option 6: Running the Dash Application (<strong>Recommended</strong>)</a></li>
 <li><a class="reference internal" href="#option-7-running-the-dockerized-dash-application">Option 7: Running the Dockerized Dash Application</a><ul>
 <li><a class="reference internal" href="#prerequisite-install-docker">Prerequisite: Install Docker</a></li>
 <li><a class="reference internal" href="#step-1-build-the-image">Step 1: Build the Image</a></li>

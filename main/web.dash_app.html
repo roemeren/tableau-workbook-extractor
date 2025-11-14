@@ -280,7 +280,35 @@
         <article role="main" id="furo-main-content">
           <section id="web-dash-app">
 <h1>web.dash_app<a class="headerlink" href="#web-dash-app" title="Link to this heading">¶</a></h1>
-<dl class="py function" id="module-web.dash_app">
+<p id="module-web.dash_app">dash_app.py</p>
+<p>Dash web application for analyzing Tableau workbooks and visualizing field
+dependencies.</p>
+<p>This application allows users to upload or select sample Tableau workbooks,
+which are then processed in the background. The resulting metadata is
+visualized as interactive dependency graphs, KPI summaries, and detailed
+information panels. The UI is fully reactive and supports multi-user,
+per-session processing through isolated task threads.</p>
+<p>Key Features:</p>
+<ul class="simple">
+<li><p>Upload local Tableau workbooks or choose from bundled sample workbooks.</p></li>
+<li><p>Background processing of TWB/TWBX files with per-session progress tracking.</p></li>
+<li><p>Optional PNG generation in addition to the default SVG output.</p></li>
+<li><p>Interactive dependency graph viewer with node selection, highlighting,
+shortest-path tracing, and calculation-chain inspection.</p></li>
+<li><p>KPI cards summarizing the workbook’s structure (fields, calcs, sheets, LODs).</p></li>
+<li><p>Downloadable output folder containing cleaned DOT graphs, metadata tables,
+and optional PNG exports.</p></li>
+<li><p>Session-aware cancel functionality that cleanly interrupts long-running tasks.</p></li>
+</ul>
+<p>Configuration:</p>
+<p>The application organizes files into dedicated folders:
+- Uploaded files → <cite>static/uploads/&lt;session-id&gt;/</cite>
+- Processed output → <cite>static/output/&lt;session-id&gt;/</cite>
+- Sample workbooks → <cite>static/sample/</cite></p>
+<p>These folders are created automatically if they do not exist.</p>
+<p>Usage:</p>
+<p>Run this module to start the Dash development server.</p>
+<dl class="py function">
 <dt class="sig sig-object py" id="web.dash_app.assign_session_id">
 <span class="sig-prename descclassname"><span class="pre">web.dash_app.</span></span><span class="sig-name descname"><span class="pre">assign_session_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#web.dash_app.assign_session_id" title="Link to this definition">¶</a></dt>
 <dd><p>Assign a unique session ID per browser tab.</p>

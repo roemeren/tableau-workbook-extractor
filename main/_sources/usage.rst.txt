@@ -3,8 +3,8 @@ Usage
 
 This tool can be run in several ways, depending on your needs.
 
-The **recommended and primary option** is to use the :ref:`Dash web application<run-render>`,  
-available either as a deployed version on Render or by running it locally.  
+The **recommended and primary option** is to use the **Dash app**,  
+available either as a :ref:`deployed version on Render<run-render>` or by :ref:`running it locally<dash-local>`.  
 The Dash app replaces the earlier Flask version and provides the same core 
 functionality along with additional interactive dashboard features.
 
@@ -22,8 +22,8 @@ for reference but are no longer maintained.
 
    output_files
 
-Option 1: Downloading the Executable File
-------------------------------------------
+Option 1: Downloading the Executable File (Legacy)
+--------------------------------------------------
 
 .. _download-run-exe:
 
@@ -117,33 +117,30 @@ named ``<my workbook> Files`` within the same directory as the selected workbook
     The main **drawback** is that Graphviz must be installed separately 
     and configured correctly for the executable to function properly.
 
-Option 2: Accessing the Application on Render
----------------------------------------------
+Option 2: Accessing the Application on Render (**Recommended**)
+---------------------------------------------------------------
 
 .. _run-render:
 
-A `Flask <https://flask.palletsprojects.com/>`_ app version of the tool has 
+A `Dash <https://dash.plotly.com/>`_ app version of the tool has 
 been dockerized and deployed as a 
 web application using `Render <https://render.com/>`_, accessible at 
 https://tableau-workbook-extractor.onrender.com/.
 
-Running the Flask application is an alternative way to use the 
+Running the Dash application is an alternative way to use the 
 tool, offering similar functionality to running an executable:
 
-.. image:: _static/images/09-flask-init.png
-    :alt: Flask Output Download Button
-    :width: 350
-
-- First, the user needs to upload a local Tableau workbook 
-  (``.twb`` or ``.twbx`` file) using a browse button in the Flask app
+- First, the user needs to either select one of the sample workbooks or 
+  upload a local Tableau workbook (``.twb`` or ``.twbx`` file) using a browse 
+  button in the app
 - Once the file is selected a button can be clicked to execute the processing.
   Progress is tracked and checked through the web interface and an output log 
   file instead of printed logs on the command line.
 - Upon completion, the generated output are zipped which can be downloaded 
   by the user (see image below).
 
-.. image:: _static/images/10-flask-done.png
-    :alt: Flask Output Download Button
+.. image:: _static/images/24-usage-dash.png
+    :alt: Dash Output Download Button
     :width: 350
 
 By default, the application generates only SVG dependency graphs, but users can 
@@ -161,8 +158,8 @@ starting the processing.
     which can result in longer loading times as the Docker container 
     needs to be started up first.
 
-Option 3: Executing the Python Script in the Command Line
----------------------------------------------------------
+Option 3: Executing the Python Script in the Command Line (Legacy)
+------------------------------------------------------------------
 
 .. _run-python:
 
@@ -281,8 +278,8 @@ To execute the script:
 
    $ python cli_main.py
 
-Option 4: Create and Run the Executable File
-----------------------------------------------
+Option 4: Create and Run the Executable File (Legacy)
+------------------------------------------------------
 
 .. _create-run-exe:
 
@@ -334,8 +331,8 @@ The resulting ``dist\cli_main.exe`` executable can be moved if needed and run by
 double-clicking it, allowing you to browse to a file and view progress and 
 logs directly in the command line window.
 
-Option 5: Running the Flask Application
-----------------------------------------
+Option 5: Running the Flask Application (Legacy)
+-------------------------------------------------
 
 .. _run-flask:
 
@@ -391,12 +388,12 @@ To execute the script (run as a module to ):
     the Flask app needs to be run as a module from the root directory as 
     shown in the code block above, not as a script
 
-Option 6: Running the Dash Application
---------------------------------------
+Option 6: Running the Dash Application (**Recommended**)
+---------------------------------------------------------
 
-.. _run-dash:
+.. _dash-local:
 
-The Dash app is the **recommended** version to run locally, as it replaces the 
+The Dash app is the recommended version to run locally, as it replaces the 
 earlier Flask interface and provides a more complete, interactive experience 
 with additional features such as workbook statistics, dependency graphs, and 
 field-level exploration.
@@ -478,5 +475,5 @@ Once the image is built, start a container from it using:
 
    $ docker run -p 8050:8050 tableau-workbook-extractor
 
-Similar to :ref:`running the Dash app locally<run-dash>`,  
+Similar to :ref:`running the Dash app locally<dash-local>`,  
 the dashboard will be accessible in your browser at ``http://localhost:8050``.
